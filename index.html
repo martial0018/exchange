@@ -1303,7 +1303,7 @@
 
    .trade-mobile-mode:not(.futures-trading-mode) #tradeWorkspace {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: auto auto auto;
     align-content: start;
     gap: 0.5rem;
@@ -1337,16 +1337,36 @@
     min-height: 28rem;
    }
 
-   .trade-mobile-mode:not(.futures-trading-mode) #tradeOrderBookPanel.grid-cols-3 {
-    grid-template-columns: minmax(0, 1fr) minmax(2.6rem, 0.65fr) !important;
+   .trade-mobile-mode #tradeOrderBookPanel .trade-orderbook-column-heading {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    column-gap: 0.25rem;
    }
 
-   .trade-mobile-mode:not(.futures-trading-mode) #tradeOrderBookPanel.grid-cols-3 >:nth-child(3) {
+   .trade-mobile-mode #tradeOrderBookPanel .trade-orderbook-column-heading >:first-child,
+   .trade-mobile-mode #tradeOrderBookPanel .trade-orderbook-column-heading >:nth-child(2) {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 8px;
+   }
+
+   .trade-mobile-mode #asksContainer >div,
+   .trade-mobile-mode #bidsContainer >div {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 0.25rem;
+    align-items: center;
+   }
+
+   .trade-mobile-mode #asksContainer >div >:nth-child(3),
+   .trade-mobile-mode #bidsContainer >div >:nth-child(3) {
     display: none;
    }
 
-   .trade-mobile-mode:not(.futures-trading-mode) #tradeOrderBookPanel.grid-cols-3 >:first-child,
-   .trade-mobile-mode:not(.futures-trading-mode) #tradeOrderBookPanel.grid-cols-3 >:nth-child(2) {
+   .trade-mobile-mode #asksContainer >div >:first-child,
+   .trade-mobile-mode #asksContainer >div >:nth-child(2),
+   .trade-mobile-mode #bidsContainer >div >:first-child,
+   .trade-mobile-mode #bidsContainer >div >:nth-child(2) {
+    min-width: 0;
     overflow: hidden;
     white-space: nowrap;
     font-size: 8px;
@@ -1375,13 +1395,6 @@
    .trade-mobile-mode:not(.futures-trading-mode) #takeProfitInputWrap:not(.protection-enabled),
    .trade-mobile-mode:not(.futures-trading-mode) #stopLossInputWrap:not(.protection-enabled) {
     display: none;
-   }
-
-   .trade-mobile-mode:not(.futures-trading-mode) #tradeOrderBookPanel.trade-orderbook-column-heading >:first-child,
-   .trade-mobile-mode:not(.futures-trading-mode) #tradeOrderBookPanel.trade-orderbook-column-heading >:nth-child(2) {
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 8px;
    }
 
    .trade-mobile-mode:not(.futures-trading-mode) #tradeOrderEntryPanel #btnSubmitOrder {
@@ -1427,28 +1440,6 @@
     align-self: start;
     height: 32rem;
     min-height: 28rem;
-   }
-
-   .futures-trading-mode #tradeOrderBookPanel.grid-cols-3 {
-    grid-template-columns: minmax(0, 1fr) minmax(2.6rem, 0.65fr) !important;
-   }
-
-   .futures-trading-mode #tradeOrderBookPanel.grid-cols-3 >:nth-child(3) {
-    display: none;
-   }
-
-   .futures-trading-mode #tradeOrderBookPanel.grid-cols-3 >:first-child,
-   .futures-trading-mode #tradeOrderBookPanel.grid-cols-3 >:nth-child(2) {
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 8px;
-   }
-
-   .futures-trading-mode #tradeOrderBookPanel.trade-orderbook-column-heading >:first-child,
-   .futures-trading-mode #tradeOrderBookPanel.trade-orderbook-column-heading >:nth-child(2) {
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 8px;
    }
 
    .futures-trading-mode #tradeChartPanel {
@@ -2084,7 +2075,13 @@
 
    <!-- Canvas Trading Area -->
    <div class="flex-1 relative w-full h-full bg-[#121418]">
-    <canvas id="tradingCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+    <canvas id="tradingCanvas" class="w-full h-full block cursor-crosshair" aria-label="Candlestick chart. Drag to pan; scroll or pinch to zoom." title="Drag to pan · Scroll or pinch to zoom · Double-click to reset"></canvas>
+    <div id="chartLoadingState" class="absolute inset-0 z-10 hidden items-center justify-center bg-[#121418]/80" role="status" aria-live="polite">
+     <div class="flex items-center gap-2 rounded border border-binanceBorder bg-binanceCard px-3 py-2 text-xs text-binanceMuted">
+      <span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-binanceMuted border-t-binanceYellow" aria-hidden="true"></span>
+      <span id="chartLoadingLabel">Loading chart…</span>
+     </div>
+    </div>
     <!-- Interactive Crosshair Tooltip -->
     <div id="chartTooltip" class="absolute top-2 left-2 bg-binanceCard bg-opacity-90 border border-binanceBorder p-2 rounded text-[11px] font-mono pointer-events-none hidden shadow-xl z-10">
      <div class="text-binanceMuted mb-1 font-sans">Candle Info:</div>
@@ -4451,6 +4448,16 @@
   let chartDataReconnectDelay = 1000;
   let chartFeedStatus = 'waiting';
   let chartHistoryLoaded = false;
+  let chartHistoryRequestController = null;
+  let pendingChartKline = null;
+  const chartHistoryCache = new Map();
+  const chartHistoryPreloads = new Set();
+  const chartHistoryPreloadQueue = [];
+  let chartHistoryPreloadActive = false;
+  const chartViewport = { visibleCount: 60, offset: 0 };
+  const chartPointers = new Map();
+  let chartDragState = null;
+  let chartPinchState = null;
   let simulatedOrderBook = { market: '', updatedAt: 0, mid: 0, asks: [], bids: [] };
   let tradeAudioContext = null;
   let fundingSecondsRemaining = 3 * 3600 + 42 * 60 + 12;
@@ -10405,7 +10412,9 @@
   }
 
   function setTimeframe(tf, btn) {
+   if (!CHART_TIMEFRAMES[tf] || state.timeframe === tf) return;
    state.timeframe = tf;
+   chartViewport.offset = 0;
    document.querySelectorAll('.tf-btn').forEach((button) => {
     button.classList.remove('bg-binanceHover', 'text-binanceYellow', 'font-semibold');
     button.classList.add('text-binanceMuted');
@@ -10495,6 +10504,8 @@
     close = open;
    }
    state.candles = candles;
+   chartViewport.offset = 0;
+   chartViewport.visibleCount = Math.min(chartViewport.visibleCount, candles.length);
    state.candleStartedAt = Date.now();
   }
 
@@ -10513,6 +10524,113 @@
 
   function chartInterval() {
    return chartTimeframe().interval;
+  }
+
+  function getChartViewport() {
+   const candles = state.candles || [];
+   const visibleCount = Math.max(1, Math.min(chartViewport.visibleCount, candles.length));
+   const maxOffset = Math.max(0, candles.length - visibleCount);
+   chartViewport.offset = Math.max(0, Math.min(chartViewport.offset, maxOffset));
+   const end = candles.length - chartViewport.offset;
+   const start = Math.max(0, end - visibleCount);
+   return { candles: candles.slice(start, end), start, end, total: candles.length, visibleCount };
+  }
+
+  function setChartZoom(visibleCount, anchorFraction = 0.5) {
+   const candles = state.candles || [];
+   if (!candles.length) return;
+   const previous = getChartViewport();
+   const nextCount = Math.max(10, Math.min(500, Math.round(visibleCount), candles.length));
+   const anchorIndex = previous.start + Math.max(0, Math.min(1, anchorFraction)) * previous.visibleCount;
+   chartViewport.visibleCount = nextCount;
+   const nextStart = Math.round(anchorIndex - anchorFraction * nextCount);
+   chartViewport.offset = Math.max(0, candles.length - nextStart - nextCount);
+   getChartViewport();
+   drawChart();
+  }
+
+  function chartHistoryCacheKey(marketType, pair, interval) {
+   return `${marketType}:${pair}:${interval}`;
+  }
+
+  function cacheChartHistory(key, candles, persistCache = true) {
+   chartHistoryCache.delete(key);
+   chartHistoryCache.set(key, candles.map((candle) => ({...candle})));
+   if (chartHistoryCache.size > 36) chartHistoryCache.delete(chartHistoryCache.keys().next().value);
+   if (persistCache) {
+    try {
+     localStorage.setItem(`exchange-chart-cache:${key}`, JSON.stringify(candles));
+    } catch (error) {
+     console.warn('Unable to persist chart history cache.', error);
+    }
+   }
+  }
+
+  function getCachedChartHistory(key) {
+   const cached = chartHistoryCache.get(key);
+   if (cached) return cached;
+   try {
+    const stored = localStorage.getItem(`exchange-chart-cache:${key}`);
+    if (!stored) return null;
+    const candles = JSON.parse(stored);
+    if (!Array.isArray(candles) || !candles.length
+     || !candles.every((candle) => candle && [candle.time, candle.open, candle.high, candle.low, candle.close, candle.volume].every(Number.isFinite))) {
+     localStorage.removeItem(`exchange-chart-cache:${key}`);
+     return null;
+    }
+    chartHistoryCache.set(key, candles);
+    return candles;
+   } catch (error) {
+    console.warn('Unable to read chart history cache.', error);
+    return null;
+   }
+  }
+
+  function preloadChartIntervals(pair, marketType, currentInterval) {
+   Object.values(CHART_TIMEFRAMES).forEach(({ interval }) => {
+    const cacheKey = chartHistoryCacheKey(marketType, pair, interval);
+    if (interval === currentInterval || getCachedChartHistory(cacheKey) || chartHistoryPreloads.has(cacheKey)) return;
+    chartHistoryPreloads.add(cacheKey);
+    chartHistoryPreloadQueue.push({ pair, marketType, interval, cacheKey });
+   });
+   loadNextChartHistoryPreload();
+  }
+
+  async function loadNextChartHistoryPreload() {
+   if (chartHistoryPreloadActive || !chartHistoryPreloadQueue.length) return;
+   chartHistoryPreloadActive = true;
+   const preload = chartHistoryPreloadQueue.shift();
+   try {
+    if (preload.pair !== state.selectedPair
+     || preload.marketType !== (state.tradingMode === 'futures'? 'futures': 'spot')) return;
+    const query = new URLSearchParams({ symbol: preload.pair, interval: preload.interval, limit: '100' });
+    const historyUrl = preload.marketType === 'futures'
+     ? `https://fapi.binance.com/fapi/v1/klines?${query}`
+     : `https://api.binance.com/api/v3/klines?${query}`;
+    const response = await fetch(historyUrl);
+    if (!response.ok) throw new Error(`Binance ${preload.interval} candle request failed with HTTP ${response.status}`);
+    const rows = await response.json();
+    if (!Array.isArray(rows)) throw new Error(`Binance returned an invalid ${preload.interval} candle response`);
+    const adjustmentFactor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey(preload.marketType, preload.pair)] || 0) / 100;
+    const candles = rows.map((row) => ({
+     time: Number(row[0]),
+     open: Number(row[1]) * adjustmentFactor,
+     high: Number(row[2]) * adjustmentFactor,
+     low: Number(row[3]) * adjustmentFactor,
+     close: Number(row[4]) * adjustmentFactor,
+     volume: Number(row[5])
+    })).filter((candle) => Number.isFinite(candle.time)
+     && [candle.open, candle.high, candle.low, candle.close, candle.volume].every(Number.isFinite)
+     && candle.open > 0 && candle.close > 0);
+    if (!candles.length) throw new Error(`Binance returned no valid ${preload.interval} candles`);
+    cacheChartHistory(preload.cacheKey, candles);
+   } catch (error) {
+    console.warn(`Unable to preload Binance ${preload.interval} chart history.`, error);
+   } finally {
+    chartHistoryPreloads.delete(preload.cacheKey);
+    chartHistoryPreloadActive = false;
+    window.setTimeout(loadNextChartHistoryPreload, 250);
+   }
   }
 
   function formatChartTimeLabel(timestamp) {
@@ -10588,10 +10706,15 @@
    if (last && last.time === candle.time) candles[candles.length - 1] = candle;
    else if (!last || candle.time > last.time) {
     candles.push(candle);
-    if (candles.length > 60) candles.shift();
+    if (candles.length > 500) candles.shift();
    } else return;
 
    chartHistoryLoaded = true;
+   cacheChartHistory(
+    chartHistoryCacheKey(state.tradingMode === 'futures'? 'futures': 'spot', state.selectedPair, chartInterval()),
+    candles,
+    false
+   );
    state.candleStartedAt = candle.time;
    state.currentPrice = candle.close;
    if (state.tradingMode === 'futures') state.futuresQuotes[state.selectedPair] = candle.close / adjustmentFactor;
@@ -10629,6 +10752,7 @@
       setChartFeedStatus('live', 'Binance futures price · Live');
       return;
      }
+     if (chartHistoryRequestController) return;
      setChartFeedStatus('waiting', chartHistoryLoaded
       ? `Binance ${state.timeframe} candles · Waiting`
       : 'History unavailable · waiting for live candle');
@@ -10637,7 +10761,12 @@
      if (chartDataSocket !== socket || generation !== chartFeedGeneration) return;
      try {
       const message = JSON.parse(event.data);
-      applyBinanceCandle(message.data?.k || message.k || message.data, generation);
+      const kline = message.data?.k || message.k || message.data;
+      if (!chartHistoryLoaded) {
+       pendingChartKline = kline;
+       return;
+      }
+      applyBinanceCandle(kline, generation);
      } catch (error) {
       console.error('Unable to parse Binance chart candle.', error);
       setChartFeedStatus('unavailable', 'Chart data error');
@@ -10663,26 +10792,72 @@
 
   async function loadSelectedMarketChart() {
    const generation = ++chartFeedGeneration;
+   chartViewport.offset = 0;
+   if (chartHistoryRequestController) {
+    chartHistoryRequestController.abort();
+    chartHistoryRequestController = null;
+   }
    closeChartDataSocket();
+   chartDataReconnectDelay = 1000;
+   pendingChartKline = null;
    const isFutures = state.tradingMode === 'futures';
    const hasLivePair = isFutures
     ? FUTURES_MARKET_CATALOG.some((market) => market.symbol === state.selectedPair)
     : LIVE_MARKET_ASSETS.has(state.asset);
    if (!hasLivePair) {
+    const loadingState = document.getElementById('chartLoadingState');
+    loadingState?.classList.add('hidden');
+    loadingState?.classList.remove('flex');
     setChartFeedStatus('unavailable', 'Chart · pair unavailable');
     return;
    }
 
    const pair = state.selectedPair;
    const interval = chartInterval();
+   const marketType = isFutures? 'futures': 'spot';
+   const cacheKey = chartHistoryCacheKey(marketType, pair, interval);
+   const cachedCandles = getCachedChartHistory(cacheKey);
+   if (cachedCandles) {
+    state.candles = cachedCandles.map((candle) => ({...candle}));
+   } else {
+    const price = Number.isFinite(state.currentPrice) && state.currentPrice > 0
+     ? state.currentPrice
+     : 0;
+    const time = Math.floor(Date.now() / chartTimeframe().duration) * chartTimeframe().duration;
+    state.candles = [{
+     time,
+     open: price,
+     high: price,
+     low: price,
+     close: price,
+     volume: 0
+    }];
+   }
+   drawChart();
+   const controller = new AbortController();
+   chartHistoryRequestController = controller;
    chartHistoryLoaded = false;
-   setChartFeedStatus('loading', `Loading Binance ${state.timeframe} candles`);
+   let historyTimedOut = false;
+   const historyTimeout = window.setTimeout(() => {
+    historyTimedOut = true;
+    controller.abort();
+   }, 30_000);
+   const loadingState = document.getElementById('chartLoadingState');
+   const loadingLabel = document.getElementById('chartLoadingLabel');
+   if (loadingLabel) loadingLabel.textContent = `${cachedCandles? 'Refreshing': 'Loading'} ${state.timeframe} chart…`;
+   if (loadingState) {
+    loadingState.classList.toggle('hidden', Boolean(cachedCandles));
+    loadingState.classList.toggle('flex', !cachedCandles);
+   }
+   setChartFeedStatus(cachedCandles? 'waiting': 'loading',
+    `${cachedCandles? 'Refreshing': 'Loading'} Binance ${state.timeframe} candles`);
+   connectSelectedChartStream(generation);
    try {
-    const query = new URLSearchParams({ symbol: pair, interval, limit: '60' });
+    const query = new URLSearchParams({ symbol: pair, interval, limit: '100' });
     const historyUrl = isFutures
      ? `https://fapi.binance.com/fapi/v1/klines?${query}`
      : `https://api.binance.com/api/v3/klines?${query}`;
-    const response = await fetch(historyUrl);
+    const response = await fetch(historyUrl, { signal: controller.signal });
     if (!response.ok) throw new Error(`Binance candle request failed with HTTP ${response.status}`);
     const rows = await response.json();
     if (!Array.isArray(rows)) throw new Error('Binance returned an invalid candle response');
@@ -10700,28 +10875,61 @@
      && candle.open > 0 && candle.close > 0);
     if (!candles.length) throw new Error('Binance returned no valid chart candles');
     state.candles = candles;
+    cacheChartHistory(cacheKey, candles);
     chartHistoryLoaded = true;
+    if (loadingState) {
+     loadingState.classList.add('hidden');
+     loadingState.classList.remove('flex');
+    }
     state.candleStartedAt = candles[candles.length - 1].time;
     state.currentPrice = candles[candles.length - 1].close;
     if (isFutures) state.futuresQuotes[pair] = state.currentPrice / adjustmentFactor;
     else state.marketQuotes[state.asset] = state.currentPrice / adjustmentFactor;
+    preloadChartIntervals(pair, marketType, interval);
     setChartFeedStatus('waiting', `Binance ${state.timeframe} candles · Connecting`);
     drawChart();
+    const pendingKline = pendingChartKline;
+    pendingChartKline = null;
+    if (pendingKline) applyBinanceCandle(pendingKline, generation);
    } catch (error) {
     if (generation !== chartFeedGeneration) return;
-    console.error('Unable to load Binance chart history.', error);
-    setChartFeedStatus('unavailable', 'Live price · chart history unavailable');
-    state.candles = [{
-     time: 0,
-     open: state.currentPrice,
-     high: state.currentPrice,
-     low: state.currentPrice,
-     close: state.currentPrice,
-     volume: 0
-    }];
-    drawChart();
+    if (error.name === 'AbortError' && !historyTimedOut) return;
+    if (historyTimedOut) {
+     console.warn(`Binance ${state.timeframe} candle history timed out; continuing with live data.`);
+    } else {
+     console.error('Unable to load Binance chart history.', error);
+    }
+    if (loadingState) {
+     loadingState.classList.add('hidden');
+     loadingState.classList.remove('flex');
+    }
+    const pendingKline = pendingChartKline;
+    pendingChartKline = null;
+    if (pendingKline) {
+     applyBinanceCandle(pendingKline, generation);
+    } else {
+     setChartFeedStatus('unavailable', cachedCandles
+      ? 'History refresh failed · showing cached candles'
+      : 'Live price · chart history unavailable');
+     if (!cachedCandles) {
+      state.candles = [{
+       time: Math.floor(Date.now() / chartTimeframe().duration) * chartTimeframe().duration,
+       open: state.currentPrice,
+       high: state.currentPrice,
+       low: state.currentPrice,
+       close: state.currentPrice,
+       volume: 0
+      }];
+      chartHistoryLoaded = true;
+     } else {
+      chartHistoryLoaded = true;
+     }
+     drawChart();
+    }
+   } finally {
+    window.clearTimeout(historyTimeout);
+    if (chartHistoryRequestController === controller) chartHistoryRequestController = null;
    }
-   connectSelectedChartStream(generation);
   }
 
   function updateLiveCandleFromTicker(price, eventTime) {
@@ -10732,7 +10940,7 @@
    if (candle.time && candle.time < candleTime) {
     candle = { time: candleTime, open: candle.close, high: price, low: price, close: price, volume: 0 };
     state.candles.push(candle);
-    if (state.candles.length > 60) state.candles.shift();
+    if (state.candles.length > 500) state.candles.shift();
    } else {
     candle.close = price;
     candle.high = Math.max(candle.high, price);
@@ -10793,7 +11001,7 @@
      close: nextPrice,
      volume: 0
     });
-    if (candles.length > 60) candles.shift();
+    if (candles.length > 500) candles.shift();
     state.candleStartedAt = Date.now();
    } else {
     currentCandle.close = nextPrice;
@@ -10878,6 +11086,9 @@
   function drawChart() {
    const canvas = document.getElementById('tradingCanvas');
    if (!canvas || !state.candles) return;
+   const viewport = getChartViewport();
+   const candles = viewport.candles;
+   if (!candles.length) return;
    const ctx = canvas.getContext('2d');
    const ratio = window.devicePixelRatio || 1;
    const parentHeight = canvas.parentElement.getBoundingClientRect().height;
@@ -10893,8 +11104,9 @@
    const padding = { left: 16, right: 18, top: 18, bottom: 18 };
    const chartWidth = width - padding.left - padding.right;
    const chartHeight = height - padding.top - padding.bottom;
-   const bands = state.indicators.bb? calculateBollingerBands(state.candles): [];
-   const values = state.candles.flatMap((c) => [c.high, c.low]);
+   const allBands = state.indicators.bb? calculateBollingerBands(state.candles): [];
+   const bands = allBands.slice(viewport.start, viewport.end);
+   const values = candles.flatMap((c) => [c.high, c.low]);
    bands.forEach((band) => {
     if (band) values.push(band.upper, band.lower);
    });
@@ -10919,29 +11131,29 @@
    }
    ctx.font = '9px Arial, sans-serif';
    ctx.fillStyle = '#848e9c';
-   const timeTickCount = Math.min(5, state.candles.length);
+   const timeTickCount = Math.min(5, candles.length);
    for (let tick = 0; tick < timeTickCount; tick++) {
-    const candleIndex = Math.round(tick * (state.candles.length - 1) / Math.max(1, timeTickCount - 1));
-    const x = padding.left + (candleIndex + 0.5) * (chartWidth / state.candles.length);
+    const candleIndex = Math.round(tick * (candles.length - 1) / Math.max(1, timeTickCount - 1));
+    const x = padding.left + (candleIndex + 0.5) * (chartWidth / candles.length);
     ctx.strokeStyle = 'rgba(132, 142, 156, 0.12)';
     ctx.beginPath();
     ctx.moveTo(x, padding.top);
     ctx.lineTo(x, height - padding.bottom);
     ctx.stroke();
     ctx.textAlign = tick === 0? 'left': tick === timeTickCount - 1? 'right': 'center';
-    ctx.fillText(formatChartTimeLabel(state.candles[candleIndex].time), x, height - 3);
+    ctx.fillText(formatChartTimeLabel(candles[candleIndex].time), x, height - 3);
    }
 
    if (state.indicators.bb) {
     ['upper', 'middle', 'lower'].forEach((key) => {
-     drawIndicatorLine(ctx, state.candles, bands.map((band) => band && band[key]), '#3b82f6', padding, chartWidth, chartHeight, min, max);
+     drawIndicatorLine(ctx, candles, bands.map((band) => band && band[key]), '#3b82f6', padding, chartWidth, chartHeight, min, max);
     });
    }
 
    if (state.chartType === 'candle') {
-    const candleWidth = Math.max(4, chartWidth / state.candles.length * 0.72);
-    state.candles.forEach((item, index) => {
-     const x = padding.left + (index + 0.5) * (chartWidth / state.candles.length);
+    const candleWidth = Math.max(1, Math.min(24, chartWidth / candles.length * 0.72));
+    candles.forEach((item, index) => {
+     const x = padding.left + (index + 0.5) * (chartWidth / candles.length);
      const yOpen = padding.top + ((max - item.open) / (max - min || 1)) * chartHeight;
      const yClose = padding.top + ((max - item.close) / (max - min || 1)) * chartHeight;
      const yHigh = padding.top + ((max - item.high) / (max - min || 1)) * chartHeight;
@@ -10957,8 +11169,8 @@
     });
    } else {
     ctx.beginPath();
-    state.candles.forEach((item, index) => {
-     const x = padding.left + (index + 0.5) * (chartWidth / state.candles.length);
+    candles.forEach((item, index) => {
+     const x = padding.left + (index + 0.5) * (chartWidth / candles.length);
      const y = padding.top + ((max - item.close) / (max - min || 1)) * chartHeight;
      if (index === 0) ctx.moveTo(x, y);
      else ctx.lineTo(x, y);
@@ -10970,19 +11182,20 @@
 
    if (state.indicators.ma) {
     const maValues = [];
-    state.candles.forEach((item, index) => {
-     const slice = state.candles.slice(Math.max(0, index - 6), index + 1);
+    candles.forEach((item, index) => {
+     const absoluteIndex = viewport.start + index;
+     const slice = state.candles.slice(Math.max(0, absoluteIndex - 6), absoluteIndex + 1);
      const avg = slice.reduce((sum, candle) => sum + candle.close, 0) / slice.length;
-     maValues.push({ x: padding.left + (index + 0.5) * (chartWidth / state.candles.length), y: padding.top + ((max - avg) / (max - min || 1)) * chartHeight });
+     maValues.push({ x: padding.left + (index + 0.5) * (chartWidth / candles.length), y: padding.top + ((max - avg) / (max - min || 1)) * chartHeight });
     });
     drawLine(maValues, '#fcd535');
    }
 
    if (state.indicators.vol) {
-    const barWidth = chartWidth / state.candles.length * 0.64;
-    const maxVolume = Math.max(...state.candles.map((item) => item.volume), 1);
-    state.candles.forEach((item, index) => {
-     const x = padding.left + index * (chartWidth / state.candles.length);
+    const barWidth = chartWidth / candles.length * 0.64;
+    const maxVolume = Math.max(...candles.map((item) => item.volume), 1);
+    candles.forEach((item, index) => {
+     const x = padding.left + index * (chartWidth / candles.length);
      const heightVol = (item.volume / maxVolume) * 48;
      ctx.fillStyle = index % 2 === 0? '#2b3139': '#3b4450';
      ctx.fillRect(x + 3, height - 18 - heightVol, barWidth, heightVol);
@@ -11050,7 +11263,8 @@
    const ctx = canvas.getContext('2d');
    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
    ctx.clearRect(0, 0, width, height);
-   const values = calculateRSI(state.candles);
+   const viewport = getChartViewport();
+   const values = calculateRSI(state.candles).slice(viewport.start, viewport.end);
    const padding = { left: 16, right: 18, top: 5, bottom: 5 };
    [30, 50, 70].forEach((level) => {
     const y = padding.top + ((100 - level) / 100) * (height - padding.top - padding.bottom);
@@ -11062,7 +11276,7 @@
     ctx.stroke();
    });
    ctx.setLineDash([]);
-   drawIndicatorLine(ctx, state.candles, values, '#3b82f6', padding, width - padding.left - padding.right, height - padding.top - padding.bottom, 0, 100);
+   drawIndicatorLine(ctx, viewport.candles, values, '#3b82f6', padding, width - padding.left - padding.right, height - padding.top - padding.bottom, 0, 100);
   }
 
   function drawLine(points, color) {
@@ -12018,12 +12232,82 @@
     if (event.key.toLowerCase() === 'l') setOrderType('limit');
    });
    const canvas = document.getElementById('tradingCanvas');
-   canvas.addEventListener('mousemove', (event) => {
+   canvas.style.touchAction = 'none';
+   canvas.style.cursor = 'grab';
+   canvas.addEventListener('pointerdown', (event) => {
+    canvas.setPointerCapture(event.pointerId);
+    chartPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (chartPointers.size >= 2) {
+     const points = [...chartPointers.values()];
+     chartPinchState = {
+      distance: Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y),
+      visibleCount: chartViewport.visibleCount
+     };
+     chartDragState = null;
+     document.getElementById('chartTooltip').classList.add('hidden');
+    } else {
+     chartDragState = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startOffset: chartViewport.offset,
+      moved: false
+     };
+    }
+   });
+   canvas.addEventListener('pointermove', (event) => {
+    if (!chartPointers.has(event.pointerId)) return;
+    chartPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (chartPointers.size >= 2 && chartPinchState) {
+     const points = [...chartPointers.values()];
+     const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+     if (distance > 0) {
+      const rect = canvas.getBoundingClientRect();
+      setChartZoom(chartPinchState.visibleCount * chartPinchState.distance / distance,
+       ((points[0].x + points[1].x) / 2 - rect.left) / rect.width);
+     }
+     return;
+    }
+    if (!chartDragState || chartDragState.pointerId !== event.pointerId) return;
+    const deltaX = event.clientX - chartDragState.startX;
+    if (!chartDragState.moved && Math.abs(deltaX) < 3) return;
+    chartDragState.moved = true;
+    canvas.style.cursor = 'grabbing';
+    document.getElementById('chartTooltip').classList.add('hidden');
+    const viewport = getChartViewport();
+    chartViewport.offset = chartDragState.startOffset + Math.round(deltaX / canvas.getBoundingClientRect().width * viewport.visibleCount);
+    getChartViewport();
+    drawChart();
+   });
+   const finishChartPointer = (event) => {
+    chartPointers.delete(event.pointerId);
+    if (chartPointers.size < 2) chartPinchState = null;
+    if (!chartPointers.size || chartDragState?.pointerId === event.pointerId) {
+     chartDragState = null;
+     canvas.style.cursor = 'grab';
+    }
+   };
+   canvas.addEventListener('pointerup', finishChartPointer);
+   canvas.addEventListener('pointercancel', finishChartPointer);
+   canvas.addEventListener('lostpointercapture', finishChartPointer);
+   canvas.addEventListener('wheel', (event) => {
+    event.preventDefault();
     const rect = canvas.getBoundingClientRect();
+    const anchor = (event.clientX - rect.left) / rect.width;
+    setChartZoom(chartViewport.visibleCount * (event.deltaY < 0? 0.85: 1.18), anchor);
+   }, { passive: false });
+   canvas.addEventListener('dblclick', () => {
+    chartViewport.visibleCount = Math.min(60, state.candles.length);
+    chartViewport.offset = 0;
+    drawChart();
+   });
+   canvas.addEventListener('mousemove', (event) => {
+    if (chartDragState?.moved || chartPinchState) return;
+    const rect = canvas.getBoundingClientRect();
+    const viewport = getChartViewport();
     const x = event.clientX - rect.left;
-    const barWidth = rect.width / state.candles.length;
-    const index = Math.min(state.candles.length - 1, Math.max(0, Math.floor(x / barWidth)));
-    const candle = state.candles[index];
+    const barWidth = rect.width / viewport.visibleCount;
+    const index = Math.min(viewport.visibleCount - 1, Math.max(0, Math.floor(x / barWidth)));
+    const candle = viewport.candles[index];
     const tooltip = document.getElementById('chartTooltip');
     tooltip.classList.remove('hidden');
     tooltip.style.left = `${Math.min(rect.width - 110, x + 14)}px`;
@@ -12033,7 +12317,7 @@
     document.getElementById('ttLow').textContent = candle.low.toFixed(2);
     document.getElementById('ttClose').textContent = candle.close.toFixed(2);
     if (state.indicators.rsi) {
-     const rsi = calculateRSI(state.candles)[index];
+     const rsi = calculateRSI(state.candles)[viewport.start + index];
      document.getElementById('ttRsi').textContent = rsi === null? '—': rsi.toFixed(1);
     }
    });
