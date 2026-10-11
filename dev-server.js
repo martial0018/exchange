@@ -10,11 +10,18 @@ const publicFiles = new Map([
     ['/', 'index.html'],
     ['/index.html', 'index.html'],
     ['/phone-preview.html', 'phone-preview.html'],
-    ['/idGOzgQxaB_1791706713499.png', 'idGOzgQxaB_1791706713499.png']
+    ['/idGOzgQxaB_1791706713499.png', 'idGOzgQxaB_1791706713499.png'],
+    ['/manifest.webmanifest', 'manifest.webmanifest'],
+    ['/service-worker.js', 'service-worker.js'],
+    ['/app-icon-192.png', 'app-icon-192.png'],
+    ['/app-icon-512.png', 'app-icon-512.png'],
+    ['/apple-touch-icon.png', 'apple-touch-icon.png']
 ]);
 const contentTypes = {
     '.html': 'text/html; charset=utf-8',
-    '.png': 'image/png'
+    '.js': 'text/javascript; charset=utf-8',
+    '.png': 'image/png',
+    '.webmanifest': 'application/manifest+json; charset=utf-8'
 };
 
 function sendJson(res, status, body) {
@@ -127,10 +134,12 @@ async function handleRequest(req, res) {
             res.end('Could not load the local preview.');
             return;
         }
-        res.writeHead(200, {
+        const responseHeaders = {
             'Content-Type': contentTypes[path.extname(filename)],
             'Cache-Control': 'no-store'
-        });
+        };
+        if (filename === 'service-worker.js') responseHeaders['Service-Worker-Allowed'] = '/';
+        res.writeHead(200, responseHeaders);
         res.end(req.method === 'HEAD' ? undefined : contents);
     });
 }
