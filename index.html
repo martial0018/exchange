@@ -4451,9 +4451,7 @@
   let chartHistoryRequestController = null;
   let pendingChartKline = null;
   const chartHistoryCache = new Map();
-  const chartHistoryPreloads = new Set();
-  const chartHistoryPreloadQueue = [];
-  let chartHistoryPreloadActive = false;
+  const chartHistoryRequests = new Map();
   const chartViewport = { visibleCount: 60, offset: 0 };
   const chartPointers = new Map();
   let chartDragState = null;
@@ -10589,29 +10587,49 @@
   function preloadChartIntervals(pair, marketType, currentInterval) {
    Object.values(CHART_TIMEFRAMES).forEach(({ interval }) => {
     const cacheKey = chartHistoryCacheKey(marketType, pair, interval);
-    if (interval === currentInterval || getCachedChartHistory(cacheKey) || chartHistoryPreloads.has(cacheKey)) return;
-    chartHistoryPreloads.add(cacheKey);
-    chartHistoryPreloadQueue.push({ pair, marketType, interval, cacheKey });
+    if (interval === currentInterval || getCachedChartHistory(cacheKey) || chartHistoryRequests.has(cacheKey)) return;
+    const promise = requestChartHistory(pair, marketType, interval);
+    promise.catch((error) => {
+     console.warn(`Unable to preload Binance ${interval} chart history.`, error);
+    });
    });
-   loadNextChartHistoryPreload();
   }
 
-  async function loadNextChartHistoryPreload() {
-   if (chartHistoryPreloadActive || !chartHistoryPreloadQueue.length) return;
-   chartHistoryPreloadActive = true;
-   const preload = chartHistoryPreloadQueue.shift();
-   try {
-    if (preload.pair !== state.selectedPair
-     || preload.marketType !== (state.tradingMode === 'futures'? 'futures': 'spot')) return;
-    const query = new URLSearchParams({ symbol: preload.pair, interval: preload.interval, limit: '100' });
-    const historyUrl = preload.marketType === 'futures'
+  function requestChartHistory(pair, marketType, interval) {
+   const cacheKey = chartHistoryCacheKey(marketType, pair, interval);
+   const existingRequest = chartHistoryRequests.get(cacheKey);
+   if (existingRequest) return existingRequest;
+   let trackedRequest;
+   const clearRequest = () => {
+    if (chartHistoryRequests.get(cacheKey) === trackedRequest) chartHistoryRequests.delete(cacheKey);
+   };
+   const request = fetchChartHistory(pair, marketType, interval);
+   trackedRequest = request.finally(clearRequest);
+   chartHistoryRequests.set(cacheKey, trackedRequest);
+   return trackedRequest;
+  }
+
+  function waitForChartHistory(pair, marketType, interval, signal) {
+   const request = requestChartHistory(pair, marketType, interval);
+   if (!signal) return request;
+   if (signal.aborted) return Promise.reject(new DOMException('Chart history request was cancelled.', 'AbortError'));
+   return new Promise((resolve, reject) => {
+    const onAbort = () => reject(new DOMException('Chart history request was cancelled.', 'AbortError'));
+    signal.addEventListener('abort', onAbort, { once: true });
+    request.then(resolve, reject).finally(() => signal.removeEventListener('abort', onAbort));
+   });
+  }
+
+  async function fetchChartHistory(pair, marketType, interval) {
+    const query = new URLSearchParams({ symbol: pair, interval, limit: '60' });
+    const historyUrl = marketType === 'futures'
      ? `https://fapi.binance.com/fapi/v1/klines?${query}`
      : `https://api.binance.com/api/v3/klines?${query}`;
     const response = await fetch(historyUrl);
-    if (!response.ok) throw new Error(`Binance ${preload.interval} candle request failed with HTTP ${response.status}`);
+    if (!response.ok) throw new Error(`Binance ${interval} candle request failed with HTTP ${response.status}`);
     const rows = await response.json();
-    if (!Array.isArray(rows)) throw new Error(`Binance returned an invalid ${preload.interval} candle response`);
-    const adjustmentFactor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey(preload.marketType, preload.pair)] || 0) / 100;
+    if (!Array.isArray(rows)) throw new Error(`Binance returned an invalid ${interval} candle response`);
+    const adjustmentFactor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey(marketType, pair)] || 0) / 100;
     const candles = rows.map((row) => ({
      time: Number(row[0]),
      open: Number(row[1]) * adjustmentFactor,
@@ -10622,15 +10640,9 @@
     })).filter((candle) => Number.isFinite(candle.time)
      && [candle.open, candle.high, candle.low, candle.close, candle.volume].every(Number.isFinite)
      && candle.open > 0 && candle.close > 0);
-    if (!candles.length) throw new Error(`Binance returned no valid ${preload.interval} candles`);
-    cacheChartHistory(preload.cacheKey, candles);
-   } catch (error) {
-    console.warn(`Unable to preload Binance ${preload.interval} chart history.`, error);
-   } finally {
-    chartHistoryPreloads.delete(preload.cacheKey);
-    chartHistoryPreloadActive = false;
-    window.setTimeout(loadNextChartHistoryPreload, 250);
-   }
+    if (!candles.length) throw new Error(`Binance returned no valid ${interval} candles`);
+    cacheChartHistory(chartHistoryCacheKey(marketType, pair, interval), candles);
+    return candles;
   }
 
   function formatChartTimeLabel(timestamp) {
@@ -10762,8 +10774,8 @@
      try {
       const message = JSON.parse(event.data);
       const kline = message.data?.k || message.k || message.data;
+      pendingChartKline = kline;
       if (!chartHistoryLoaded) {
-       pendingChartKline = kline;
        return;
       }
       applyBinanceCandle(kline, generation);
@@ -10816,32 +10828,21 @@
    const interval = chartInterval();
    const marketType = isFutures? 'futures': 'spot';
    const cacheKey = chartHistoryCacheKey(marketType, pair, interval);
+   const adjustmentFactor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey(marketType, pair)] || 0) / 100;
    const cachedCandles = getCachedChartHistory(cacheKey);
    if (cachedCandles) {
     state.candles = cachedCandles.map((candle) => ({...candle}));
-   } else {
-    const price = Number.isFinite(state.currentPrice) && state.currentPrice > 0
-     ? state.currentPrice
-     : 0;
-    const time = Math.floor(Date.now() / chartTimeframe().duration) * chartTimeframe().duration;
-    state.candles = [{
-     time,
-     open: price,
-     high: price,
-     low: price,
-     close: price,
-     volume: 0
-    }];
+    drawChart();
+    preloadChartIntervals(pair, marketType, interval);
    }
-   drawChart();
+   chartHistoryLoaded = Boolean(cachedCandles);
    const controller = new AbortController();
    chartHistoryRequestController = controller;
-   chartHistoryLoaded = false;
    let historyTimedOut = false;
    const historyTimeout = window.setTimeout(() => {
     historyTimedOut = true;
     controller.abort();
-   }, 30_000);
+   }, 10_000);
    const loadingState = document.getElementById('chartLoadingState');
    const loadingLabel = document.getElementById('chartLoadingLabel');
    if (loadingLabel) loadingLabel.textContent = `${cachedCandles? 'Refreshing': 'Loading'} ${state.timeframe} chart…`;
@@ -10849,31 +10850,12 @@
     loadingState.classList.toggle('hidden', Boolean(cachedCandles));
     loadingState.classList.toggle('flex', !cachedCandles);
    }
-   setChartFeedStatus(cachedCandles? 'waiting': 'loading',
+   setChartFeedStatus('loading',
     `${cachedCandles? 'Refreshing': 'Loading'} Binance ${state.timeframe} candles`);
    connectSelectedChartStream(generation);
    try {
-    const query = new URLSearchParams({ symbol: pair, interval, limit: '100' });
-    const historyUrl = isFutures
-     ? `https://fapi.binance.com/fapi/v1/klines?${query}`
-     : `https://api.binance.com/api/v3/klines?${query}`;
-    const response = await fetch(historyUrl, { signal: controller.signal });
-    if (!response.ok) throw new Error(`Binance candle request failed with HTTP ${response.status}`);
-    const rows = await response.json();
-    if (!Array.isArray(rows)) throw new Error('Binance returned an invalid candle response');
+    const candles = await waitForChartHistory(pair, marketType, interval, controller.signal);
     if (generation !== chartFeedGeneration || pair !== state.selectedPair || interval !== chartInterval()) return;
-    const adjustmentFactor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey(isFutures? 'futures': 'spot', pair)] || 0) / 100;
-    const candles = rows.map((row) => ({
-     time: Number(row[0]),
-     open: Number(row[1]) * adjustmentFactor,
-     high: Number(row[2]) * adjustmentFactor,
-     low: Number(row[3]) * adjustmentFactor,
-     close: Number(row[4]) * adjustmentFactor,
-     volume: Number(row[5])
-    })).filter((candle) => Number.isFinite(candle.time)
-     && [candle.open, candle.high, candle.low, candle.close, candle.volume].every(Number.isFinite)
-     && candle.open > 0 && candle.close > 0);
-    if (!candles.length) throw new Error('Binance returned no valid chart candles');
     state.candles = candles;
     cacheChartHistory(cacheKey, candles);
     chartHistoryLoaded = true;
@@ -10911,20 +10893,8 @@
      setChartFeedStatus('unavailable', cachedCandles
       ? 'History refresh failed · showing cached candles'
       : 'Live price · chart history unavailable');
-     if (!cachedCandles) {
-      state.candles = [{
-       time: Math.floor(Date.now() / chartTimeframe().duration) * chartTimeframe().duration,
-       open: state.currentPrice,
-       high: state.currentPrice,
-       low: state.currentPrice,
-       close: state.currentPrice,
-       volume: 0
-      }];
-      chartHistoryLoaded = true;
-     } else {
-      chartHistoryLoaded = true;
-     }
-     drawChart();
+     chartHistoryLoaded = Boolean(cachedCandles);
+     if (cachedCandles) drawChart();
     }
    } finally {
     window.clearTimeout(historyTimeout);
@@ -12203,6 +12173,9 @@
     if (!document.getElementById('depthView').classList.contains('hidden')) drawDepth();
    });
    selectPair(state.selectedPair, state.currentPrice, state.asset, false);
+   if (LIVE_MARKET_ASSETS.has(state.asset)) {
+    preloadChartIntervals(state.selectedPair, 'spot', null);
+   }
    setMarketFeedStatus('connecting');
    loadTradfiQuotes();
    window.setInterval(loadTradfiQuotes, 15_000);
