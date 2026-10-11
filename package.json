@@ -1,0 +1,14 @@
+{
+  "name": "exchange-practice-platform",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel deploy --prod"
+  },
+  "dependencies": {
+    "postgres": "^3.4.7"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Binance Pro Trading Platform</title>
+    <link rel="icon" type="image/png" href="./idGOzgQxaB_1791706713499.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -42,6 +43,14 @@
     <style>
         .mobile-bottom-nav {
             padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+        }
+        .header-brand-logo {
+            display: block;
+            height: 1.75rem;
+            width: auto;
+            max-width: 7rem;
+            flex-shrink: 0;
+            object-fit: contain;
         }
         .trade-canvas-quick-actions {
             display: none;
@@ -1244,6 +1253,242 @@
                 content: "";
             }
         }
+        @media (max-width: 767px) {
+            #userHomePage {
+                padding: 12px 16px 75px;
+                background: #181a20;
+                color: #eaecef;
+            }
+
+            #guestHomeContent,
+            #signedInHomeContent {
+                width: 100%;
+                max-width: 412px;
+                margin-inline: auto;
+            }
+
+            #guestHomeContent > form,
+            #signedInHomeContent > form {
+                border: 0;
+                border-radius: 18px;
+                background: #2b3139;
+                padding: 6px 12px;
+            }
+
+            #guestHomeMarketSearch,
+            #homeMarketSearch {
+                margin-left: 8px;
+                color: #eaecef;
+                font-size: 13px;
+            }
+
+            #guestHomeContent > section[aria-labelledby="guestHomePromoTitle"] {
+                border-radius: 12px;
+                background: #1e2329;
+                padding: 12px 16px 18px;
+            }
+
+            #guestHomeContent > section[aria-labelledby="guestMarketsTitle"],
+            #homeMarketWatchCard {
+                overflow: hidden;
+                border: 1px solid #2b3139;
+                border-radius: 12px;
+                background: #1e2329;
+            }
+
+            #homeBalanceCard {
+                border: 0;
+                border-radius: 0;
+                background: transparent;
+                padding: 0;
+            }
+
+            #homeBalanceCard > .pointer-events-none,
+            #homeBalanceCard > .relative.mt-3 {
+                display: none;
+            }
+
+            #homeBalanceCard > .relative.grid {
+                display: block;
+            }
+
+            #homeBalanceCard > .relative.grid > div:first-child > .flex:first-child {
+                margin-bottom: 4px;
+                color: #848e9c;
+                font-size: 12px;
+            }
+
+            #homeBalanceCard .rounded-full.border-binanceYellow\/20 {
+                display: none;
+            }
+
+            #homePortfolioValue {
+                display: block !important;
+                font-size: 34px;
+                line-height: 1.15;
+                letter-spacing: -0.5px;
+            }
+
+            #homePortfolioBtcValue {
+                display: none !important;
+            }
+
+            #homePortfolioFiat {
+                margin-top: 2px;
+                font-size: 11px;
+            }
+
+            #homePortfolioChange {
+                padding: 0;
+                background: transparent !important;
+                font-size: 12px;
+            }
+
+            #homeBalanceCard .relative.mt-3.flex {
+                margin-top: 5px;
+                justify-content: flex-start;
+                border: 0;
+                padding-top: 0;
+                font-size: 12px;
+            }
+
+            #homeBalanceCard .relative.mt-3.flex > span {
+                display: none;
+            }
+
+            #signedInHomeContent > .home-mobile-actions {
+                gap: 16px 10px;
+                margin: 4px 0 16px;
+                padding: 0 2px;
+            }
+
+            #signedInHomeContent > .home-mobile-actions > button {
+                min-height: 52px;
+                justify-content: center;
+                gap: 6px;
+                padding: 4px 0;
+            }
+
+            #signedInHomeContent > .home-mobile-actions > button > span:first-child {
+                width: 24px;
+                height: 24px;
+                margin-bottom: 0;
+                background: transparent;
+                color: #848e9c;
+            }
+
+            #signedInHomeContent > .home-mobile-actions > button > span:first-child > svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            #signedInHomeContent > #homePromotionBanner {
+                display: none;
+            }
+
+            #homeMarketWatchCard {
+                border: 0;
+                border-radius: 0;
+                background: transparent;
+            }
+
+            #homeMarketWatchCard > .flex:first-child {
+                padding: 0 0 10px;
+            }
+
+            #homeMarketWatchCard > .flex:first-child h2 {
+                font-size: 15px;
+            }
+
+            #homeMarketWatchCard > .flex:first-child p {
+                display: none;
+            }
+
+            #homeMarketWatchCard > .border-b.border-binanceBorder.px-3 {
+                padding-right: 0;
+                padding-left: 0;
+            }
+
+            #homeMarketWatchCard > .grid {
+                padding-right: 0;
+                padding-left: 0;
+            }
+
+            #homeMarketList > button {
+                padding-right: 0;
+                padding-left: 0;
+            }
+
+            #guestHomeContent [data-home-category],
+            #signedInHomeContent [data-home-category] {
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            #guestHomeContent [data-home-market],
+            #signedInHomeContent [data-home-market] {
+                font-size: 13px;
+                font-weight: 500;
+            }
+
+            #guestHomeMarketList > button,
+            #homeMarketList > button {
+                grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.6fr) 72px;
+                gap: 10px;
+                align-items: center;
+                padding: 12px 10px;
+            }
+
+            #guestHomeMarketList > button > span:first-child,
+            #homeMarketList > button > span:first-child {
+                gap: 10px;
+            }
+
+            #guestHomeMarketList > button > span:nth-child(2),
+            #homeMarketList > button > span:nth-child(2) {
+                align-items: flex-start;
+                text-align: left;
+            }
+
+            #guestHomeMarketList [data-home-quote-price],
+            #homeMarketList [data-home-quote-price] {
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            #guestHomeMarketList [data-home-quote-change],
+            #homeMarketList [data-home-quote-change] {
+                width: 72px;
+                justify-self: end;
+                border-radius: 4px;
+                background-color: rgba(14, 203, 129, 0.15);
+                color: #0ecb81;
+                font-size: 13px;
+                font-weight: 600;
+                text-align: center;
+            }
+
+            #guestHomeMarketList [data-home-quote-change].bg-binanceRed,
+            #homeMarketList [data-home-quote-change].bg-binanceRed {
+                background-color: rgba(246, 70, 93, 0.15);
+                color: #f6465d;
+            }
+
+            #mobileBottomNav {
+                min-height: 60px;
+                background: #181a20;
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
+
+            #appBody.home-header-mode > header {
+                height: 40px;
+                min-height: 40px;
+                border-bottom: 0;
+                background: #181a20;
+                padding-right: 16px;
+                padding-left: 16px;
+            }
+        }
     </style>
 </head>
 <body id="appBody" class="bg-binanceBg text-binanceText font-sans h-screen flex flex-col overflow-hidden select-none">
@@ -1258,9 +1503,9 @@
                 <button id="mobileSupportButton" type="button" onclick="runHeaderAccountAction('support')" aria-label="Help and support" class="flex h-8 w-8 items-center justify-center rounded-full text-binanceMuted transition hover:bg-binanceHover hover:text-white md:hidden">
                     <i data-lucide="headset" class="h-5 w-5"></i>
                 </button>
-                <button id="headerAccountMenuButton" type="button" data-account-menu-trigger onclick="toggleHeaderAccountMenu(event)" aria-label="Open account menu" aria-haspopup="true" aria-expanded="false" aria-controls="headerAccountMenuPanel" class="hidden items-center gap-2 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-binanceYellow md:flex">
+                <button id="headerAccountMenuButton" type="button" data-account-menu-trigger onclick="openUserHome()" aria-label="Go to home" aria-haspopup="false" aria-expanded="false" aria-controls="headerAccountMenuPanel" class="hidden items-center gap-2 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-binanceYellow md:flex">
                     <span class="flex items-center gap-2">
-                        <span class="hidden font-bold text-xl tracking-tight text-white sm:inline">BINANCE</span>
+                        <img src="./idGOzgQxaB_1791706713499.png" alt="Brand logo" class="header-brand-logo hidden sm:block" />
                         <span id="headerProBadge" class="rounded border border-binanceBorder bg-binanceHover px-1.5 py-0.5 text-[10px] font-semibold text-binanceYellow">PRO</span>
                     </span>
                 </button>
@@ -1348,7 +1593,6 @@
                 </button>
                 <button onclick="openP2PPage()" class="hover:text-binanceYellow transition">P2P Escrow</button>
                 <button onclick="notify('Earn Products & Staking features standard')" class="hover:text-binanceYellow transition">Earn</button>
-                <button id="adminNavButton" onclick="openAdminPanel()" class="hover:text-binanceYellow transition">Admin</button>
             </nav>
         </div>
 
@@ -1445,6 +1689,7 @@
                 <div>
                     <div id="currentPriceDisplay" class="text-xl font-bold text-binanceGreen font-mono">$91,800.00</div>
                     <div id="currentPriceUSD" class="text-[11px] text-binanceMuted font-mono">≈ $91,800.00 USD</div>
+                    <div id="priceAdjustmentNotice" class="hidden text-[9px] font-semibold text-binanceYellow"></div>
                     <div data-market-feed-status class="text-[9px] text-binanceMuted">Binance spot · Connecting</div>
                     <div class="text-[8px] text-binanceMuted">Practice chart, order book, and trade tape</div>
                 </div>
@@ -1914,7 +2159,7 @@
                     <button type="button" data-home-market="futures" aria-pressed="false" onclick="setHomeMarketType('futures')" class="shrink-0 rounded-full px-3 py-1.5 text-binanceMuted">Futures</button>
                     <button type="button" data-home-market="stocks" aria-pressed="false" onclick="setHomeMarketType('stocks')" class="shrink-0 rounded-full px-3 py-1.5 text-binanceMuted">Stocks</button>
                 </div>
-                <div class="mb-2 text-[10px] text-binanceMuted"><span id="guestHomeMarketSubtitle">Binance spot prices · USDT pairs</span> · <span data-market-feed-status>Connecting</span></div>
+                <div class="mb-2 text-[10px] text-binanceMuted"><span id="guestHomeMarketSubtitle">Binance spot prices · USDT pairs</span> · <span data-market-feed-status>Connecting</span><span id="guestTradfiQuoteStatus" class="hidden"></span></div>
                 <div class="market-list-header flex items-center justify-between text-[10px] text-binanceMuted">
                     <span>Name / Vol</span>
                     <div class="flex items-center gap-6 text-right"><span>Last Price</span><span>24h Chg</span></div>
@@ -1944,12 +2189,12 @@
             </form>
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                <article class="relative col-span-1 overflow-hidden rounded-xl border border-binanceBorder bg-gradient-to-br from-binanceCard via-binanceCard to-[#24251e] p-4 sm:col-span-2 xl:col-span-2 sm:p-5">
+                <article id="homeBalanceCard" class="relative col-span-1 overflow-hidden rounded-xl border border-binanceBorder bg-gradient-to-br from-binanceCard via-binanceCard to-[#24251e] p-4 sm:col-span-2 xl:col-span-2 sm:p-5">
                     <div class="pointer-events-none absolute -right-8 -top-12 h-40 w-40 rounded-full bg-binanceYellow/5 blur-2xl"></div>
                     <div class="relative grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(9rem,0.8fr)] sm:items-center">
                         <div>
                             <div class="flex items-center gap-2">
-                                <span class="text-xs font-medium text-binanceMuted">Est. Total Value</span>
+                                <span class="text-xs font-medium text-binanceMuted">Total Balance</span>
                                 <label class="relative inline-flex items-center">
                                     <span class="sr-only">Home balance display currency</span>
                                     <select id="homePortfolioCurrency" aria-label="Home balance display currency" onchange="setAssetsDisplayCurrency(this.value)" class="appearance-none bg-transparent pr-4 text-[10px] font-semibold text-binanceText outline-none" style="color-scheme: dark">
@@ -2019,7 +2264,7 @@
                 </article>
             </div>
 
-            <div class="grid grid-cols-4 gap-x-2 gap-y-1 rounded-xl bg-transparent px-1 py-2 text-center md:hidden">
+            <div class="home-mobile-actions grid grid-cols-4 gap-x-2 gap-y-1 rounded-xl bg-transparent px-1 py-2 text-center md:hidden">
                 <button type="button" onclick="openHomeAction('referral')" class="group flex min-w-0 flex-col items-center gap-1.5 rounded-lg py-2 text-binanceText active:bg-binanceHover">
                     <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-binanceHover text-white group-hover:text-binanceYellow"><i data-lucide="user-round-plus" class="h-5 w-5"></i></span><span class="text-[10px]">Referral</span>
                 </button>
@@ -2089,9 +2334,9 @@
                     <div id="homeAssetList" class="divide-y divide-binanceBorder"></div>
                 </section>
 
-                <section class="overflow-hidden rounded-xl border border-binanceBorder bg-binanceCard">
+                <section id="homeMarketWatchCard" class="overflow-hidden rounded-xl border border-binanceBorder bg-binanceCard">
                     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-binanceBorder px-4 py-3">
-                        <div class="w-full md:w-auto"><h2 class="text-sm font-bold text-white">Market watch</h2><p class="mt-1 text-[10px] text-binanceMuted"><span id="homeMarketSubtitle">Binance spot prices · USDT pairs</span> · <span data-market-feed-status>Connecting</span></p></div>
+                        <div class="w-full md:w-auto"><h2 class="text-sm font-bold text-white">Market watch</h2><p class="mt-1 text-[10px] text-binanceMuted"><span id="homeMarketSubtitle">Binance spot prices · USDT pairs</span> · <span data-market-feed-status>Connecting</span><span id="homeTradfiQuoteStatus" class="hidden"></span></p></div>
                         <div class="hidden max-w-full items-center gap-1 overflow-x-auto rounded-lg border border-binanceBorder bg-binanceBg p-1 md:flex" role="group" aria-label="Market watch type">
                             <button type="button" onclick="openHomeMarketCategory('favorites')" class="whitespace-nowrap rounded-md px-2.5 py-1.5 text-[9px] font-semibold text-binanceMuted hover:bg-binanceHover hover:text-white">Favourites</button>
                             <button type="button" data-home-market="spot" aria-pressed="true" onclick="setHomeMarketType('spot')" class="rounded-md bg-binanceYellow px-2.5 py-1.5 text-[9px] font-bold text-binanceBg">Spot</button>
@@ -2186,7 +2431,7 @@
                 <article class="rounded-xl border border-binanceBorder bg-binanceCard p-4"><div id="marketTrackedLabel" class="text-[10px] uppercase tracking-wide text-binanceMuted">Markets in view</div><div id="marketTrackedCount" class="mt-2 text-xl font-bold text-white">—</div></article>
                 <article class="rounded-xl border border-binanceBorder bg-binanceCard p-4"><div class="text-[10px] uppercase tracking-wide text-binanceMuted">Favorites</div><div id="marketFavoritesCount" class="mt-2 text-xl font-bold text-binanceYellow">—</div></article>
                 <article class="rounded-xl border border-binanceBorder bg-binanceCard p-4"><div id="marketLeaderLabel" class="text-[10px] uppercase tracking-wide text-binanceMuted">Market leader</div><div id="marketLeaderValue" class="mt-2 text-xl font-bold text-white">BTC / USDT</div></article>
-                <article class="rounded-xl border border-binanceBorder bg-binanceCard p-4"><div class="text-[10px] uppercase tracking-wide text-binanceMuted">Crypto data</div><div class="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-binanceGreen"><span data-market-feed-dot class="h-2 w-2 rounded-full bg-binanceYellow"></span><span data-market-feed-status>Connecting</span></div></article>
+                <article class="rounded-xl border border-binanceBorder bg-binanceCard p-4"><div id="marketDataCardLabel" class="text-[10px] uppercase tracking-wide text-binanceMuted">Crypto data</div><div class="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-binanceGreen"><span data-market-feed-dot class="h-2 w-2 rounded-full bg-binanceYellow"></span><span data-market-feed-status>Connecting</span><span id="marketsTradfiQuoteStatus" class="hidden font-normal text-binanceMuted"></span></div></article>
             </div>
             <section class="overflow-hidden rounded-xl border border-binanceBorder bg-binanceCard">
                 <div class="flex flex-col gap-3 border-b border-binanceBorder p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -2855,7 +3100,7 @@
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="text-binanceMuted block mb-1">Select Asset</label>
-                    <select id="depositAsset" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
+                    <select id="depositAsset" onchange="updateDepositAddressDisplay()" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
                         <option value="USDT">USDT - Tether USD</option>
                         <option value="BTC">BTC - Bitcoin</option>
                         <option value="ETH">ETH - Ethereum</option>
@@ -2867,15 +3112,27 @@
                         <option value="AVAX">AVAX - Avalanche</option>
                     </select>
                 </div>
-                <div class="bg-binanceBg border border-binanceBorder rounded p-3 text-binanceMuted">
-                    Practice wallet credit only. No blockchain deposit or real funds are involved.
-                </div>
                 <div>
-                    <label class="text-binanceMuted block mb-1">Practice credit amount</label>
-                    <input id="depositAmount" type="number" min="0" step="any" placeholder="0.00" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
+                    <label class="text-binanceMuted block mb-1">Network</label>
+                    <select id="depositNetwork" onchange="updateDepositAddressDisplay()" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono"></select>
                 </div>
+                <div class="rounded border border-binanceBorder bg-binanceBg p-3">
+                    <div class="mb-2 flex items-center justify-between gap-2">
+                        <span class="text-binanceMuted">Deposit address</span>
+                        <button id="copyDepositAddressButton" type="button" onclick="copyDepositAddress()" class="hidden rounded border border-binanceBorder px-2 py-1 text-[10px] text-white hover:border-binanceYellow">Copy</button>
+                    </div>
+                    <code id="depositAddressValue" class="block break-all font-mono text-[11px] text-white">Loading address…</code>
+                    <p id="depositAddressMemo" class="mt-2 hidden break-all text-[10px] text-binanceMuted"></p>
+                </div>
+                <p class="rounded border border-binanceRed/40 bg-binanceRedBg p-3 text-[10px] leading-relaxed text-binanceRed">Practice demo only. Blockchain deposits are not monitored or credited automatically. Do not send real funds.</p>
             </div>
-            <button onclick="depositDemoFunds()" class="w-full py-2.5 rounded font-bold bg-binanceYellow text-binanceBg hover:bg-binanceYellowHover">Credit Practice Wallet</button>
+            <details class="rounded border border-binanceBorder bg-binanceBg p-3">
+                <summary class="cursor-pointer text-xs font-semibold text-binanceMuted">Practice wallet credit (demo only)</summary>
+                <label class="mt-3 block text-xs text-binanceMuted">Practice credit amount
+                    <input id="depositAmount" type="number" min="0" step="any" placeholder="0.00" class="mt-1 w-full bg-binanceCard border border-binanceBorder rounded p-2.5 text-white font-mono">
+                </label>
+                <button onclick="depositDemoFunds()" class="mt-3 w-full py-2.5 rounded font-bold bg-binanceYellow text-binanceBg hover:bg-binanceYellowHover">Credit Practice Wallet</button>
+            </details>
         </div>
     </div>
 
@@ -2960,6 +3217,7 @@
                     <button id="confirmCryptoAction" onclick="confirmCryptoPurchase()" class="flex-1 rounded bg-binanceYellow py-2.5 text-xs font-bold text-binanceBg">Confirm practice purchase</button>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -3105,9 +3363,7 @@
                         <div class="space-y-2 max-h-[48vh] overflow-y-auto pr-1 pt-2" id="p2pOffersList"></div>
                     </div>
                 </div>
-                </div>
             </div>
-
             <div id="p2pMyTrades" class="hidden space-y-2 text-xs max-h-[60vh] overflow-y-auto"></div>
             <div id="p2pMyAds" class="hidden space-y-2 text-xs max-h-[60vh] overflow-y-auto">
                 <button onclick="showP2PView('market')" class="text-binanceYellow hover:text-white">← Back to marketplace</button>
@@ -3157,6 +3413,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <div id="authModal" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-[60] p-4" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
@@ -3211,7 +3468,7 @@
                 <label class="block text-xs text-binanceMuted">
                     Password
                     <span class="mt-1 flex bg-binanceBg border border-binanceBorder rounded focus-within:border-binanceYellow">
-                        <input id="signupPassword" name="new-password" type="password" autocomplete="new-password" minlength="8" oninput="validateSignupForm()" aria-describedby="signupPasswordRules" class="min-w-0 flex-1 bg-transparent px-3 py-2 text-white outline-none" placeholder="Create a strong password" required>
+                        <input id="signupPassword" name="new-password" type="password" autocomplete="new-password" minlength="12" maxlength="128" oninput="validateSignupForm()" aria-describedby="signupPasswordRules" class="min-w-0 flex-1 bg-transparent px-3 py-2 text-white outline-none" placeholder="Create a strong password" required>
                         <button type="button" onclick="toggleAuthPassword('signupPassword', this)" aria-label="Show password" class="px-3 text-[10px] text-binanceMuted hover:text-white">Show</button>
                     </span>
                 </label>
@@ -3222,7 +3479,7 @@
                     </div>
                     <div class="mb-2 h-1 overflow-hidden rounded bg-binanceHover"><div id="signupPasswordStrengthBar" class="h-full w-0 rounded bg-binanceRed transition-all"></div></div>
                     <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-binanceMuted">
-                        <span id="passwordRuleLength">○ At least 8 characters</span>
+                        <span id="passwordRuleLength">○ At least 12 characters</span>
                         <span id="passwordRuleLower">○ Lowercase letter</span>
                         <span id="passwordRuleUpper">○ Uppercase letter</span>
                         <span id="passwordRuleNumber">○ Number</span>
@@ -3239,11 +3496,11 @@
                 </label>
                 <label class="flex items-start gap-2 text-[10px] leading-relaxed text-binanceMuted">
                     <input id="signupDemoAcknowledgement" type="checkbox" onchange="validateSignupForm()" class="mt-0.5 accent-binanceYellow" required>
-                    <span>I understand this is a local practice account. It does not provide real authentication, email verification, or real financial services.</span>
+                    <span>I understand this is a practice account. Balances, orders, and financial services are simulated and do not represent real funds.</span>
                 </label>
                 <button id="signupSubmitButton" class="w-full rounded bg-binanceYellow py-2.5 text-xs font-bold text-binanceBg hover:bg-binanceYellowHover">Create practice account</button>
             </form>
-            <p class="mt-4 border-t border-binanceBorder pt-3 text-[10px] leading-relaxed text-binanceMuted">Practice accounts are stored only in this browser. Do not use a real password or sensitive personal information.</p>
+            <p class="mt-4 border-t border-binanceBorder pt-3 text-[10px] leading-relaxed text-binanceMuted">Account sign-in is protected by the server. All balances and trading activity remain for practice only.</p>
         </div>
     </div>
 
@@ -3267,22 +3524,20 @@
                 <form onsubmit="loginAdmin(event)" class="bg-binanceBg border border-binanceBorder rounded-xl p-5 space-y-4">
                     <div>
                         <div class="text-xs text-binanceMuted uppercase tracking-wide">Admin access</div>
-                        <h4 class="mt-2 text-xl font-bold text-white">Sign in to manage balances</h4>
+                        <h4 class="mt-2 text-xl font-bold text-white">Administrator sign in</h4>
                     </div>
                     <label class="block text-xs text-binanceMuted">
-                        Username
-                        <input id="adminUsername" value="admin" class="mt-1 w-full bg-binanceCard border border-binanceBorder rounded px-3 py-2 text-white outline-none focus:border-binanceYellow" placeholder="admin" />
+                        Email or username
+                        <input id="adminUsername" autocomplete="username" required class="mt-1 w-full bg-binanceCard border border-binanceBorder rounded px-3 py-2 text-white outline-none focus:border-binanceYellow" placeholder="Admin email or username" />
                     </label>
                     <label class="block text-xs text-binanceMuted">
                         Password
-                        <input id="adminPassword" type="password" value="admin123" class="mt-1 w-full bg-binanceCard border border-binanceBorder rounded px-3 py-2 text-white outline-none focus:border-binanceYellow" placeholder="admin123" />
-                    </label>
-                    <div class="rounded border border-binanceYellow/30 bg-binanceYellow/10 px-3 py-2 text-[10px] text-binanceYellow">
-                        Practice credentials: admin / admin123
-                    </div>
-                    <button class="w-full rounded bg-binanceYellow py-2.5 text-xs font-bold text-binanceBg hover:bg-binanceYellowHover">Login to admin</button>
-                </form>
-            </div>
+                        <input id="adminPassword" type="password" autocomplete="current-password" required class="mt-1 w-full bg-binanceCard border border-binanceBorder rounded px-3 py-2 text-white outline-none focus:border-binanceYellow" placeholder="Password" />
+                        </label>
+                        <div id="adminAuthFeedback" class="hidden rounded border border-binanceRed/40 bg-binanceRedBg px-3 py-2 text-[10px] text-binanceRed" role="alert"></div>
+                        <button class="w-full rounded bg-binanceYellow py-2.5 text-xs font-bold text-binanceBg hover:bg-binanceYellowHover">Sign in</button>
+                    </form>
+                </div>
 
             <div id="adminDashboard" class="hidden">
                 <div class="flex items-center justify-between mb-5">
@@ -3341,6 +3596,56 @@
                     </div>
                 </div>
 
+                <section class="bg-binanceBg border border-binanceBorder rounded-lg p-4 mb-5">
+                    <div class="mb-3">
+                        <h4 class="text-sm font-bold text-white">Pair price adjustment</h4>
+                        <p class="mt-1 text-[10px] leading-relaxed text-binanceMuted">Practice-only override applied to Binance reference prices and practice trades. Use a negative percentage to lower the price; enter 0 or leave blank to remove an adjustment.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                        <label class="text-xs text-binanceMuted">Market
+                            <select id="adminPriceMarketType" onchange="updateAdminPricePairOptions()" class="mt-1 w-full rounded border border-binanceBorder bg-binanceCard px-3 py-2 text-white outline-none focus:border-binanceYellow">
+                                <option value="spot">Spot</option>
+                                <option value="futures">Futures</option>
+                            </select>
+                        </label>
+                        <label class="text-xs text-binanceMuted">Pair
+                            <select id="adminPricePair" onchange="updateAdminPriceAdjustmentInput()" class="mt-1 w-full rounded border border-binanceBorder bg-binanceCard px-3 py-2 text-white outline-none focus:border-binanceYellow"></select>
+                        </label>
+                        <label class="text-xs text-binanceMuted">Adjustment percentage
+                            <input id="adminPricePercentage" type="number" min="-99.99" max="1000" step="0.001" placeholder="e.g. 2.5 or -1" class="mt-1 w-full rounded border border-binanceBorder bg-binanceCard px-3 py-2 font-mono text-white outline-none focus:border-binanceYellow">
+                        </label>
+                        <div class="flex items-end">
+                            <button id="adminSavePriceAdjustment" type="button" onclick="saveAdminPriceAdjustment()" class="w-full rounded bg-binanceYellow py-2 text-xs font-bold text-binanceBg hover:bg-binanceYellowHover disabled:cursor-not-allowed disabled:opacity-40">Save pair price</button>
+                        </div>
+                    </div>
+                    <p id="adminPriceAdjustmentFeedback" role="status" class="mt-3 hidden rounded border px-3 py-2 text-xs"></p>
+                </section>
+
+                <section class="mb-5 rounded-lg border border-binanceBorder bg-binanceBg p-4">
+                    <div class="mb-3">
+                        <h4 class="text-sm font-bold text-white">Shared crypto deposit addresses</h4>
+                        <p class="mt-1 text-[10px] leading-relaxed text-binanceMuted">These addresses are visible to every account in the deposit form. Leave the address blank and save to remove it. This demo does not monitor blockchain deposits or credit them automatically; do not use real funds.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                        <label class="text-xs text-binanceMuted">Asset
+                            <select id="adminDepositAsset" onchange="updateAdminDepositNetworkOptions()" class="mt-1 w-full rounded border border-binanceBorder bg-binanceCard px-3 py-2 text-white outline-none focus:border-binanceYellow"></select>
+                        </label>
+                        <label class="text-xs text-binanceMuted">Network
+                            <select id="adminDepositNetwork" onchange="updateAdminDepositAddressInput()" class="mt-1 w-full rounded border border-binanceBorder bg-binanceCard px-3 py-2 text-white outline-none focus:border-binanceYellow"></select>
+                        </label>
+                        <label class="text-xs text-binanceMuted sm:col-span-2">Deposit address
+                            <input id="adminDepositAddress" type="text" maxlength="200" autocomplete="off" spellcheck="false" placeholder="Paste the address to show users; blank removes it" class="mt-1 w-full rounded border border-binanceBorder bg-binanceCard px-3 py-2 font-mono text-white outline-none focus:border-binanceYellow">
+                        </label>
+                        <label class="text-xs text-binanceMuted sm:col-span-2">Memo / destination tag (optional)
+                            <input id="adminDepositMemo" type="text" maxlength="120" autocomplete="off" placeholder="Required tag or memo, if applicable" class="mt-1 w-full rounded border border-binanceBorder bg-binanceCard px-3 py-2 font-mono text-white outline-none focus:border-binanceYellow">
+                        </label>
+                        <div class="flex items-end">
+                            <button id="adminSaveDepositAddress" type="button" onclick="saveAdminDepositAddress()" class="w-full rounded bg-binanceYellow py-2 text-xs font-bold text-binanceBg hover:bg-binanceYellowHover disabled:cursor-not-allowed disabled:opacity-40">Save address</button>
+                        </div>
+                    </div>
+                    <p id="adminDepositAddressFeedback" role="status" class="mt-3 hidden rounded border px-3 py-2 text-xs"></p>
+                </section>
+
                 <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
                     <div class="bg-binanceBg border border-binanceBorder rounded-lg p-4">
                         <div class="flex items-center justify-between mb-4">
@@ -3388,7 +3693,7 @@
                                 <label class="mt-2 block text-binanceMuted">Source address
                                     <input id="adminCreditAddress" type="text" maxlength="200" autocomplete="off" spellcheck="false" placeholder="Enter practice source wallet address" class="mt-1 w-full bg-binanceCard border border-binanceBorder rounded px-3 py-2 text-white font-mono outline-none focus:border-binanceYellow">
                                 </label>
-                                <p class="text-[10px] leading-relaxed text-binanceMuted">Practice only: balance changes show as processing for at least 1 minute, then complete. The address and network are recorded as entered; no blockchain transfer or verification occurs.</p>
+                                <p class="text-[10px] leading-relaxed text-binanceMuted">Practice only: balance changes are saved immediately to the account database. The address and network are recorded as entered; no blockchain transfer or verification occurs.</p>
                                 <button id="adminAddBalanceButton" type="button" onclick="creditSelectedUserBalance()" class="mt-2 w-full rounded bg-binanceGreen py-2 font-semibold text-binanceBg hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed">Add to selected balance</button>
                             </div>
                             <button id="adminCreditUsdtButton" onclick="creditDemoWallet('USDT', 10000)" class="w-full rounded border border-binanceBorder bg-binanceHover py-2 text-white hover:text-binanceYellow disabled:opacity-40 disabled:cursor-not-allowed">Credit +$10,000 USDT</button>
@@ -3415,6 +3720,28 @@
                                 </thead>
                                 <tbody id="adminBalanceTableBody" class="text-white"></tbody>
                             </table>
+                        </div>
+                        <div class="mt-5 rounded-lg border border-binanceBorder bg-binanceBg p-4">
+                            <div class="mb-3 flex items-center justify-between gap-3">
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Administrator action history</h4>
+                                    <p class="mt-1 text-[10px] text-binanceMuted">Recent wallet and pair-price changes saved in the database</p>
+                                </div>
+                                <span id="adminAuditStatus" class="text-[10px] text-binanceMuted"></span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full min-w-[640px] text-left text-xs">
+                                    <thead class="text-binanceMuted uppercase tracking-wide">
+                                        <tr>
+                                            <th class="pb-2 pr-4">Time</th>
+                                            <th class="pb-2 pr-4">Administrator</th>
+                                            <th class="pb-2 pr-4">Account</th>
+                                            <th class="pb-2">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminAuditTableBody" class="text-white"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3480,6 +3807,17 @@
     <div id="toast" class="fixed right-4 bottom-4 px-3 py-2 rounded bg-binanceCard border border-binanceBorder text-white text-xs font-mono shadow-xl opacity-0 pointer-events-none transition-all duration-200 z-[60]"></div>
 
     <script>
+        const DEPOSIT_NETWORKS_BY_ASSET = {
+            USDT: ['Ethereum (ERC-20)', 'BNB Smart Chain (BEP-20)', 'Tron (TRC-20)', 'Solana'],
+            BTC: ['Bitcoin'],
+            ETH: ['Ethereum (ERC-20)'],
+            SOL: ['Solana'],
+            BNB: ['BNB Smart Chain (BEP-20)'],
+            XRP: ['XRP Ledger'],
+            ADA: ['Cardano'],
+            DOGE: ['Dogecoin'],
+            AVAX: ['Avalanche C-Chain']
+        };
         const state = {
             tab: 'trade',
             tradingMode: 'spot',
@@ -3510,19 +3848,24 @@
             assetsFuturesView: 'assets',
             assetsPageQuery: '',
             marketFeedStatus: 'connecting',
+            tradfiQuoteStatus: 'connecting',
+            tradfiQuotesLoading: false,
+            tradfiQuotesCheckedAt: 0,
             marketTickerStats: {},
+            marketPriceAdjustments: {},
+            cryptoDepositAddresses: [],
             futuresQuotes: {},
             futuresQuoteChanges: {},
             futuresTickerStats: {},
             marketQuotes: {
                 BTC: 91800, ETH: 3480, SOL: 192, BNB: 635, XRP: 0.62, ADA: 0.78,
-                DOGE: 0.19, AVAX: 34.9, SPX: 5842.47, NDX: 20318.76, AAPL: 224.18,
-                TSLA: 248.50, NVDA: 132.87, XAU: 2648.30, XAG: 31.27, WTI: 74.35
+                DOGE: 0.19, AVAX: 34.9, SPY: 779.95, QQQ: 751.22, AAPL: 336.64,
+                TSLA: 383.05, NVDA: 230.87, XAU: 4199.19, XAG: 60.84, CL: 91.37
             },
             marketQuoteChanges: {
                 BTC: 2.84, ETH: 1.26, SOL: -0.72, BNB: 0.48, XRP: -0.31, ADA: 1.08,
-                DOGE: 3.42, AVAX: -1.14, SPX: 0.64, NDX: 0.91, AAPL: 1.12,
-                TSLA: -1.37, NVDA: 2.18, XAU: 0.42, XAG: -0.18, WTI: 0.85
+                DOGE: 3.42, AVAX: -1.14, SPY: 0, QQQ: -0.013, AAPL: 0,
+                TSLA: 0.065, NVDA: 0.156, XAU: 0.046, XAG: -0.115, CL: 0.705
             },
             currentPrice: 91800,
             asset: 'BTC',
@@ -3544,7 +3887,14 @@
                 loggedIn: false,
                 username: '',
                 lastLogin: '',
-                selectedUser: ''
+                selectedUser: '',
+                userId: null,
+                loadError: '',
+                audit: [],
+                auditError: '',
+                priceAdjustments: [],
+                priceAdjustmentError: '',
+                saving: false
             },
             futuresPositions: [],
             fundingAssets: [],
@@ -3655,6 +4005,17 @@
             if (!Number.isFinite(state.marketQuoteChanges[asset])) state.marketQuoteChanges[asset] = change;
         });
         const LIVE_MARKET_ASSETS = new Set(CRYPTO_MARKET_CATALOG.map(({ asset }) => asset));
+        const TRADFI_BINANCE_SYMBOLS = {
+            SPY: 'SPYUSDT',
+            QQQ: 'QQQUSDT',
+            AAPL: 'AAPLUSDT',
+            TSLA: 'TSLAUSDT',
+            NVDA: 'NVDAUSDT',
+            XAU: 'XAUUSDT',
+            XAG: 'XAGUSDT',
+            CL: 'CLUSDT'
+        };
+        const TRADFI_ASSETS = new Set(Object.keys(TRADFI_BINANCE_SYMBOLS));
         const FUTURES_MARKET_CATALOG = [];
         let marketDataSocket = null;
         let marketDataReconnectTimer = null;
@@ -3676,7 +4037,6 @@
 
         const DEMO_STORAGE_KEY = 'exchange-practice-account-v1';
         const USERS_STORAGE_KEY = 'exchange-practice-users-v1';
-        const SESSION_STORAGE_KEY = 'exchange-practice-session-v1';
         const BALANCE_PROCESSING_DELAY_MS = 60_000;
 
         function createDefaultWallet() {
@@ -3700,7 +4060,15 @@
                 }
                 const parsed = JSON.parse(stored);
                 state.users = Array.isArray(parsed) ? parsed : [];
+                let removedPlaintextPasswords = false;
+                state.users.forEach((user) => {
+                    if (Object.prototype.hasOwnProperty.call(user, 'password')) {
+                        delete user.password;
+                        removedPlaintextPasswords = true;
+                    }
+                });
                 state.users.forEach(ensureUserActivity);
+                if (removedPlaintextPasswords) saveUsers();
             } catch (error) {
                 console.error('Could not load stored users', error);
                 notify('Saved practice accounts could not be loaded from this browser');
@@ -3710,7 +4078,8 @@
 
         function saveUsers() {
             try {
-                localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(state.users));
+                const safeUsers = state.users.map(({ password, ...user }) => user);
+                localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(safeUsers));
                 return true;
             } catch (error) {
                 console.error('Could not save stored users', error);
@@ -3780,7 +4149,6 @@
         function renderAuthUI() {
             const loginButton = document.getElementById('authLoginButton');
             const signupButton = document.getElementById('authSignupButton');
-            const adminButton = document.getElementById('adminNavButton');
             const notifications = document.getElementById('accountNotifications');
             const homeButton = document.getElementById('homeNavButton');
             const isLoggedIn = !!state.currentUser;
@@ -3808,9 +4176,6 @@
                 signupButton.classList.toggle('hidden', isLoggedIn);
                 signupButton.classList.toggle('md:block', !isLoggedIn);
                 signupButton.classList.toggle('md:hidden', isLoggedIn);
-            }
-            if (adminButton) {
-                adminButton.classList.toggle('hidden', isLoggedIn);
             }
             if (notifications) notifications.classList.toggle('hidden', !isLoggedIn);
             if (homeButton) homeButton.classList.toggle('hidden', !isLoggedIn);
@@ -4163,7 +4528,6 @@
             const pages = ['home', 'markets', 'futures', 'assets', 'convert'];
             const isTradingWorkspace = page === 'trade' || page === 'futuresTrade';
             const isLoggedInAssetsView = page === 'assets' && !!state.currentUser;
-            if (isTradingWorkspace && !requireSignedInForTrading()) return;
             document.getElementById('appBody').classList.remove('assets-history-mode');
             document.getElementById('assetsMobileContent')?.classList.toggle('hidden', !isLoggedInAssetsView);
             document.getElementById('mobileAssetsHistoryPage')?.classList.add('hidden');
@@ -4206,14 +4570,12 @@
         }
 
         function openTradePage() {
-            if (!requireSignedInForTrading()) return false;
             openAppPage('trade');
             setTradingMode('spot');
             return true;
         }
 
         function openTradeMode(mode) {
-            if (!requireSignedInForTrading()) return;
             if (state.activePage !== 'trade') openAppPage('trade');
             setTradingMode(mode);
         }
@@ -4739,27 +5101,36 @@
                 subtitle: 'Binance spot · USDT market'
             }));
             const tradfiCatalog = [
-                { asset: 'SPX', name: 'S&P 500', price: 5842.47, change: 0.64, volume: '1.82B', tradfiClass: 'bstocks' },
-                { asset: 'NDX', name: 'Nasdaq 100', price: 20318.76, change: 0.91, volume: '864.3M', tradfiClass: 'bstocks' },
-                { asset: 'AAPL', name: 'Apple', price: 224.18, change: 1.12, volume: '48.6M', tradfiClass: 'bstocks' },
-                { asset: 'TSLA', name: 'Tesla', price: 248.50, change: -1.37, volume: '72.4M', tradfiClass: 'bstocks' },
-                { asset: 'NVDA', name: 'NVIDIA', price: 132.87, change: 2.18, volume: '39.2M', tradfiClass: 'bstocks' },
-                { asset: 'XAU', name: 'Gold', price: 2648.30, change: 0.42, volume: '214.6M', tradfiClass: 'commodities' },
-                { asset: 'XAG', name: 'Silver', price: 31.27, change: -0.18, volume: '86.1M', tradfiClass: 'commodities' },
-                { asset: 'WTI', name: 'Crude Oil', price: 74.35, change: 0.85, volume: '163.7M', tradfiClass: 'commodities' }
+                { asset: 'SPY', name: 'S&P 500 ETF', price: 779.95, change: 0, volume: '—', tradfiClass: 'bstocks' },
+                { asset: 'QQQ', name: 'Nasdaq-100 ETF', price: 751.22, change: -0.013, volume: '—', tradfiClass: 'bstocks' },
+                { asset: 'AAPL', name: 'Apple', price: 336.64, change: 0, volume: '—', tradfiClass: 'bstocks' },
+                { asset: 'TSLA', name: 'Tesla', price: 383.05, change: 0.065, volume: '—', tradfiClass: 'bstocks' },
+                { asset: 'NVDA', name: 'NVIDIA', price: 230.87, change: 0.156, volume: '—', tradfiClass: 'bstocks' },
+                { asset: 'XAU', name: 'Gold', price: 4199.19, change: 0.046, volume: '—', tradfiClass: 'commodities' },
+                { asset: 'XAG', name: 'Silver', price: 60.84, change: -0.115, volume: '—', tradfiClass: 'commodities' },
+                { asset: 'CL', name: 'Crude Oil', price: 91.37, change: 0.705, volume: '—', tradfiClass: 'commodities' }
             ].map((instrument) => ({
                 ...instrument,
                 price: demoMarketPrice(instrument.asset),
                 change: state.marketQuoteChanges[instrument.asset] ?? instrument.change,
-                pair: `${instrument.asset}USD`,
+                volume: Number.isFinite(state.marketTickerStats[instrument.asset]?.quoteVolume)
+                    ? formatMarketVolume(state.marketTickerStats[instrument.asset].quoteVolume)
+                    : instrument.volume,
+                pair: `${instrument.asset}USDT`,
                 category: 'tradfi',
                 display: instrument.asset,
-                subtitle: `${instrument.name} · practice watchlist quote`
+                subtitle: `${instrument.name} · Binance TradFi perpetual reference`
             }));
-            const futuresCatalog = cryptoCatalog.map((instrument) => ({
-                ...instrument,
+            const futuresCatalog = FUTURES_MARKET_CATALOG.map((contract) => ({
+                ...contract,
+                pair: contract.symbol,
+                price: futuresMarketPrice(contract.symbol, contract.price),
+                change: state.futuresQuoteChanges[contract.symbol] ?? contract.change,
+                volume: state.futuresTickerStats[contract.symbol]
+                    ? formatMarketVolume(state.futuresTickerStats[contract.symbol].quoteVolume)
+                    : formatMarketVolume(contract.volume),
                 category: 'futures',
-                display: `${instrument.asset} / USDT`,
+                display: `${contract.asset} / USDT`,
                 subtitle: 'USDⓈ-M · practice perpetual contract'
             }));
             const allRows = [...cryptoCatalog, ...tradfiCatalog];
@@ -4774,7 +5145,7 @@
                             .slice(0, 8);
             document.getElementById('marketFavoritesCount').textContent = String(allRows.filter((instrument) => state.favoritePairs.includes(instrument.pair)).length);
             document.getElementById('marketLeaderLabel').textContent = state.marketSection === 'tradfi' ? 'TradFi reference' : 'Market leader';
-            document.getElementById('marketLeaderValue').textContent = state.marketSection === 'tradfi' ? 'S&P 500' : state.marketSection === 'favorites' && rows.length ? rows[0].display : 'BTC / USDT';
+            document.getElementById('marketLeaderValue').textContent = state.marketSection === 'tradfi' ? 'Binance TradFi' : state.marketSection === 'favorites' && rows.length ? rows[0].display : 'BTC / USDT';
             const query = state.marketPageQuery;
             const filtered = rows.filter((coin) => {
                 return !query || coin.asset.toLowerCase().includes(query) || coin.display.toLowerCase().includes(query) || (coin.name || '').toLowerCase().includes(query);
@@ -4782,17 +5153,21 @@
             document.getElementById('marketTrackedCount').textContent = String(filtered.length);
             document.getElementById('marketTrackedLabel').textContent = state.marketSection === 'crypto' ? 'Pairs in view' : 'Markets in view';
             const sectionTitles = {
-                'for-you': ['Market', 'Binance spot prices and practice TradFi watchlist'],
+                'for-you': ['Market', 'Binance spot prices and live TradFi references'],
                 favorites: ['Market', 'Your saved crypto and TradFi markets'],
                 crypto: ['Pair', 'Live Binance spot prices · USDT pairs'],
-                tradfi: ['Instrument', 'Practice TradFi watchlist quotes · trading is not enabled']
+                tradfi: ['Instrument', 'Binance USDⓈ-M TradFi perpetual quotes · reference prices']
             };
             const [columnName, description] = sectionTitles[state.marketSection];
             document.getElementById('marketsColumnName').textContent = columnName;
             document.getElementById('marketsSectionDescription').textContent = description;
             document.getElementById('marketsPageEyebrow').textContent = state.marketSection === 'tradfi'
                 ? 'Markets · practice TradFi'
-                : state.marketSection === 'crypto' ? 'Markets · Binance spot' : 'Markets · Binance spot + practice watchlist';
+                : state.marketSection === 'crypto' ? 'Markets · Binance spot' : 'Markets · Binance spot + TradFi references';
+            const marketDataLabel = document.getElementById('marketDataCardLabel');
+            if (marketDataLabel) marketDataLabel.textContent = state.marketSection === 'tradfi' ? 'TradFi data' : 'Crypto data';
+            document.getElementById('marketsTradfiQuoteStatus')?.classList.toggle('hidden', state.marketSection !== 'tradfi');
+            updateTradfiQuoteStatus();
             input.placeholder = state.marketSection === 'crypto' ? 'Search coin or pair' : 'Search market';
             const mobileSearch = document.getElementById('mobileMarketsSearch');
             if (mobileSearch && document.activeElement !== mobileSearch) mobileSearch.value = input.value;
@@ -4836,7 +5211,7 @@
                             <span class="block truncate text-xs font-bold text-white">${escapeHTML(coin.display)}</span>
                             <span class="mt-1 block truncate text-[9px] text-binanceMuted">${escapeHTML(coin.subtitle)}</span>
                         </button>
-                        <span data-market-quote-price="${escapeHTML(coin.asset)}" class="text-right font-mono text-[11px] text-white">${formatMoney(coin.price)}</span>
+                        <span data-market-quote-price="${coin.category === 'futures' ? `futures:${escapeHTML(coin.pair)}` : `spot:${escapeHTML(coin.asset)}`}" class="text-right font-mono text-[11px] text-white">${formatMoney(coin.price)}</span>
                         <span data-market-quote-change="${escapeHTML(coin.asset)}" class="text-right font-mono text-[10px] ${coin.change >= 0 ? 'text-binanceGreen' : 'text-binanceRed'}">${coin.change >= 0 ? '+' : ''}${coin.change.toFixed(2)}%</span>
                         <span data-market-quote-volume="${escapeHTML(coin.asset)}" class="hidden text-right font-mono text-[10px] text-binanceMuted sm:block">$${coin.volume}</span>
                         <div class="flex items-center gap-1">
@@ -4863,8 +5238,8 @@
                             </span>
                         </button>
                         <button type="button" onclick="${action}" class="min-w-0 flex-1 text-right">
-                            <span data-market-quote-price="${escapeHTML(coin.asset)}" class="block truncate font-mono text-[13px] font-semibold text-white">${formatMoney(coin.price)}</span>
-                            <span data-market-quote-price="${escapeHTML(coin.asset)}" class="block text-[10px] text-binanceMuted">${formatMoney(coin.price)}</span>
+                            <span data-market-quote-price="${coin.category === 'futures' ? `futures:${escapeHTML(coin.pair)}` : `spot:${escapeHTML(coin.asset)}`}" class="block truncate font-mono text-[13px] font-semibold text-white">${formatMoney(coin.price)}</span>
+                            <span data-market-quote-price="${coin.category === 'futures' ? `futures:${escapeHTML(coin.pair)}` : `spot:${escapeHTML(coin.asset)}`}" class="block text-[10px] text-binanceMuted">${formatMoney(coin.price)}</span>
                         </button>
                         <div class="flex shrink-0 items-center gap-1">
                             <button type="button" onclick="toggleMarketFavorite('${coin.pair}')" aria-label="${favorite ? 'Remove from' : 'Add to'} favorites" aria-pressed="${favorite}" class="rounded p-1 ${favorite ? 'text-binanceYellow' : 'text-binanceMuted'}"><i data-lucide="star" class="h-3.5 w-3.5" ${favorite ? 'fill="currentColor"' : ''}></i></button>
@@ -4905,7 +5280,7 @@
             }).format(value)}`;
             const usdMCatalog = FUTURES_MARKET_CATALOG.map((contract) => ({
                 ...contract,
-                price: state.futuresQuotes[contract.symbol] ?? contract.price,
+                price: futuresMarketPrice(contract.symbol, contract.price),
                 change: state.futuresQuoteChanges[contract.symbol] ?? contract.change,
                 volume: state.futuresTickerStats[contract.symbol]?.quoteVolume ?? contract.volume
             }));
@@ -5524,15 +5899,18 @@
                 volume: state.marketTickerStats[market.asset] ? formatMarketVolume(state.marketTickerStats[market.asset].quoteVolume) : market.volume
             }));
             const stockMarkets = [
-                { asset: 'SPX', name: 'S&P 500', volume: '1.82B' },
-                { asset: 'NDX', name: 'Nasdaq 100', volume: '864.3M' },
-                { asset: 'AAPL', name: 'Apple', volume: '48.6M' },
-                { asset: 'TSLA', name: 'Tesla', volume: '72.4M' },
-                { asset: 'NVDA', name: 'NVIDIA', volume: '39.2M' }
+                { asset: 'SPY', name: 'S&P 500 ETF', volume: '—' },
+                { asset: 'QQQ', name: 'Nasdaq-100 ETF', volume: '—' },
+                { asset: 'AAPL', name: 'Apple', volume: '—' },
+                { asset: 'TSLA', name: 'Tesla', volume: '—' },
+                { asset: 'NVDA', name: 'NVIDIA', volume: '—' }
             ].map((market) => ({
                 ...market,
                 price: demoMarketPrice(market.asset),
-                change: state.marketQuoteChanges[market.asset] || 0
+                change: state.marketQuoteChanges[market.asset] || 0,
+                volume: Number.isFinite(state.marketTickerStats[market.asset]?.quoteVolume)
+                    ? formatMarketVolume(state.marketTickerStats[market.asset].quoteVolume)
+                    : market.volume
             }));
             let rows = state.homeMarketType === 'stocks' ? stockMarkets : cryptoMarkets;
             if (state.homeMarketType !== 'stocks') {
@@ -5553,12 +5931,15 @@
             const marketRows = getHomeMarketRows();
             const subtitle = state.homeMarketType === 'futures'
                 ? 'Practice USDⓈ-M perpetuals · funding rates shown'
-                : state.homeMarketType === 'stocks' ? 'Practice TradFi reference prices'
+                : state.homeMarketType === 'stocks' ? 'Binance TradFi perpetual quotes · live reference'
                     : 'Binance spot prices · USDT pairs';
             ['homeMarketSubtitle', 'guestHomeMarketSubtitle'].forEach((id) => {
                 const element = document.getElementById(id);
                 if (element) element.textContent = subtitle;
             });
+            document.getElementById('homeTradfiQuoteStatus')?.classList.toggle('hidden', state.homeMarketType !== 'stocks');
+            document.getElementById('guestTradfiQuoteStatus')?.classList.toggle('hidden', state.homeMarketType !== 'stocks');
+            updateTradfiQuoteStatus();
             document.querySelectorAll('[data-home-market]').forEach((button) => {
                 const active = button.dataset.homeMarket === state.homeMarketType;
                 button.setAttribute('aria-pressed', String(active));
@@ -5596,7 +5977,7 @@
                             <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${market.asset === 'BTC' ? 'bg-[#f7931a]' : market.asset === 'BNB' ? 'bg-[#f0b90b] text-binanceBg' : 'bg-binanceHover'} text-[10px] font-bold text-white">${escapeHTML(market.asset.slice(0, 1))}</span>
                             <span class="min-w-0"><span class="block truncate text-xs font-semibold text-white">${escapeHTML(market.asset)}${market.name ? `<span class="ml-1 text-[9px] font-normal text-binanceMuted">${escapeHTML(market.name)}</span>` : ''}</span><span class="mt-0.5 block truncate text-[9px] text-binanceMuted">${escapeHTML(market.name ? market.name : market.asset === 'BTC' ? 'Bitcoin' : market.asset)} · <span data-market-quote-volume="${escapeHTML(market.asset)}">$${escapeHTML(market.volume)}</span></span></span>
                         </span>
-                        <span class="text-right"><span data-home-quote-price="${escapeHTML(market.asset)}" class="block font-mono text-[11px] text-white">${formatMoney(market.price)}</span><span class="mt-0.5 block text-[8px] text-binanceMuted">${state.homeMarketType === 'stocks' ? 'USD' : 'USDT'}</span></span>
+                        <span class="text-right"><span data-home-quote-price="${escapeHTML(market.asset)}" class="block font-mono text-[11px] text-white">${formatMoney(market.price)}</span><span class="mt-0.5 block text-[8px] text-binanceMuted">USDT</span></span>
                         <span data-home-quote-change="${escapeHTML(market.asset)}" class="min-w-[4.5rem] rounded bg-binanceGreen px-1.5 py-1.5 text-right font-mono text-[10px] font-medium text-white ${positive ? 'bg-binanceGreen' : 'bg-binanceRed'}">${positive ? '+' : ''}${market.change.toFixed(2)}%</span>
                     </button>`;
             }).join('') : `<div class="p-6 text-center text-[10px] text-binanceMuted">${state.homeMarketCategory === 'favorites' ? 'No favorite markets yet. Save a pair from Markets to see it here.' : 'No markets available in this selection.'}</div>`;
@@ -5903,7 +6284,7 @@
             if (title) title.textContent = isLogin ? 'Welcome back' : 'Create your account';
             if (subtitle) subtitle.textContent = isLogin
                 ? 'Sign in to your practice exchange account.'
-                : 'Set up a local practice account to save your exchange activity.';
+                : 'Create an account to save your exchange activity.';
             if (loginTab) {
                 loginTab.classList.toggle('bg-binanceYellow', isLogin);
                 loginTab.classList.toggle('text-binanceBg', isLogin);
@@ -5957,6 +6338,337 @@
             feedback.classList.toggle('text-binanceGreen', type === 'success');
         }
 
+        function isLocalPreviewMode() {
+            return window.location.protocol === 'file:' || ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+        }
+
+        function getLocalPreviewSession() {
+            try {
+                const saved = localStorage.getItem('exchange-preview-session-v1');
+                return saved ? JSON.parse(saved) : null;
+            } catch (error) {
+                console.error('Could not read local preview session', error);
+                return null;
+            }
+        }
+
+        function setLocalPreviewSession(user) {
+            try {
+                const safeUser = { ...user };
+                delete safeUser.password;
+                localStorage.setItem('exchange-preview-session-v1', JSON.stringify(safeUser));
+            } catch (error) {
+                console.error('Could not save local preview session', error);
+            }
+        }
+
+        function clearLocalPreviewSession() {
+            localStorage.removeItem('exchange-preview-session-v1');
+        }
+
+        function getLocalPreviewCredentials() {
+            try {
+                const saved = localStorage.getItem('exchange-preview-auth-v1');
+                return saved ? JSON.parse(saved) : {};
+            } catch (error) {
+                console.error('Could not read local preview auth records', error);
+                return {};
+            }
+        }
+
+        function setLocalPreviewCredentials(credentials) {
+            try {
+                localStorage.setItem('exchange-preview-auth-v1', JSON.stringify(credentials));
+            } catch (error) {
+                console.error('Could not save local preview auth records', error);
+            }
+        }
+
+        function normalizeLocalPreviewIdentifier(value) {
+            return String(value || '').trim().toLowerCase();
+        }
+
+        function createLocalPreviewUserRecord(user) {
+            const username = String(user.username || '').trim();
+            const email = String(user.email || '').trim().toLowerCase();
+            const fullName = String(user.fullName || username || 'Practice Trader').trim();
+            const id = String(user.id || `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+            return {
+                id,
+                username,
+                email,
+                fullName,
+                role: user.role || 'user',
+                wallet: Array.isArray(user.wallet) ? user.wallet : createDefaultWallet(),
+                fundingWallet: Array.isArray(user.fundingWallet) ? user.fundingWallet : [],
+                transactions: Array.isArray(user.transactions) ? user.transactions : [],
+                notifications: Array.isArray(user.notifications) ? user.notifications : [],
+                balanceJobs: Array.isArray(user.balanceJobs) ? user.balanceJobs : [],
+                openOrders: Array.isArray(user.openOrders) ? user.openOrders : [],
+                orderHistory: Array.isArray(user.orderHistory) ? user.orderHistory : [],
+                futuresPositions: Array.isArray(user.futuresPositions) ? user.futuresPositions : [],
+                createdAt: user.createdAt || new Date().toISOString(),
+                updatedAt: user.updatedAt || new Date().toISOString()
+            };
+        }
+
+        function createLocalPreviewAdminUser() {
+            return createLocalPreviewUserRecord({
+                id: 'admin-local-preview',
+                username: 'admin',
+                email: 'admin@exchange.local',
+                fullName: 'Administrator',
+                role: 'admin',
+                password: 'admin123',
+                wallet: createDefaultWallet(),
+                fundingWallet: [],
+                notifications: []
+            });
+        }
+
+        function getLocalPreviewAccountByIdentifier(identifier) {
+            const normalized = normalizeLocalPreviewIdentifier(identifier);
+            if (!normalized) return null;
+
+            const credentials = getLocalPreviewCredentials();
+            const credentialEntries = Object.entries(credentials || {});
+            const directMatch = credentialEntries.find(([key, value]) => key === normalized || normalizeLocalPreviewIdentifier(key) === normalized);
+            if (directMatch) {
+                const [matchKey, password] = directMatch;
+                const record = state.users.find((user) => normalizeLocalPreviewIdentifier(user.username) === normalizeLocalPreviewIdentifier(matchKey) || normalizeLocalPreviewIdentifier(user.email) === normalizeLocalPreviewIdentifier(matchKey));
+                if (record) return { ...record, password };
+                if (matchKey === 'admin' || normalizeLocalPreviewIdentifier(matchKey) === 'admin') {
+                    return { ...createLocalPreviewAdminUser(), password };
+                }
+            }
+
+            const seededAdmin = createLocalPreviewAdminUser();
+            const adminHashKey = normalizeLocalPreviewIdentifier(seededAdmin.username);
+            if (normalized === adminHashKey || normalized === normalizeLocalPreviewIdentifier(seededAdmin.email)) {
+                return { ...seededAdmin, password: seededAdmin.password || 'admin123' };
+            }
+
+            const match = state.users.find((user) => normalizeLocalPreviewIdentifier(user.username) === normalized || normalizeLocalPreviewIdentifier(user.email) === normalized);
+            if (!match) return null;
+            const userPassword = credentials[normalizeLocalPreviewIdentifier(match.username)] || credentials[normalizeLocalPreviewIdentifier(match.email)] || match.password || '';
+            return { ...match, password: userPassword };
+        }
+
+        function handleLocalPreviewApi(path, options = {}) {
+            if (!isLocalPreviewMode()) return null;
+
+            const target = new URL(path, window.location.origin);
+            const method = (options.method || 'GET').toUpperCase();
+            const pathname = target.pathname;
+            const resource = target.searchParams.get('resource');
+            const sessionUser = getLocalPreviewSession();
+
+            if (pathname === '/api/auth/signup' && method === 'POST') {
+                const payload = JSON.parse(options.body || '{}');
+                const username = String(payload.username || '').trim();
+                const email = String(payload.email || '').trim().toLowerCase();
+                const fullName = String(payload.fullName || username || 'Practice Trader').trim();
+                const password = String(payload.password || '');
+                if (!username || !email || !password) {
+                    throw new Error('Enter your username, email and password');
+                }
+                const existingUser = state.users.find((user) => normalizeLocalPreviewIdentifier(user.username) === normalizeLocalPreviewIdentifier(username) || normalizeLocalPreviewIdentifier(user.email) === normalizeLocalPreviewIdentifier(email));
+                if (existingUser) {
+                    throw new Error('An account with those details already exists');
+                }
+                const user = createLocalPreviewUserRecord({
+                    id: `local-${Date.now()}`,
+                    username,
+                    email,
+                    fullName,
+                    role: 'user',
+                    password
+                });
+                const credentials = getLocalPreviewCredentials();
+                credentials[normalizeLocalPreviewIdentifier(username)] = password;
+                credentials[normalizeLocalPreviewIdentifier(email)] = password;
+                setLocalPreviewCredentials(credentials);
+                state.users.push(user);
+                saveUsers();
+                setLocalPreviewSession(user);
+                return { user: { ...user, password: undefined } };
+            }
+
+            if (pathname === '/api/auth/login' && method === 'POST') {
+                const payload = JSON.parse(options.body || '{}');
+                const account = getLocalPreviewAccountByIdentifier(payload.identifier || '');
+                if (!account) {
+                    throw new Error('Invalid username/email or password');
+                }
+                const password = String(payload.password || '');
+                if (account.password !== password) {
+                    throw new Error('Invalid username/email or password');
+                }
+                const user = createLocalPreviewUserRecord(account);
+                setLocalPreviewSession(user);
+                return { user: { ...user, password: undefined } };
+            }
+
+            if (pathname === '/api/auth/me') {
+                if (method === 'GET') {
+                    if (!sessionUser) throw new Error('Not signed in');
+                    return { user: sessionUser };
+                }
+                if (method === 'DELETE') {
+                    clearLocalPreviewSession();
+                    return { ok: true };
+                }
+            }
+
+            if (pathname === '/api/admin/users' && method === 'GET') {
+                if (!sessionUser || sessionUser.role !== 'admin') throw new Error('Administrator access is required');
+                return { users: state.users.map((user) => ({ ...user, password: undefined })) };
+            }
+
+            if (pathname === '/api/market-price-adjustments' && resource === 'deposit-addresses' && method === 'GET') {
+                return { addresses: [] };
+            }
+
+            if (pathname === '/api/admin/deposit-addresses' && method === 'GET') {
+                return { addresses: [] };
+            }
+
+            if ((pathname === '/api/market-price-adjustments' || pathname === '/api/admin/price-adjustments') && method === 'GET') {
+                return { adjustments: [] };
+            }
+
+            return null;
+        }
+
+        async function requestAuthApi(path, options = {}) {
+            if (isLocalPreviewMode()) {
+                const previewResult = handleLocalPreviewApi(path, options);
+                if (previewResult !== null) {
+                    return previewResult;
+                }
+            }
+
+            let response;
+            try {
+                response = await fetch(path, {
+                    credentials: 'same-origin',
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    }
+                });
+            } catch (error) {
+                console.error(`Could not reach ${path}`, error);
+                throw new Error('The account service could not be reached. Check your connection and try again.');
+            }
+            const contentType = response.headers.get('content-type') || '';
+            if (response.status === 404 && !contentType.includes('application/json')
+                && (window.location.protocol === 'file:'
+                    || ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname))) {
+                throw new Error('Account creation is unavailable in the static local preview. Open https://exchange-seven-jade.vercel.app to create your account.');
+            }
+            let result;
+            try {
+                result = await response.json();
+            } catch (error) {
+                console.error(`Invalid response from ${path}`, error);
+                throw new Error('The account service returned an invalid response. Please try again later.');
+            }
+            if (!response.ok) {
+                throw new Error(result.error || 'The account request could not be completed.');
+            }
+            return result;
+        }
+
+        function storeAuthenticatedUser(user) {
+            const safeUser = { ...user };
+            delete safeUser.password;
+            const index = state.users.findIndex((entry) => String(entry.username || '').toLowerCase() === String(user.username || '').toLowerCase());
+            if (index < 0) state.users.push(safeUser);
+            else state.users[index] = safeUser;
+            ensureUserActivity(safeUser);
+            saveUsers();
+            setCurrentUser(safeUser);
+        }
+
+        function setAdminSession(user) {
+            state.currentUser = null;
+            state.admin.loggedIn = true;
+            state.admin.username = user.username;
+            state.admin.userId = user.id;
+            state.admin.lastLogin = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            renderAuthUI();
+        }
+
+        async function loadAdminUsers() {
+            try {
+                const { users } = await requestAuthApi('/api/admin/users', { method: 'GET', headers: {} });
+                state.users = users.map((user) => {
+                    const safeUser = { ...user };
+                    delete safeUser.password;
+                    ensureUserActivity(safeUser);
+                    return safeUser;
+                });
+                state.admin.loadError = '';
+                if (!state.users.some((user) => user.username === state.admin.selectedUser)) {
+                    state.admin.selectedUser = state.users.length ? state.users[0].username : '';
+                }
+            } catch (error) {
+                console.error('Could not load administrator accounts', error);
+                state.admin.loadError = error.message;
+                state.users = [];
+                state.admin.selectedUser = '';
+            }
+            renderAdminPanel();
+            await Promise.all([loadAdminAudit(), loadAdminPriceAdjustments(), loadAdminDepositAddresses()]);
+        }
+
+        async function loadAdminAudit() {
+            const tableBody = document.getElementById('adminAuditTableBody');
+            const status = document.getElementById('adminAuditStatus');
+            if (!tableBody || !status) return;
+            try {
+                const { entries } = await requestAuthApi('/api/admin/audit', { method: 'GET', headers: {} });
+                state.admin.audit = entries;
+                state.admin.auditError = '';
+                status.textContent = `${entries.length} recent action${entries.length === 1 ? '' : 's'}`;
+                tableBody.innerHTML = entries.length ? entries.map((entry) => {
+                    const createdAt = new Date(entry.createdAt);
+                    const time = Number.isFinite(createdAt.getTime()) ? createdAt.toLocaleString() : '—';
+                    const details = entry.action === 'price_adjustment'
+                        ? `${escapeHTML(entry.details.marketType)} ${escapeHTML(entry.details.symbol)} price ${entry.details.percentage === null ? 'override removed' : `set to ${escapeHTML(entry.details.percentage)}%`}`
+                        : entry.action === 'deposit_address_update'
+                            ? `${escapeHTML(entry.details.asset)} · ${escapeHTML(entry.details.network)} deposit address ${entry.details.afterAddress ? 'updated' : 'removed'}`
+                        : entry.action === 'wallet_reset'
+                        ? 'Wallet reset'
+                        : entry.action === 'balance_credit'
+                            ? `Credited ${escapeHTML(entry.details.amount)} ${escapeHTML(entry.details.asset)}`
+                            : `Adjusted ${escapeHTML(entry.details.asset)} balance`;
+                    return `<tr class="border-t border-binanceBorder"><td class="py-2 pr-4 text-binanceMuted">${escapeHTML(time)}</td><td class="py-2 pr-4">${escapeHTML(entry.actorUsername)}</td><td class="py-2 pr-4">${escapeHTML(entry.targetUsername)}</td><td class="py-2">${details}</td></tr>`;
+                }).join('') : '<tr><td colspan="4" class="py-5 text-center text-binanceMuted">No administrator actions have been recorded.</td></tr>';
+            } catch (error) {
+                console.error('Could not load administrator action history', error);
+                state.admin.audit = [];
+                state.admin.auditError = error.message;
+                status.textContent = 'Could not load history';
+                tableBody.innerHTML = `<tr><td colspan="4" class="py-5 text-center text-binanceRed">${escapeHTML(error.message)}</td></tr>`;
+            }
+        }
+
+        function setAdminFeedback(id, message, type = 'error') {
+            const feedback = document.getElementById(id);
+            if (!feedback) return;
+            feedback.textContent = message;
+            feedback.classList.toggle('hidden', !message);
+            feedback.classList.toggle('border-binanceRed/40', type === 'error');
+            feedback.classList.toggle('bg-binanceRedBg', type === 'error');
+            feedback.classList.toggle('text-binanceRed', type === 'error');
+            feedback.classList.toggle('border-binanceGreen/40', type === 'success');
+            feedback.classList.toggle('bg-binanceGreenBg', type === 'success');
+            feedback.classList.toggle('text-binanceGreen', type === 'success');
+        }
+
         function toggleAuthPassword(inputId, button) {
             const input = document.getElementById(inputId);
             if (!input || !button) return;
@@ -5984,13 +6696,13 @@
             if (!name || !username || !email || !password || !confirmation || !acknowledgement) return false;
 
             const passwordRules = {
-                length: password.value.length >= 8,
+                length: password.value.length >= 12,
                 lower: /[a-z]/.test(password.value),
                 upper: /[A-Z]/.test(password.value),
                 number: /\d/.test(password.value),
                 symbol: /[^A-Za-z0-9]/.test(password.value)
             };
-            setPasswordRule('passwordRuleLength', passwordRules.length, 'At least 8 characters');
+            setPasswordRule('passwordRuleLength', passwordRules.length, 'At least 12 characters');
             setPasswordRule('passwordRuleLower', passwordRules.lower, 'Lowercase letter');
             setPasswordRule('passwordRuleUpper', passwordRules.upper, 'Uppercase letter');
             setPasswordRule('passwordRuleNumber', passwordRules.number, 'Number');
@@ -6016,26 +6728,20 @@
 
             const normalizedUsername = username.value.trim().toLowerCase();
             const usernameValid = /^[a-z0-9_]{3,20}$/.test(normalizedUsername);
-            const duplicateUsername = normalizedUsername && state.users.some((user) => String(user.username || '').toLowerCase() === normalizedUsername);
             const usernameHint = document.getElementById('signupUsernameHint');
             if (usernameHint) {
-                usernameHint.textContent = duplicateUsername
-                    ? 'That username is already registered.'
-                    : '3–20 characters: letters, numbers, and underscores.';
-                usernameHint.classList.toggle('text-binanceRed', !!duplicateUsername);
-                usernameHint.classList.toggle('text-binanceMuted', !duplicateUsername);
+                usernameHint.textContent = '3–20 characters: letters, numbers, and underscores. Availability is checked when you sign up.';
+                usernameHint.classList.remove('text-binanceRed');
+                usernameHint.classList.add('text-binanceMuted');
             }
 
             const normalizedEmail = email.value.trim().toLowerCase();
             const emailValid = !!normalizedEmail && email.checkValidity();
-            const duplicateEmail = emailValid && state.users.some((user) => String(user.email || '').toLowerCase() === normalizedEmail);
             const emailHint = document.getElementById('signupEmailHint');
             if (emailHint) {
-                emailHint.textContent = duplicateEmail
-                    ? 'That email is already registered.'
-                    : 'Use an email address not already registered here.';
-                emailHint.classList.toggle('text-binanceRed', !!duplicateEmail);
-                emailHint.classList.toggle('text-binanceMuted', !duplicateEmail);
+                emailHint.textContent = 'Use an email address not already registered. Availability is checked when you sign up.';
+                emailHint.classList.remove('text-binanceRed');
+                emailHint.classList.add('text-binanceMuted');
             }
 
             const passwordsMatch = !!confirmation.value && password.value === confirmation.value;
@@ -6051,9 +6757,7 @@
 
             const valid = name.value.trim().length >= 2
                 && usernameValid
-                && !duplicateUsername
                 && emailValid
-                && !duplicateEmail
                 && Object.values(passwordRules).every(Boolean)
                 && passwordsMatch
                 && acknowledgement.checked;
@@ -6078,7 +6782,6 @@
             user.futuresPositions = state.futuresPositions;
             user.updatedAt = new Date().toISOString();
             saveUsers();
-            localStorage.setItem(SESSION_STORAGE_KEY, state.currentUser.username);
         }
 
         function setCurrentUser(user) {
@@ -6093,9 +6796,6 @@
                 state.openOrders = Array.isArray(user.openOrders) ? user.openOrders : [];
                 state.orderHistory = Array.isArray(user.orderHistory) ? user.orderHistory : [];
                 state.futuresPositions = Array.isArray(user.futuresPositions) ? user.futuresPositions : [];
-                localStorage.setItem(SESSION_STORAGE_KEY, user.username);
-            } else {
-                localStorage.removeItem(SESSION_STORAGE_KEY);
             }
             renderAuthUI();
             renderAssets();
@@ -6104,19 +6804,26 @@
             if (user) openUserHome();
         }
 
-        function restoreUserSession() {
-            const savedUsername = localStorage.getItem(SESSION_STORAGE_KEY);
-            if (!savedUsername) return;
-            const user = state.users.find((entry) => String(entry.username || '').toLowerCase() === savedUsername.toLowerCase());
-            if (!user) {
-                localStorage.removeItem(SESSION_STORAGE_KEY);
-                notify('Your saved practice sign-in could not be restored. Please log in again.');
-                return;
+        async function restoreUserSession() {
+            try {
+                const { user } = await requestAuthApi('/api/auth/me', { method: 'GET', headers: {} });
+                if (!user) return;
+                if (user.role === 'admin') {
+                    setAdminSession(user);
+                    await loadAdminUsers();
+                    openAdminPanel();
+                    return;
+                }
+                storeAuthenticatedUser(user);
+            } catch (error) {
+                if (error.message !== 'Not signed in') {
+                    console.error('Could not restore signed-in account', error);
+                    notify(error.message);
+                }
             }
-            setCurrentUser(user);
         }
 
-        function signupUser(event) {
+        async function signupUser(event) {
             event.preventDefault();
             const fullName = document.getElementById('signupName').value.trim();
             const username = document.getElementById('signupUsername').value.trim();
@@ -6126,55 +6833,66 @@
                 setAuthFeedback('Review the highlighted signup requirements before continuing.');
                 return;
             }
-            const existing = state.users.find((user) => String(user.username || '').toLowerCase() === username.toLowerCase() || String(user.email || '').toLowerCase() === email);
-            if (existing) {
-                setAuthFeedback('That username or email is already registered.');
-                return;
+            const submitButton = document.getElementById('signupSubmitButton');
+            submitButton.disabled = true;
+            try {
+                const { user } = await requestAuthApi('/api/auth/signup', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, email, fullName, password })
+                });
+                storeAuthenticatedUser(user);
+                closeModal('authModal');
+                document.getElementById('authSignupView').reset();
+                validateSignupForm();
+                notify(`Welcome ${user.username}! Your practice wallet is ready.`);
+            } catch (error) {
+                console.error('Account signup failed', error);
+                setAuthFeedback(error.message);
+            } finally {
+                validateSignupForm();
             }
-            const user = {
-                username,
-                fullName,
-                email,
-                password,
-                wallet: createDefaultWallet(),
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                transactions: [],
-                notifications: [],
-                balanceJobs: [],
-                openOrders: [],
-                orderHistory: [],
-                futuresPositions: []
-            };
-            state.users.push(user);
-            if (!saveUsers()) {
-                state.users.pop();
-                setAuthFeedback('This browser could not save the account. Check available storage and try again.');
-                return;
-            }
-            setCurrentUser(user);
-            closeModal('authModal');
-            document.getElementById('authSignupView').reset();
-            validateSignupForm();
-            notify(`Welcome ${username}! Your practice wallet is ready.`);
         }
 
-        function loginUser(event) {
+        async function loginUser(event) {
             event.preventDefault();
-            const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+            const identifier = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
-            const user = state.users.find((entry) => (String(entry.username || '').toLowerCase() === username || String(entry.email || '').toLowerCase() === username) && entry.password === password);
-            if (!user) {
-                setAuthFeedback('We couldn’t sign you in with those details. Check your username/email and password.');
-                return;
+            const button = document.getElementById('loginSubmitButton');
+            if (button) button.disabled = true;
+            try {
+                const { user } = await requestAuthApi('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ identifier, password })
+                });
+                if (user.role === 'admin') {
+                    setAdminSession(user);
+                    closeModal('authModal');
+                    document.getElementById('authLoginView').reset();
+                    await loadAdminUsers();
+                    openAdminPanel();
+                    notify('Administrator signed in');
+                    return;
+                }
+                storeAuthenticatedUser(user);
+                closeModal('authModal');
+                document.getElementById('authLoginView').reset();
+                notify(`Signed in as ${user.username}`);
+            } catch (error) {
+                console.error('Account sign in failed', error);
+                setAuthFeedback(error.message);
+            } finally {
+                if (button) button.disabled = false;
             }
-            setCurrentUser(user);
-            closeModal('authModal');
-            document.getElementById('authLoginView').reset();
-            notify(`Signed in as ${user.username}`);
         }
 
-        function logoutUser() {
+        async function logoutUser() {
+            let logoutError = null;
+            try {
+                await requestAuthApi('/api/auth/me', { method: 'DELETE', headers: {} });
+            } catch (error) {
+                logoutError = error;
+                console.error('Server sign out failed', error);
+            }
             state.currentUser = null;
             state.assets = createDefaultWallet();
             state.fundingAssets = [];
@@ -6183,13 +6901,13 @@
             state.orderHistory = [];
             state.futuresPositions = [];
             state.homeBalancesVisible = true;
-            localStorage.removeItem(SESSION_STORAGE_KEY);
             closeProfilePage();
             renderAuthUI();
             renderAssets();
             renderTransactions();
             openUserHome();
-            notify('Signed out successfully');
+            if (logoutError) notify(`Signed out on this device, but the server session could not be revoked: ${logoutError.message}`);
+            else notify('Signed out successfully');
         }
 
         function loadDemoState() {
@@ -6289,9 +7007,234 @@
             return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(value);
         }
 
+        function marketAdjustmentKey(marketType, symbol) {
+            return `${marketType}:${symbol}`;
+        }
+
+        function adjustedMarketPrice(marketType, symbol, referencePrice) {
+            const percentage = Number(state.marketPriceAdjustments[marketAdjustmentKey(marketType, symbol)] || 0);
+            return Number.isFinite(referencePrice) && referencePrice > 0
+                ? referencePrice * (1 + percentage / 100)
+                : 0;
+        }
+
         function demoMarketPrice(asset) {
             const referencePrices = { BTC: 91800, ETH: 3480, SOL: 192, BNB: 635, XRP: 0.62, ADA: 0.78, DOGE: 0.19, AVAX: 34.9 };
-            return state.marketQuotes[asset] || referencePrices[asset] || 0;
+            const referencePrice = state.marketQuotes[asset] || referencePrices[asset] || 0;
+            if (TRADFI_ASSETS.has(asset)) return referencePrice;
+            return adjustedMarketPrice('spot', `${asset}USDT`, referencePrice);
+        }
+
+        function updateTradfiQuoteStatus() {
+            const labels = {
+                connecting: 'Binance USDⓈ-M · connecting to live TradFi references',
+                live: `Binance TradFi reference · updated ${new Date(state.tradfiQuotesCheckedAt).toLocaleTimeString()}`,
+                partial: 'Some Binance TradFi quotes unavailable · others refreshed',
+                stale: `Binance quote refresh failed · last update ${state.tradfiQuotesCheckedAt ? new Date(state.tradfiQuotesCheckedAt).toLocaleTimeString() : 'never'}`,
+                unavailable: 'Binance TradFi quotes unavailable'
+            };
+            document.querySelectorAll('[id$="TradfiQuoteStatus"]').forEach((element) => {
+                element.textContent = labels[state.tradfiQuoteStatus] || labels.unavailable;
+            });
+        }
+
+        async function loadTradfiQuotes() {
+            if (state.tradfiQuotesLoading) return;
+            state.tradfiQuotesLoading = true;
+            if (!Array.from(TRADFI_ASSETS).some((asset) => Number.isFinite(state.marketTickerStats[asset]?.updatedAt))) {
+                state.tradfiQuoteStatus = 'connecting';
+                updateTradfiQuoteStatus();
+            }
+            try {
+                const results = await Promise.all(Object.entries(TRADFI_BINANCE_SYMBOLS).map(async ([asset, symbol]) => {
+                    try {
+                        const ticker = await fetchBinanceJson(
+                            `https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${encodeURIComponent(symbol)}`
+                        );
+                        if (ticker.symbol !== symbol) throw new Error(`Binance returned an unexpected symbol for ${asset}.`);
+                        return {
+                            asset,
+                            price: Number(ticker.lastPrice),
+                            change: Number(ticker.priceChangePercent),
+                            quoteVolume: Number(ticker.quoteVolume),
+                            updatedAt: Number(ticker.closeTime)
+                        };
+                    } catch (error) {
+                        console.error(`Unable to load the Binance ${symbol} market quote.`, error);
+                        return { asset, error };
+                    }
+                }));
+                const quotes = results.filter((quote) => !quote.error);
+                const errors = results.filter((quote) => quote.error);
+                if (!Array.isArray(quotes) || quotes.length === 0) {
+                    throw new Error('Binance returned no stock, index proxy, or commodity prices.');
+                }
+                let acceptedQuotes = 0;
+                quotes.forEach((quote) => {
+                    if (!TRADFI_ASSETS.has(quote.asset) || !Number.isFinite(quote.price)
+                        || quote.price <= 0 || !Number.isFinite(quote.change)) return;
+                    acceptedQuotes += 1;
+                    state.marketQuotes[quote.asset] = quote.price;
+                    state.marketQuoteChanges[quote.asset] = quote.change;
+                    state.marketTickerStats[quote.asset] = {
+                        ...(state.marketTickerStats[quote.asset] || {}),
+                        quoteVolume: Number.isFinite(quote.quoteVolume) ? quote.quoteVolume : undefined,
+                        updatedAt: Number.isFinite(quote.updatedAt) ? quote.updatedAt : Date.now()
+                    };
+                });
+                if (!acceptedQuotes) throw new Error('Binance returned no valid TradFi prices.');
+                state.tradfiQuotesCheckedAt = Date.now();
+                state.tradfiQuoteStatus = errors.length ? 'partial' : 'live';
+                updateTradfiQuoteStatus();
+                renderHomeMarkets();
+                if (state.activePage === 'markets') renderMarketsPage();
+            } catch (error) {
+                console.error('Unable to refresh Binance TradFi quotes.', error);
+                state.tradfiQuoteStatus = Array.from(TRADFI_ASSETS)
+                    .some((asset) => Number.isFinite(state.marketTickerStats[asset]?.updatedAt)) ? 'stale' : 'unavailable';
+                updateTradfiQuoteStatus();
+            } finally {
+                state.tradfiQuotesLoading = false;
+            }
+        }
+
+        function futuresMarketPrice(symbol, fallbackPrice = 0) {
+            const referencePrice = state.futuresQuotes[symbol] || fallbackPrice;
+            return adjustedMarketPrice('futures', symbol, referencePrice);
+        }
+
+        async function loadMarketPriceAdjustments() {
+            try {
+                const { adjustments } = await requestAuthApi('/api/market-price-adjustments', { method: 'GET', headers: {} });
+                state.marketPriceAdjustments = Object.fromEntries(adjustments.map(({ marketType, symbol, percentage }) => [
+                    marketAdjustmentKey(marketType, symbol),
+                    Number(percentage)
+                ]));
+                refreshAdjustedMarketDisplays();
+            } catch (error) {
+                console.error('Unable to load saved market price adjustments.', error);
+            }
+        }
+
+        function refreshAdjustedMarketDisplays() {
+            updateMarketCatalogs();
+            if (state.admin.loggedIn) updateAdminPricePairOptions();
+            updatePairSelectorPrices();
+            updateMarketQuoteDisplays();
+            updateHomeQuoteDisplays();
+            if (state.tradingMode === 'futures') {
+                state.currentPrice = futuresMarketPrice(state.selectedPair, state.currentPrice);
+            } else {
+                state.currentPrice = demoMarketPrice(state.asset);
+            }
+            const priceText = formatMoney(state.currentPrice);
+            const currentPriceDisplay = document.getElementById('currentPriceDisplay');
+            if (currentPriceDisplay) currentPriceDisplay.textContent = priceText;
+            const currentPriceUSD = document.getElementById('currentPriceUSD');
+            if (currentPriceUSD) currentPriceUSD.textContent = `≈ ${priceText} ${state.tradingMode === 'futures' ? 'USDT' : 'USD'}`;
+            const markPrice = document.getElementById('markPrice');
+            if (markPrice) markPrice.textContent = priceText;
+            const indexPrice = document.getElementById('indexPrice');
+            if (indexPrice) indexPrice.textContent = priceText;
+            const orderBookPrice = document.getElementById('obCurrentPrice');
+            if (orderBookPrice) orderBookPrice.textContent = priceText;
+            const priceInput = document.getElementById('inputPrice');
+            if (priceInput && state.orderType === 'market') {
+                priceInput.value = state.currentPrice.toFixed(pricePrecision());
+                calculateTotal();
+            }
+            if (state.activePage === 'trade') loadSelectedMarketChart();
+            updatePriceAdjustmentNotice();
+        }
+
+        function updatePriceAdjustmentNotice() {
+            const notice = document.getElementById('priceAdjustmentNotice');
+            if (!notice) return;
+            const marketType = state.tradingMode === 'futures' ? 'futures' : 'spot';
+            const symbol = state.selectedPair;
+            const percentage = Number(state.marketPriceAdjustments[marketAdjustmentKey(marketType, symbol)] || 0);
+            notice.classList.toggle('hidden', percentage === 0);
+            notice.textContent = percentage === 0
+                ? ''
+                : `Practice-only adjustment ${percentage > 0 ? '+' : ''}${percentage}% vs Binance`;
+        }
+
+        function updateAdminPricePairOptions() {
+            const marketType = document.getElementById('adminPriceMarketType')?.value || 'spot';
+            const pairSelect = document.getElementById('adminPricePair');
+            if (!pairSelect) return;
+            const selectedSymbol = pairSelect.value;
+            const pairs = marketType === 'futures'
+                ? FUTURES_MARKET_CATALOG.map((market) => market.symbol)
+                : CRYPTO_MARKET_CATALOG.map((market) => market.symbol || `${market.asset}USDT`);
+            pairSelect.innerHTML = pairs.map((symbol) => `<option value="${escapeHTML(symbol)}">${escapeHTML(symbol)}</option>`).join('');
+            if (pairs.includes(selectedSymbol)) pairSelect.value = selectedSymbol;
+            updateAdminPriceAdjustmentInput();
+        }
+
+        function updateAdminPriceAdjustmentInput() {
+            const marketType = document.getElementById('adminPriceMarketType')?.value || 'spot';
+            const symbol = document.getElementById('adminPricePair')?.value || '';
+            const input = document.getElementById('adminPricePercentage');
+            if (!input) return;
+            const percentage = state.marketPriceAdjustments[marketAdjustmentKey(marketType, symbol)];
+            input.value = Number.isFinite(percentage) ? String(percentage) : '';
+        }
+
+        async function loadAdminPriceAdjustments() {
+            try {
+                const { adjustments } = await requestAuthApi('/api/admin/price-adjustments', { method: 'GET', headers: {} });
+                state.admin.priceAdjustments = adjustments;
+                state.admin.priceAdjustmentError = '';
+                state.marketPriceAdjustments = Object.fromEntries(adjustments.map(({ marketType, symbol, percentage }) => [
+                    marketAdjustmentKey(marketType, symbol),
+                    Number(percentage)
+                ]));
+                updateAdminPricePairOptions();
+                refreshAdjustedMarketDisplays();
+                return true;
+            } catch (error) {
+                console.error('Could not load administrator pair price adjustments', error);
+                state.admin.priceAdjustmentError = error.message;
+                setAdminFeedback('adminPriceAdjustmentFeedback', error.message, 'error');
+                return false;
+            }
+        }
+
+        async function saveAdminPriceAdjustment() {
+            if (state.admin.saving) return;
+            const marketType = document.getElementById('adminPriceMarketType').value;
+            const symbol = document.getElementById('adminPricePair').value;
+            const input = document.getElementById('adminPricePercentage');
+            let percentage = input.value.trim() === '' ? null : Number(input.value);
+            if (percentage === 0) percentage = null;
+            if (percentage !== null && (!Number.isFinite(percentage) || percentage < -99.99 || percentage > 1000
+                || Math.abs(percentage * 1000 - Math.round(percentage * 1000)) > 1e-7)) {
+                setAdminFeedback('adminPriceAdjustmentFeedback', 'Enter a percentage from -99.99 to 1000 with at most three decimal places, or leave it blank to remove the override.', 'error');
+                return;
+            }
+            const button = document.getElementById('adminSavePriceAdjustment');
+            state.admin.saving = true;
+            button.disabled = true;
+            try {
+                await requestAuthApi('/api/admin/price-adjustments', {
+                    method: 'PUT',
+                    body: JSON.stringify({ marketType, symbol, percentage })
+                });
+                if (!await loadAdminPriceAdjustments()) {
+                    throw new Error('The adjustment was saved, but the latest settings could not be reloaded. Refresh the page to confirm it.');
+                }
+                setAdminFeedback('adminPriceAdjustmentFeedback', percentage === null
+                    ? `Removed the ${marketType} ${symbol} price adjustment.`
+                    : `Saved ${percentage > 0 ? '+' : ''}${percentage}% for ${marketType} ${symbol}.`, 'success');
+                await loadAdminAudit();
+            } catch (error) {
+                console.error('Could not save administrator pair price adjustment', error);
+                setAdminFeedback('adminPriceAdjustmentFeedback', error.message, 'error');
+            } finally {
+                state.admin.saving = false;
+                button.disabled = false;
+            }
         }
 
         function setMarketFeedStatus(status) {
@@ -6320,21 +7263,24 @@
 
         function updatePairSelectorPrices() {
             document.querySelectorAll('[data-pair-price]').forEach((element) => {
-                const price = state.marketQuotes[element.dataset.pairPrice];
+                const price = demoMarketPrice(element.dataset.pairPrice);
                 if (Number.isFinite(price) && price > 0) element.textContent = formatMoney(price);
             });
         }
 
         function applyBinanceTicker(ticker) {
-            const asset = ticker.s.slice(0, -4);
-            const price = Number(ticker.c);
+            const symbol = ticker.s;
+            const asset = symbol.slice(0, -4);
+            const referencePrice = Number(ticker.c);
             const change = Number(ticker.P);
-            const high = Number(ticker.h);
-            const low = Number(ticker.l);
+            const factor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey('spot', symbol)] || 0) / 100;
+            const price = referencePrice * factor;
+            const high = Number(ticker.h) * factor;
+            const low = Number(ticker.l) * factor;
             const quoteVolume = Number(ticker.q);
             if (!LIVE_MARKET_ASSETS.has(asset) || !Number.isFinite(price) || price <= 0 || !Number.isFinite(change)) return;
 
-            state.marketQuotes[asset] = price;
+            state.marketQuotes[asset] = referencePrice;
             state.marketQuoteChanges[asset] = change;
             state.marketTickerStats[asset] = { high, low, quoteVolume, updatedAt: Number(ticker.E) || Date.now() };
             marketDataReconnectDelay = 1000;
@@ -6499,6 +7445,7 @@
                 });
 
                 updateMarketCatalogs();
+                if (state.admin.loggedIn) updateAdminPricePairOptions();
                 connectMarketData();
                 connectFuturesMarketData();
                 if (state.activePage === 'trade') loadSelectedMarketChart();
@@ -6577,17 +7524,19 @@
                 || !Number.isFinite(price) || price <= 0 || !Number.isFinite(change)) return;
 
             state.futuresQuotes[symbol] = price;
+            const adjustedPrice = futuresMarketPrice(symbol);
             state.futuresQuoteChanges[symbol] = change;
             state.futuresTickerStats[symbol] = { quoteVolume, updatedAt: Number(ticker.E) || Date.now() };
+            updateMarketQuoteDisplays();
             const asset = FUTURES_MARKET_CATALOG.find((market) => market.symbol === symbol)?.asset;
             if (asset && state.tradingMode === 'futures' && state.selectedPair === symbol) {
                 document.querySelectorAll('[data-pair-price]').forEach((element) => {
-                    if (element.dataset.pairPrice === asset) element.textContent = formatMoney(price);
+                    if (element.dataset.pairPrice === asset) element.textContent = formatMoney(adjustedPrice);
                 });
             }
             if (state.activePage === 'futures' && state.futuresSection === 'usd-m') {
                 document.querySelectorAll('[data-futures-quote-price]').forEach((element) => {
-                    if (element.dataset.futuresQuotePrice === symbol) element.textContent = formatMoney(price);
+                    if (element.dataset.futuresQuotePrice === symbol) element.textContent = formatMoney(adjustedPrice);
                 });
                 document.querySelectorAll('[data-futures-quote-change]').forEach((element) => {
                     if (element.dataset.futuresQuoteChange !== symbol) return;
@@ -6602,13 +7551,13 @@
 
             if (state.selectedPair !== symbol || state.tradingMode !== 'futures') return;
             const previousPrice = state.currentPrice;
-            state.currentPrice = price;
-            updateLiveCandleFromTicker(price, Number(ticker.E) || Date.now());
-            const priceText = formatMoney(price);
+            state.currentPrice = adjustedPrice;
+            updateLiveCandleFromTicker(adjustedPrice, Number(ticker.E) || Date.now());
+            const priceText = formatMoney(adjustedPrice);
             const currentPriceDisplay = document.getElementById('currentPriceDisplay');
             currentPriceDisplay.textContent = priceText;
-            currentPriceDisplay.classList.toggle('text-binanceGreen', price >= previousPrice);
-            currentPriceDisplay.classList.toggle('text-binanceRed', price < previousPrice);
+            currentPriceDisplay.classList.toggle('text-binanceGreen', adjustedPrice >= previousPrice);
+            currentPriceDisplay.classList.toggle('text-binanceRed', adjustedPrice < previousPrice);
             document.getElementById('currentPriceUSD').textContent = `≈ ${priceText} USDT`;
             document.getElementById('markPrice').textContent = priceText;
             document.getElementById('indexPrice').textContent = priceText;
@@ -6616,7 +7565,7 @@
             document.getElementById('tradePairChangeValue').textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
             document.getElementById('tradePairChangeValue').className = change >= 0 ? 'text-binanceGreen' : 'text-binanceRed';
             if (state.orderType === 'market') {
-                document.getElementById('inputPrice').value = price.toFixed(pricePrecision());
+                document.getElementById('inputPrice').value = adjustedPrice.toFixed(pricePrecision());
                 calculateTotal();
             }
             processOpenOrders();
@@ -6667,7 +7616,10 @@
         function updateMarketQuoteDisplays() {
             if (!['markets', 'futures'].includes(state.activePage)) return;
             document.querySelectorAll('[data-market-quote-price]').forEach((element) => {
-                const price = demoMarketPrice(element.dataset.marketQuotePrice);
+                const [marketType, identifier] = element.dataset.marketQuotePrice.split(':');
+                const price = marketType === 'futures'
+                    ? futuresMarketPrice(identifier)
+                    : demoMarketPrice(identifier);
                 if (price > 0) element.textContent = formatMoney(price);
             });
             document.querySelectorAll('[data-market-quote-change]').forEach((element) => {
@@ -7133,9 +8085,10 @@
         function selectPair(pair, price, asset, notifyUser = true) {
             state.selectedPair = pair;
             state.currentPrice = state.tradingMode === 'futures'
-                ? state.futuresQuotes[pair] || Number(price)
+                ? futuresMarketPrice(pair, Number(price))
                 : LIVE_MARKET_ASSETS.has(asset) ? demoMarketPrice(asset) : Number(price);
             state.asset = asset;
+            updatePriceAdjustmentNotice();
             closePairMenu();
 
             const pairText = `${asset}/USDT`;
@@ -7800,7 +8753,12 @@
             totalUsers.textContent = users.length.toLocaleString();
             summary.textContent = `${users.length} registered account${users.length === 1 ? '' : 's'} · showing ${filteredUsers.length}`;
             if (!filteredUsers.length) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-binanceMuted">${users.length ? 'No users match your search.' : 'No user accounts have been registered on this browser yet.'}</td></tr>`;
+                const message = state.admin.loadError
+                    ? `Could not load server accounts: ${escapeHTML(state.admin.loadError)}`
+                    : users.length
+                        ? 'No users match your search.'
+                        : 'No user accounts have been registered yet.';
+                tableBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-binanceMuted">${message}</td></tr>`;
                 return;
             }
 
@@ -7891,14 +8849,14 @@
                                 </td>
                             `).join('')}
                             <td class="py-2 text-right">
-                                <button type="button" onclick="updateAdminBalanceInput(this)" data-admin-save-asset="${assetName}" class="rounded border border-binanceBorder px-2 py-1 text-[10px] text-binanceYellow hover:border-binanceYellow">Save</button>
+                                <button type="button" onclick="updateAdminBalanceInput(this)" data-admin-save-asset="${assetName}" ${state.admin.saving ? 'disabled' : ''} class="rounded border border-binanceBorder px-2 py-1 text-[10px] text-binanceYellow hover:border-binanceYellow disabled:opacity-40">Save</button>
                             </td>
                         </tr>
                     `;
                 }).join('') : `<tr><td colspan="5" class="py-6 text-center text-binanceMuted">${selectedAccount ? 'This account has no wallet assets.' : 'Select a registered account to edit its balances.'}</td></tr>`;
                 ['adminCreditAmount', 'adminCreditAsset', 'adminCreditNetwork', 'adminCreditAddress', 'adminAddBalanceButton', 'adminCreditUsdtButton', 'adminCreditBtcButton', 'adminResetWalletButton'].forEach((id) => {
                     const button = document.getElementById(id);
-                    if (button) button.disabled = !selectedAccount;
+                    if (button) button.disabled = !selectedAccount || state.admin.saving;
                 });
             } else {
                 subtitle.textContent = 'Practice exchange management dashboard';
@@ -7927,31 +8885,85 @@
             renderAdminPanel();
         }
 
-        function loginAdmin(event) {
+        async function loginAdmin(event) {
             event.preventDefault();
-            const username = document.getElementById('adminUsername').value.trim();
+            const identifier = document.getElementById('adminUsername').value.trim();
             const password = document.getElementById('adminPassword').value;
-            if (username.toLowerCase() === 'admin' && password === 'admin123') {
-                state.admin.loggedIn = true;
-                state.admin.username = 'admin';
-                state.admin.lastLogin = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-                state.admin.selectedUser = state.users.length ? state.users[0].username : '';
-                renderAdminPanel();
-                notify('Admin access granted');
-            } else {
-                notify('Invalid admin credentials');
+            const form = document.querySelector('#adminLoginView form');
+            const button = form?.querySelector('button[type="submit"], button:not([type])');
+            if (button) button.disabled = true;
+            setAdminFeedback('adminAuthFeedback', '');
+            try {
+                const { user } = await requestAuthApi('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ identifier, password })
+                });
+                if (user.role !== 'admin') {
+                    await requestAuthApi('/api/auth/me', { method: 'DELETE', headers: {} });
+                    throw new Error('This account does not have administrator access.');
+                }
+                setAdminSession(user);
+                document.getElementById('adminPassword').value = '';
+                await loadAdminUsers();
+                if (state.admin.loadError) {
+                    setAdminFeedback('adminAuthFeedback', `Signed in, but could not load the dashboard: ${state.admin.loadError}`);
+                } else {
+                    notify('Administrator signed in');
+                }
+            } catch (error) {
+                console.error('Administrator sign in failed', error);
+                setAdminFeedback('adminAuthFeedback', error.message);
+            } finally {
+                if (button) button.disabled = false;
             }
         }
 
-        function logoutAdmin() {
-            state.admin.loggedIn = false;
-            state.admin.username = '';
-            state.admin.selectedUser = '';
-            renderAdminPanel();
-            notify('Admin signed out');
+        async function logoutAdmin() {
+            try {
+                await requestAuthApi('/api/auth/me', { method: 'DELETE', headers: {} });
+                state.admin.loggedIn = false;
+                state.admin.username = '';
+                state.admin.userId = null;
+                state.admin.selectedUser = '';
+                state.admin.loadError = '';
+                renderAdminPanel();
+                notify('Administrator signed out');
+            } catch (error) {
+                console.error('Administrator sign out failed', error);
+                notify(`Could not sign out from the server: ${error.message}`);
+            }
         }
 
-        function updateAdminBalanceInput(input) {
+        async function saveAdminAction(user, payload, successMessage) {
+            if (state.admin.saving) return false;
+            state.admin.saving = true;
+            renderAdminPanel();
+            try {
+                const { user: updatedUser } = await requestAuthApi(`/api/admin/users/${encodeURIComponent(user.id)}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ ...payload, requestId: crypto.randomUUID() })
+                });
+                const userIndex = state.users.findIndex((entry) => String(entry.id) === String(updatedUser.id));
+                if (userIndex < 0) {
+                    throw new Error('The updated account is not in the administrator account list.');
+                }
+                state.users[userIndex] = updatedUser;
+                ensureUserActivity(updatedUser);
+                renderAdminPanel();
+                notify(successMessage);
+                await loadAdminAudit();
+                return true;
+            } catch (error) {
+                console.error('Could not save administrator action', error);
+                notify(`Could not save administrator action: ${error.message}`);
+                return false;
+            } finally {
+                state.admin.saving = false;
+                renderAdminPanel();
+            }
+        }
+
+        async function updateAdminBalanceInput(input) {
             const asset = input && input.dataset.adminSaveAsset;
             const user = getSelectedAdminUser();
             if (!user) {
@@ -7995,59 +9007,25 @@
                 notify('Total balance must cover available balance and funds in orders');
                 return;
             }
-            ensureUserActivity(user);
-            if (user.balanceJobs.some((job) => job.status === 'Processing' && job.asset === asset)) {
-                notify(`Wait for ${user.username}'s pending ${asset} balance transaction to finish before editing it again`);
-                return;
-            }
-            const delta = next.total - balance.total;
-            const network = document.getElementById('adminCreditNetwork')?.value.trim() || '';
-            const sourceAddress = document.getElementById('adminCreditAddress')?.value.trim() || '';
-            if (delta > 0 && (!network || !sourceAddress || sourceAddress.length > 200)) {
-                notify('Enter the practice source address and select a network before increasing a balance');
-                document.getElementById('adminCreditAddress')?.focus();
-                return;
-            }
-            if (enqueueAdminBalanceJob(user, {
+            await saveAdminAction(user, {
+                action: 'balance_adjustment',
                 asset,
-                amount: delta,
-                operation: 'set',
-                targetBalance: { total: next.total, available: next.available, inOrders: next.inOrders },
-                type: delta > 0 ? 'Admin Balance Credit' : 'Admin Balance Adjustment',
-                details: delta === 0 ? 'Available / in-orders allocation update' : '',
-                network: delta > 0 ? network : '',
-                fromAddress: delta > 0 ? sourceAddress : ''
-            })) {
-                renderAdminPanel();
-                notify(`${user.username}'s ${asset} balance change is processing`);
-            }
+                total: next.total,
+                available: next.available,
+                inOrders: next.inOrders
+            }, `${user.username}'s ${asset} balance was saved to the database`);
         }
 
-        function resetDemoStateForAdmin() {
+        async function resetDemoStateForAdmin() {
             const user = getSelectedAdminUser();
             if (!user) {
                 notify('Select a registered user before resetting a wallet');
                 return;
             }
-            ensureUserActivity(user);
-            if (user.balanceJobs.some((job) => job.status === 'Processing')) {
-                notify(`Wait for ${user.username}'s pending balance transactions to finish before resetting the wallet`);
-                return;
-            }
-            if (enqueueAdminBalanceJob(user, {
-                asset: 'WALLET',
-                amount: 0,
-                operation: 'setWallet',
-                targetWallet: createDefaultWallet(),
-                type: 'Admin Wallet Reset',
-                details: 'Reset to the default practice wallet'
-            })) {
-                renderAdminPanel();
-                notify(`${user.username}'s wallet reset is processing`);
-            }
+            await saveAdminAction(user, { action: 'wallet_reset' }, `${user.username}'s practice wallet was reset`);
         }
 
-        function creditDemoWallet(asset, amount) {
+        async function creditDemoWallet(asset, amount) {
             const user = getSelectedAdminUser();
             if (!user) {
                 notify('Select a registered user before crediting a wallet');
@@ -8065,27 +9043,16 @@
                 document.getElementById('adminCreditAddress')?.focus();
                 return false;
             }
-            ensureUserActivity(user);
-            if (user.balanceJobs.some((job) => job.status === 'Processing' && job.asset === asset && job.operation === 'set')) {
-                notify(`Wait for ${user.username}'s pending ${asset} balance adjustment to finish before adding a credit`);
-                return false;
-            }
-            if (enqueueAdminBalanceJob(user, {
+            return saveAdminAction(user, {
+                action: 'balance_credit',
                 asset,
                 amount: credit,
-                operation: 'credit',
-                type: 'Practice Deposit',
                 network,
                 fromAddress: sourceAddress
-            })) {
-                renderAdminPanel();
-                notify(`${credit} ${asset} is processing for ${user.username}`);
-                return true;
-            }
-            return false;
+            }, `${credit} ${asset} was saved to ${user.username}'s practice balance`);
         }
 
-        function creditSelectedUserBalance() {
+        async function creditSelectedUserBalance() {
             const amountInput = document.getElementById('adminCreditAmount');
             const assetSelect = document.getElementById('adminCreditAsset');
             if (!amountInput || !assetSelect) return;
@@ -8095,18 +9062,19 @@
                 amountInput.focus();
                 return;
             }
-            if (creditDemoWallet(assetSelect.value, amount)) {
+            if (await creditDemoWallet(assetSelect.value, amount)) {
                 amountInput.value = '';
             }
         }
 
         function openAdminPanel() {
-            if (state.currentUser) {
+            if (state.currentUser && state.currentUser.role !== 'admin') {
                 notify('Admin access is reserved for the administrator account only');
                 return;
             }
             renderAdminPanel();
             openModal('adminPanel');
+            if (state.admin.loggedIn && !state.users.length && !state.admin.loadError) loadAdminUsers();
         }
 
         function closeAdminPanel() {
@@ -8146,6 +9114,7 @@
         function openModal(id) {
             const modal = document.getElementById(id);
             if (modal) modal.classList.remove('hidden');
+            if (id === 'depositModal') updateDepositNetworkOptions();
             if (id === 'p2pModal') {
                 document.getElementById('p2pTradePanel')?.classList.add('hidden');
                 showP2PView('market');
@@ -9064,12 +10033,14 @@
 
         function applyBinanceCandle(kline, generation) {
             if (generation !== chartFeedGeneration || !kline || kline.s !== state.selectedPair) return;
+            const marketType = state.tradingMode === 'futures' ? 'futures' : 'spot';
+            const adjustmentFactor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey(marketType, state.selectedPair)] || 0) / 100;
             const candle = {
                 time: Number(kline.t),
-                open: Number(kline.o),
-                high: Number(kline.h),
-                low: Number(kline.l),
-                close: Number(kline.c),
+                open: Number(kline.o) * adjustmentFactor,
+                high: Number(kline.h) * adjustmentFactor,
+                low: Number(kline.l) * adjustmentFactor,
+                close: Number(kline.c) * adjustmentFactor,
                 volume: Number(kline.v)
             };
             if (![candle.time, candle.open, candle.high, candle.low, candle.close, candle.volume].every(Number.isFinite)
@@ -9087,8 +10058,8 @@
             chartHistoryLoaded = true;
             state.candleStartedAt = candle.time;
             state.currentPrice = candle.close;
-            if (state.tradingMode === 'futures') state.futuresQuotes[state.selectedPair] = candle.close;
-            else state.marketQuotes[state.asset] = candle.close;
+            if (state.tradingMode === 'futures') state.futuresQuotes[state.selectedPair] = candle.close / adjustmentFactor;
+            else state.marketQuotes[state.asset] = candle.close / adjustmentFactor;
             if (chartDataStaleTimer) window.clearTimeout(chartDataStaleTimer);
             chartDataStaleTimer = window.setTimeout(() => setChartFeedStatus('stale', 'Chart data stale'), 15_000);
             setChartFeedStatus('live', `Binance ${state.timeframe} candles · Live`);
@@ -9180,12 +10151,13 @@
                 const rows = await response.json();
                 if (!Array.isArray(rows)) throw new Error('Binance returned an invalid candle response');
                 if (generation !== chartFeedGeneration || pair !== state.selectedPair || interval !== chartInterval()) return;
+                const adjustmentFactor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey(isFutures ? 'futures' : 'spot', pair)] || 0) / 100;
                 const candles = rows.map((row) => ({
                     time: Number(row[0]),
-                    open: Number(row[1]),
-                    high: Number(row[2]),
-                    low: Number(row[3]),
-                    close: Number(row[4]),
+                    open: Number(row[1]) * adjustmentFactor,
+                    high: Number(row[2]) * adjustmentFactor,
+                    low: Number(row[3]) * adjustmentFactor,
+                    close: Number(row[4]) * adjustmentFactor,
                     volume: Number(row[5])
                 })).filter((candle) => Number.isFinite(candle.time)
                     && [candle.open, candle.high, candle.low, candle.close, candle.volume].every(Number.isFinite)
@@ -9195,8 +10167,8 @@
                 chartHistoryLoaded = true;
                 state.candleStartedAt = candles[candles.length - 1].time;
                 state.currentPrice = candles[candles.length - 1].close;
-                if (isFutures) state.futuresQuotes[pair] = state.currentPrice;
-                else state.marketQuotes[state.asset] = state.currentPrice;
+                if (isFutures) state.futuresQuotes[pair] = state.currentPrice / adjustmentFactor;
+                else state.marketQuotes[state.asset] = state.currentPrice / adjustmentFactor;
                 setChartFeedStatus('waiting', `Binance ${state.timeframe} candles · Connecting`);
                 drawChart();
             } catch (error) {
@@ -9245,7 +10217,7 @@
             if (!candles || !candles.length) return;
             if (LIVE_MARKET_ASSETS.has(state.asset)) {
                 Object.keys(state.marketQuotes).forEach((asset) => {
-                    if (LIVE_MARKET_ASSETS.has(asset)) return;
+                    if (LIVE_MARKET_ASSETS.has(asset) || TRADFI_ASSETS.has(asset)) return;
                     const previousQuote = state.marketQuotes[asset];
                     const nextQuote = Math.max(0.000001, previousQuote * (1 + (Math.random() - 0.5) * 0.0012));
                     state.marketQuotes[asset] = nextQuote;
@@ -9266,7 +10238,7 @@
             state.marketQuoteChanges[state.asset] = previousChange + ((nextPrice - previousPrice) / previousPrice) * 100;
             state.marketQuotes[state.asset] = nextPrice;
             Object.keys(state.marketQuotes).forEach((asset) => {
-                if (asset === state.asset || LIVE_MARKET_ASSETS.has(asset)) return;
+                if (asset === state.asset || LIVE_MARKET_ASSETS.has(asset) || TRADFI_ASSETS.has(asset)) return;
                 const previousQuote = state.marketQuotes[asset];
                 const nextQuote = Math.max(0.000001, previousQuote * (1 + (Math.random() - 0.5) * 0.0012));
                 state.marketQuotes[asset] = nextQuote;
@@ -10082,6 +11054,137 @@
             notify(`${amount} ${asset} credited to practice wallet`);
         }
 
+        function depositAddressForSelection(asset, network) {
+            return state.cryptoDepositAddresses.find((entry) => entry.asset === asset && entry.network === network) || null;
+        }
+
+        function updateDepositNetworkOptions() {
+            const assetSelect = document.getElementById('depositAsset');
+            const networkSelect = document.getElementById('depositNetwork');
+            if (!assetSelect || !networkSelect) return;
+            const networks = DEPOSIT_NETWORKS_BY_ASSET[assetSelect.value] || [];
+            networkSelect.innerHTML = networks.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
+            networkSelect.disabled = !networks.length;
+            updateDepositAddressDisplay();
+        }
+
+        function updateDepositAddressDisplay() {
+            const asset = document.getElementById('depositAsset')?.value || '';
+            const network = document.getElementById('depositNetwork')?.value || '';
+            const address = depositAddressForSelection(asset, network);
+            const addressValue = document.getElementById('depositAddressValue');
+            const memo = document.getElementById('depositAddressMemo');
+            const copyButton = document.getElementById('copyDepositAddressButton');
+            if (!addressValue || !memo || !copyButton) return;
+            addressValue.textContent = address?.address || 'No deposit address is configured for this network.';
+            copyButton.classList.toggle('hidden', !address?.address);
+            memo.textContent = address?.memo ? `Memo / destination tag: ${address.memo}` : '';
+            memo.classList.toggle('hidden', !address?.memo);
+        }
+
+        async function copyDepositAddress() {
+            const address = depositAddressForSelection(
+                document.getElementById('depositAsset').value,
+                document.getElementById('depositNetwork').value
+            );
+            if (!address?.address) {
+                notify('No deposit address is configured for this network');
+                return;
+            }
+            if (!navigator.clipboard?.writeText) {
+                notify('Copying is not supported in this browser');
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(address.address);
+                notify('Deposit address copied');
+            } catch (error) {
+                console.error('Could not copy deposit address', error);
+                notify('Could not copy deposit address');
+            }
+        }
+
+        async function loadDepositAddresses() {
+            try {
+                const { addresses } = await requestAuthApi('/api/market-price-adjustments?resource=deposit-addresses', { method: 'GET', headers: {} });
+                state.cryptoDepositAddresses = addresses;
+                updateDepositAddressDisplay();
+            } catch (error) {
+                console.error('Unable to load crypto deposit addresses', error);
+                const addressValue = document.getElementById('depositAddressValue');
+                if (addressValue) addressValue.textContent = 'Deposit addresses are temporarily unavailable.';
+            }
+        }
+
+        function updateAdminDepositNetworkOptions() {
+            const assetSelect = document.getElementById('adminDepositAsset');
+            const networkSelect = document.getElementById('adminDepositNetwork');
+            if (!assetSelect || !networkSelect) return;
+            const networks = DEPOSIT_NETWORKS_BY_ASSET[assetSelect.value] || [];
+            const selectedNetwork = networkSelect.value;
+            networkSelect.innerHTML = networks.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
+            if (networks.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
+            updateAdminDepositAddressInput();
+        }
+
+        function updateAdminDepositAddressInput() {
+            const asset = document.getElementById('adminDepositAsset')?.value || '';
+            const network = document.getElementById('adminDepositNetwork')?.value || '';
+            const saved = depositAddressForSelection(asset, network);
+            const address = document.getElementById('adminDepositAddress');
+            const memo = document.getElementById('adminDepositMemo');
+            if (address) address.value = saved?.address || '';
+            if (memo) memo.value = saved?.memo || '';
+        }
+
+        async function loadAdminDepositAddresses() {
+            try {
+                const { addresses } = await requestAuthApi('/api/admin/deposit-addresses', { method: 'GET', headers: {} });
+                state.cryptoDepositAddresses = addresses;
+                updateAdminDepositNetworkOptions();
+                updateDepositAddressDisplay();
+                return true;
+            } catch (error) {
+                console.error('Could not load administrator deposit addresses', error);
+                setAdminFeedback('adminDepositAddressFeedback', error.message, 'error');
+                return false;
+            }
+        }
+
+        async function saveAdminDepositAddress() {
+            if (state.admin.saving) return;
+            const asset = document.getElementById('adminDepositAsset').value;
+            const network = document.getElementById('adminDepositNetwork').value;
+            const address = document.getElementById('adminDepositAddress').value.trim();
+            const memo = document.getElementById('adminDepositMemo').value.trim();
+            if (address.length > 200 || memo.length > 120) {
+                setAdminFeedback('adminDepositAddressFeedback', 'Address must be 200 characters or fewer and memo/tag 120 characters or fewer.', 'error');
+                return;
+            }
+            const button = document.getElementById('adminSaveDepositAddress');
+            state.admin.saving = true;
+            button.disabled = true;
+            try {
+                await requestAuthApi('/api/admin/deposit-addresses', {
+                    method: 'PUT',
+                    body: JSON.stringify({ asset, network, address, memo })
+                });
+                if (!await loadAdminDepositAddresses()) {
+                    throw new Error('The address was saved, but the latest settings could not be reloaded. Refresh the page to confirm it.');
+                }
+                setAdminFeedback('adminDepositAddressFeedback', address
+                    ? `Saved the shared ${asset} address for ${network}.`
+                    : `Removed the shared ${asset} address for ${network}.`, 'success');
+                await loadAdminAudit();
+            } catch (error) {
+                console.error('Could not save administrator deposit address', error);
+                setAdminFeedback('adminDepositAddressFeedback', error.message, 'error');
+            } finally {
+                state.admin.saving = false;
+                button.disabled = false;
+            }
+        }
+
         function withdrawDemoFunds() {
             const asset = document.getElementById('withdrawAsset').value;
             const amount = Number(document.getElementById('withdrawAmount').value);
@@ -10310,10 +11413,12 @@
         function init() {
             loadDemoState();
             loadUsers();
+            updateDepositNetworkOptions();
+            updateAdminDepositNetworkOptions();
+            loadDepositAddresses();
             restoreUserSession();
             renderAuthUI();
             renderPairOptions();
-            processDueAdminBalanceJobs();
             generateCandles();
             renderOrderBook();
             renderTrades();
@@ -10347,12 +11452,14 @@
             });
             selectPair(state.selectedPair, state.currentPrice, state.asset, false);
             setMarketFeedStatus('connecting');
+            loadTradfiQuotes();
+            window.setInterval(loadTradfiQuotes, 15_000);
+            loadMarketPriceAdjustments();
             loadLiveMarketCatalogs();
             window.addEventListener('storage', handleUserStorageChange);
             window.setInterval(advanceMarket, 750);
             window.setInterval(tickP2PTrades, 1000);
             window.setInterval(tickFundingCountdown, 1000);
-            window.setInterval(processDueAdminBalanceJobs, 1000);
             document.addEventListener('click', (event) => {
                 if (!document.getElementById('marketPairSelector').contains(event.target)) {
                     closePairMenu();
