@@ -2,7 +2,7 @@
   "name": "exchange-practice-platform",
   "private": true,
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "node dev-server.js",
     "deploy": "vercel deploy --prod"
   },
   "dependencies": {
