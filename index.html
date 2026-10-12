@@ -52,6 +52,35 @@
   .mobile-bottom-nav {
    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
+  #pullToRefreshIndicator {
+   position: fixed;
+   top: max(0.5rem, env(safe-area-inset-top));
+   left: 50%;
+   z-index: 100;
+   display: flex;
+   align-items: center;
+   gap: 0.5rem;
+   padding: 0.55rem 0.85rem;
+   border: 1px solid #2b3139;
+   border-radius: 9999px;
+   background: #1e2329;
+   color: #eaecef;
+   font-size: 0.7rem;
+   opacity: 0;
+   pointer-events: none;
+   transform: translate(-50%, -160%);
+   transition: opacity 120ms ease, transform 120ms ease;
+  }
+  #pullToRefreshIndicator.visible {
+   opacity: 1;
+   transform: translate(-50%, var(--pull-refresh-offset, 0.5rem));
+  }
+  #pullToRefreshIndicator.refreshing [data-pull-refresh-icon] {
+   animation: pull-refresh-spin 0.8s linear infinite;
+  }
+  @keyframes pull-refresh-spin {
+   to { transform: rotate(360deg); }
+  }
   .header-brand-logo {
    display: block;
    height: 1.75rem;
@@ -1990,6 +2019,10 @@
  </style>
 </head>
 <body id="appBody" class="bg-binanceBg text-binanceText font-sans h-screen flex flex-col overflow-hidden select-none">
+<div id="pullToRefreshIndicator" role="status" aria-live="polite">
+ <i data-pull-refresh-icon data-lucide="arrow-down" class="h-3.5 w-3.5 text-binanceYellow"></i>
+ <span data-pull-refresh-label>Pull to refresh</span>
+</div>
 
  <!-- TOP NAVIGATION HEADER -->
  <header class="relative h-14 bg-binanceCard border-b border-binanceBorder flex items-center justify-between px-4 z-20 shrink-0">
@@ -2153,7 +2186,7 @@
   <button type="button" data-futures-trade-tab="smart-money" onclick="setFuturesSection('smart-money')" aria-pressed="false">SmartMoney</button>
  </nav>
 
- <main id="tradeWorkspace" class="flex-1 grid grid-cols-12 grid-rows-12 gap-1 p-1 pb-20 md:pb-1 bg-binanceBg overflow-hidden">
+ <main id="tradeWorkspace" data-pull-to-refresh class="flex-1 grid grid-cols-12 grid-rows-12 gap-1 p-1 pb-20 md:pb-1 bg-binanceBg overflow-hidden">
   
   <!-- TOP LEFT HEADER BAR: Pair Selector & Live Metric Summary -->
   <div id="tradeMarketSummary" class="col-span-12 lg:col-span-9 row-span-1 bg-binanceCard border border-binanceBorder rounded flex items-center justify-between px-4 py-1.5 overflow-visible">
@@ -2611,7 +2644,7 @@
 
  </main>
 
- <section id="userHomePage" class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg p-4 pb-24 md:p-6" aria-label="Home">
+ <section id="userHomePage" data-pull-to-refresh class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg p-4 pb-24 md:p-6" aria-label="Home">
   <div id="guestHomeContent" class="mx-auto max-w-[430px] space-y-4 md:grid md:max-w-7xl md:grid-cols-12 md:gap-6 md:space-y-0">
    <form class="rounded-lg bg-binanceHover px-3 py-2 md:col-span-12 md:mb-1 md:border md:border-binanceBorder md:bg-binanceCard md:px-4 md:py-3" onsubmit="openGuestMarketSearch(event)">
     <label for="guestHomeMarketSearch" class="flex items-center gap-2 text-binanceMuted">
@@ -2878,7 +2911,7 @@
   </div>
  </section>
 
- <section id="marketsPage" class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg p-0 pb-24 md:p-6" aria-labelledby="marketsPageTitle">
+ <section id="marketsPage" data-pull-to-refresh class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg p-0 pb-24 md:p-6" aria-labelledby="marketsPageTitle">
   <div id="marketsMobileContent" class="md:hidden">
    <div class="px-4 pb-1 pt-4">
     <label class="flex items-center gap-2 rounded-lg bg-binanceCard px-3 py-2.5">
@@ -2945,7 +2978,7 @@
   </div>
  </section>
 
- <section id="futuresPage" class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg p-4 pb-24 md:p-6" aria-labelledby="futuresPageTitle">
+ <section id="futuresPage" data-pull-to-refresh class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg p-4 pb-24 md:p-6" aria-labelledby="futuresPageTitle">
   <div class="mx-auto max-w-7xl space-y-5">
    <div class="flex flex-wrap items-end justify-between gap-3">
     <div>
@@ -3003,7 +3036,7 @@
   </div>
  </section>
 
- <section id="convertPage" class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg pb-24" aria-labelledby="convertPageTitle">
+ <section id="convertPage" data-pull-to-refresh class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg pb-24" aria-labelledby="convertPageTitle">
   <div class="mx-auto max-w-xl px-4 pb-6 pt-3">
    <div class="flex items-center justify-between py-2">
     <div class="flex items-center gap-2">
@@ -3066,7 +3099,7 @@
   </div>
  </section>
 
- <section id="assetsPage" class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg p-0 pb-24 md:p-6" aria-labelledby="assetsPageTitle">
+ <section id="assetsPage" data-pull-to-refresh class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg p-0 pb-24 md:p-6" aria-labelledby="assetsPageTitle">
   <section id="guestAssetsContent" class="hidden mx-auto min-h-[65vh] max-w-md px-6 py-10 md:py-12" aria-labelledby="guestAssetsTitle">
    <div class="mx-auto w-full max-w-[372px]">
     <h1 id="guestAssetsTitle" class="mb-8 text-[32px] font-semibold leading-tight text-binanceText">Log in</h1>
@@ -3396,7 +3429,7 @@
   </div>
  </section>
 
- <section id="profilePage" class="profile-design-page hidden flex-1 min-h-0 overflow-y-auto" aria-labelledby="profilePageTitle">
+ <section id="profilePage" data-pull-to-refresh class="profile-design-page hidden flex-1 min-h-0 overflow-y-auto" aria-labelledby="profilePageTitle">
   <div class="profile-phone-wrapper">
    <div class="profile-top-navbar">
     <button type="button" class="profile-icon-btn" onclick="closeProfilePage()" aria-label="Back to exchange"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
@@ -8016,6 +8049,20 @@
    return response.json();
   }
 
+  async function fetchBinanceSpotJson(path, options = {}) {
+   const origins = ['https://api.binance.com', 'https://data-api.binance.vision'];
+   const errors = [];
+   for (const origin of origins) {
+    try {
+     return await fetchBinanceJson(`${origin}${path}`, { ...options, cache: 'no-store' });
+    } catch (error) {
+     if (error.name === 'AbortError') throw error;
+     errors.push(`${origin}: ${error.message}`);
+    }
+   }
+   throw new Error(`Binance spot data is unavailable from all configured endpoints. ${errors.join(' | ')}`);
+  }
+
   async function refreshActiveQuoteFallback() {
    if (quoteFallbackRequestActive) return;
    const isFutures = state.tradingMode === 'futures';
@@ -8032,11 +8079,10 @@
    const controller = new AbortController();
    const timeout = window.setTimeout(() => controller.abort(), 5_000);
    try {
-    const endpoint = isFutures? 'https://fapi.binance.com/fapi/v1/ticker/24hr': 'https://api.binance.com/api/v3/ticker/24hr';
     const query = new URLSearchParams({ symbol: pair });
-    const response = await fetch(`${endpoint}?${query}`, { signal: controller.signal });
-    if (!response.ok) throw new Error(`Binance quote backup failed with HTTP ${response.status}`);
-    const ticker = await response.json();
+    const ticker = isFutures
+     ? await fetchBinanceJson(`https://fapi.binance.com/fapi/v1/ticker/24hr?${query}`, { signal: controller.signal })
+     : await fetchBinanceSpotJson(`/api/v3/ticker/24hr?${query}`, { signal: controller.signal });
     if ((ticker.s || ticker.symbol) !== pair) throw new Error('Binance quote backup returned an unexpected market');
     if (pair !== state.selectedPair || isFutures !== (state.tradingMode === 'futures')) return;
     if (isFutures) applyBinanceFuturesTicker(ticker, 'rest');
@@ -8078,7 +8124,7 @@
    try {
     const [spotTickers, futuresTickers] = await Promise.all([
      spotNeedsRefresh
-      ? fetchBinanceJson('https://api.binance.com/api/v3/ticker/24hr', { signal: controller.signal })
+      ? fetchBinanceSpotJson('/api/v3/ticker/24hr', { signal: controller.signal })
       : Promise.resolve(null),
      futuresNeedsRefresh
       ? fetchBinanceJson('https://fapi.binance.com/fapi/v1/ticker/24hr', { signal: controller.signal })
@@ -8164,8 +8210,8 @@
   async function loadLiveMarketCatalogs() {
    try {
     const [spotExchange, spotTickers, futuresExchange, futuresTickers, futuresPremiums] = await Promise.all([
-     fetchBinanceJson('https://api.binance.com/api/v3/exchangeInfo'),
-     fetchBinanceJson('https://api.binance.com/api/v3/ticker/24hr'),
+     fetchBinanceSpotJson('/api/v3/exchangeInfo'),
+     fetchBinanceSpotJson('/api/v3/ticker/24hr'),
      fetchBinanceJson('https://fapi.binance.com/fapi/v1/exchangeInfo'),
      fetchBinanceJson('https://fapi.binance.com/fapi/v1/ticker/24hr'),
      fetchBinanceJson('https://fapi.binance.com/fapi/v1/premiumIndex')
@@ -8281,7 +8327,7 @@
    }
    setMarketFeedStatus(marketDataSocket? 'reconnecting': 'connecting');
    try {
-    const socket = new WebSocket('wss://stream.binance.com:9443/ws');
+    const socket = new WebSocket('wss://stream.binance.com:443/ws');
     marketDataSocket = socket;
     resetMarketDataWatchdog(false, socket);
     socket.addEventListener('open', () => {
@@ -10162,7 +10208,102 @@
    }
   }
 
+  async function refreshExchangeApp() {
+   const indicator = document.getElementById('pullToRefreshIndicator');
+   const label = indicator?.querySelector('[data-pull-refresh-label]');
+   const icon = indicator?.querySelector('[data-pull-refresh-icon]');
+   indicator?.classList.add('visible', 'refreshing');
+   if (indicator) indicator.style.setProperty('--pull-refresh-offset', '0.5rem');
+   if (label) label.textContent = 'Refreshing…';
+   if (icon) icon.classList.add('animate-spin');
+   try {
+    if ('serviceWorker' in navigator) {
+     const registration = await navigator.serviceWorker.getRegistration();
+     if (registration) {
+      await Promise.race([
+       registration.update(),
+       new Promise((resolve) => window.setTimeout(resolve, 1500))
+      ]);
+     }
+    }
+   } catch (error) {
+    console.error('Could not check for an Exchange app update before refreshing.', error);
+   }
+   window.location.reload();
+  }
+
+  function setupPullToRefresh() {
+   if (!('ontouchstart' in window) && !navigator.maxTouchPoints) return;
+   const indicator = document.getElementById('pullToRefreshIndicator');
+   const label = indicator?.querySelector('[data-pull-refresh-label]');
+   const icon = indicator?.querySelector('[data-pull-refresh-icon]');
+   if (!indicator || !label || !icon) return;
+   let startY = 0;
+   let pullDistance = 0;
+   let tracking = false;
+   let readyToRefresh = false;
+   const threshold = 74;
+
+   const reset = () => {
+    tracking = false;
+    readyToRefresh = false;
+    pullDistance = 0;
+    indicator.classList.remove('visible', 'refreshing');
+    indicator.style.removeProperty('--pull-refresh-offset');
+    icon.classList.remove('rotate-180', 'animate-spin');
+    label.textContent = 'Pull to refresh';
+   };
+
+   const findPullScrollContainer = (target) => {
+    const page = target instanceof Element? target.closest('[data-pull-to-refresh]'): null;
+    if (!page || page.classList.contains('hidden')) return null;
+    let element = target;
+    while (element && element !== page) {
+     const overflowY = window.getComputedStyle(element).overflowY;
+     if (['auto', 'scroll'].includes(overflowY) && element.scrollHeight > element.clientHeight) {
+      return element.scrollTop <= 0? page: null;
+     }
+     element = element.parentElement;
+    }
+    return page;
+   };
+
+   document.addEventListener('touchstart', (event) => {
+    if (event.touches.length !== 1 || indicator.classList.contains('refreshing')) return;
+    if (event.target instanceof Element && event.target.closest('button, a, input, select, textarea, [role="dialog"]')) return;
+    if (!findPullScrollContainer(event.target)) return;
+    startY = event.touches[0].clientY;
+    pullDistance = 0;
+    tracking = true;
+   }, { passive: true });
+
+   document.addEventListener('touchmove', (event) => {
+    if (!tracking || event.touches.length !== 1) return;
+    const distance = event.touches[0].clientY - startY;
+    if (distance <= 0) {
+     reset();
+     return;
+    }
+    event.preventDefault();
+    pullDistance = Math.min(110, distance * 0.65);
+    readyToRefresh = pullDistance >= threshold;
+    indicator.style.setProperty('--pull-refresh-offset', `${8 + pullDistance}px`);
+    indicator.classList.add('visible');
+    icon.classList.toggle('rotate-180', readyToRefresh);
+    label.textContent = readyToRefresh? 'Release to refresh': 'Pull to refresh';
+   }, { passive: false });
+
+   document.addEventListener('touchend', () => {
+    if (!tracking) return;
+    const shouldRefresh = readyToRefresh;
+    reset();
+    if (shouldRefresh) void refreshExchangeApp();
+   }, { passive: true });
+   document.addEventListener('touchcancel', reset, { passive: true });
+  }
+
   function setupInstallableApp() {
+   setupPullToRefresh();
    const installButton = document.getElementById('installAppButton');
    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
    if (isStandalone && installButton) installButton.classList.add('hidden');
@@ -11144,12 +11285,9 @@
 
   async function fetchChartHistory(pair, marketType, interval) {
     const query = new URLSearchParams({ symbol: pair, interval, limit: '60' });
-    const historyUrl = marketType === 'futures'
-     ? `https://fapi.binance.com/fapi/v1/klines?${query}`
-     : `https://api.binance.com/api/v3/klines?${query}`;
-    const response = await fetch(historyUrl);
-    if (!response.ok) throw new Error(`Binance ${interval} candle request failed with HTTP ${response.status}`);
-    const rows = await response.json();
+    const rows = marketType === 'futures'
+     ? await fetchBinanceJson(`https://fapi.binance.com/fapi/v1/klines?${query}`, { cache: 'no-store' })
+     : await fetchBinanceSpotJson(`/api/v3/klines?${query}`);
     if (!Array.isArray(rows)) throw new Error(`Binance returned an invalid ${interval} candle response`);
     const adjustmentFactor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey(marketType, pair)] || 0) / 100;
     const candles = rows.map((row) => ({
@@ -11267,7 +11405,7 @@
    if (generation !== chartFeedGeneration || !hasLivePair) return;
    try {
     const streamName = `${state.selectedPair.toLowerCase()}@kline_${chartInterval()}`;
-    const streamHost = state.tradingMode === 'futures'? 'wss://fstream.binance.com/ws': 'wss://stream.binance.com:9443/ws';
+    const streamHost = state.tradingMode === 'futures'? 'wss://fstream.binance.com/ws': 'wss://stream.binance.com:443/ws';
     const socket = new WebSocket(`${streamHost}/${streamName}`);
     chartDataSocket = socket;
     socket.addEventListener('open', () => {
@@ -12736,6 +12874,15 @@
    window.setInterval(refreshActiveQuoteFallback, 5_000);
    refreshMarketCatalogFallback();
    window.setInterval(refreshMarketCatalogFallback, 15_000);
+   const resumeMarketFeeds = () => {
+    if (document.visibilityState === 'hidden') return;
+    connectMarketData();
+    connectFuturesMarketData();
+    refreshActiveQuoteFallback();
+    refreshMarketCatalogFallback();
+   };
+   window.addEventListener('online', resumeMarketFeeds);
+   document.addEventListener('visibilitychange', resumeMarketFeeds);
    loadTradfiQuotes();
    window.setInterval(loadTradfiQuotes, 15_000);
    loadMarketPriceAdjustments();
