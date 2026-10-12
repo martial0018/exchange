@@ -2142,7 +2142,7 @@
    </div>
    <button id="headerWalletButton" onclick="openMobileAssets()" title="Open wallet overview" aria-label="Open wallet overview" class="hidden items-center space-x-2 bg-binanceHover hover:bg-opacity-80 px-3 py-1.5 rounded text-xs border border-binanceBorder md:flex">
     <i data-lucide="wallet" class="w-3.5 h-3.5 text-binanceYellow"></i>
-    <span id="headerUSDTBalance" class="font-mono font-semibold">$10,000.00 USD</span>
+    <span id="headerUSDTBalance" class="font-mono font-semibold">$0.00 USD</span>
    </button>
    
    <button onclick="openModal('depositModal')" class="hidden md:block bg-binanceYellow hover:bg-binanceYellowHover text-binanceBg font-bold px-3 py-1.5 rounded text-xs transition">
@@ -2514,7 +2514,7 @@
      <div class="flex justify-between text-[11px] text-binanceMuted pt-1">
       <span id="formAvailLabel">Avail Balance:</span>
       <span class="flex items-center gap-1.5">
-       <span id="formAvailBalance" class="text-white font-mono">10,000.00 USDT</span>
+       <span id="formAvailBalance" class="text-white font-mono">0.00 USDT</span>
        <button type="button" onclick="openModal('depositModal')" aria-label="Add funds" class="font-bold text-binanceYellow">+</button>
       </span>
      </div>
@@ -2615,11 +2615,11 @@
      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div class="bg-binanceBg p-3 rounded border border-binanceBorder">
        <span class="text-binanceMuted text-xs block">Total Estimated Net Worth</span>
-       <span id="portfolioTotalUSD" class="text-xl font-bold font-mono text-white">$10,000.00 USD</span>
+       <span id="portfolioTotalUSD" class="text-xl font-bold font-mono text-white">$0.00 USD</span>
       </div>
       <div class="bg-binanceBg p-3 rounded border border-binanceBorder">
        <span class="text-binanceMuted text-xs block">Available USDT</span>
-       <span id="spotBalanceUSD" class="text-xl font-bold font-mono text-binanceYellow">$10,000.00 USDT</span>
+       <span id="spotBalanceUSD" class="text-xl font-bold font-mono text-binanceYellow">$0.00 USDT</span>
       </div>
       <div class="bg-binanceBg p-3 rounded border border-binanceBorder">
        <span class="text-binanceMuted text-xs block">Futures Unrealized PnL</span>
@@ -4652,11 +4652,7 @@
    openOrders: [],
    orderHistory: [],
    transactions: [],
-   assets: [
-    { asset: 'BTC', total: 0.2441, available: 0.2441, inOrders: 0 },
-    { asset: 'USDT', total: 10000, available: 10000, inOrders: 0 },
-    { asset: 'ETH', total: 1.3425, available: 1.3425, inOrders: 0 }
-   ],
+   assets: createDefaultWallet(),
    trades: [],
    lastTick: Date.now()
   };
@@ -4717,16 +4713,31 @@
   let fundingSecondsRemaining = 3 * 3600 + 42 * 60 + 12;
 
   const DEMO_STORAGE_KEY = 'exchange-account-v1';
+  const PAGE_SESSION_STORAGE_KEY = 'exchange-page-v1';
   const USERS_STORAGE_KEY = 'exchange-users-v1';
   const BALANCE_PROCESSING_DELAY_MS = 60_000;
   const P2P_PAYMENT_METHODS = ['Bank Transfer', 'Cash in Person', 'Wise', 'PayPal', 'Revolut', 'Zelle', 'Skrill', 'Apple Pay'];
 
   function createDefaultWallet() {
    return [
-    { asset: 'BTC', total: 0.2441, available: 0.2441, inOrders: 0 },
-    { asset: 'USDT', total: 10000, available: 10000, inOrders: 0 },
-    { asset: 'ETH', total: 1.3425, available: 1.3425, inOrders: 0 }
+    { asset: 'BTC', total: 0, available: 0, inOrders: 0 },
+    { asset: 'USDT', total: 0, available: 0, inOrders: 0 },
+    { asset: 'ETH', total: 0, available: 0, inOrders: 0 }
    ];
+  }
+
+  function migrateLegacyPracticeWallet(wallet) {
+   const legacyBalances = { BTC: 0.2441, USDT: 10000, ETH: 1.3425 };
+   const isLegacyPracticeWallet = Array.isArray(wallet)
+    && wallet.length === Object.keys(legacyBalances).length
+    && Object.entries(legacyBalances).every(([asset, amount]) => {
+     const balance = wallet.find((entry) => entry?.asset === asset);
+     return balance
+      && balance.total === amount
+      && balance.available === amount
+      && balance.inOrders === 0;
+    });
+   return isLegacyPracticeWallet? createDefaultWallet(): wallet;
   }
 
   function cloneWallet(wallet) {
@@ -4743,14 +4754,22 @@
     const parsed = JSON.parse(stored);
     state.users = Array.isArray(parsed)? parsed: [];
     let removedPlaintextPasswords = false;
+    let migratedPracticeWallet = false;
     state.users.forEach((user) => {
      if (Object.prototype.hasOwnProperty.call(user, 'password')) {
       delete user.password;
       removedPlaintextPasswords = true;
      }
+     if (Array.isArray(user.wallet)) {
+      const wallet = migrateLegacyPracticeWallet(user.wallet);
+      if (wallet !== user.wallet) {
+       user.wallet = wallet;
+       migratedPracticeWallet = true;
+      }
+     }
     });
     state.users.forEach(ensureUserActivity);
-    if (removedPlaintextPasswords) saveUsers();
+    if (removedPlaintextPasswords || migratedPracticeWallet) saveUsers();
    } catch (error) {
     console.error('Could not load stored users', error);
     notify('Saved accounts could not be loaded from this browser');
@@ -4936,7 +4955,9 @@
      .map((item) => [item.id, `${item.title}|${item.message}`])
    );
    state.currentUser = user;
-   state.assets = cloneWallet(user.wallet || createDefaultWallet());
+   const wallet = migrateLegacyPracticeWallet(user.wallet || createDefaultWallet());
+   if (wallet !== user.wallet) user.wallet = wallet;
+   state.assets = cloneWallet(wallet);
    state.fundingAssets = hasFundingWallet? cloneWallet(user.fundingWallet): [];
    if (!hasFundingWallet) {
     migrateP2PPurchasesToFunding([], user.transactions);
@@ -7507,7 +7528,9 @@
    if (user) {
     const hasFundingWallet = Array.isArray(user.fundingWallet);
     ensureUserActivity(user);
-    state.assets = cloneWallet(user.wallet || createDefaultWallet());
+    const wallet = migrateLegacyPracticeWallet(user.wallet || createDefaultWallet());
+    if (wallet !== user.wallet) user.wallet = wallet;
+    state.assets = cloneWallet(wallet);
     state.fundingAssets = hasFundingWallet? cloneWallet(user.fundingWallet): [];
     state.futuresAssets = Array.isArray(user.futuresWallet)? cloneWallet(user.futuresWallet): [];
     state.transactions = user.transactions;
@@ -7667,7 +7690,7 @@
     const saved = JSON.parse(stored);
     if (!saved || ![1, 2].includes(saved.version)) return;
     if (Array.isArray(saved.assets) && saved.assets.every((asset) => asset && typeof asset.asset === 'string')) {
-     state.assets = saved.assets;
+     state.assets = migrateLegacyPracticeWallet(saved.assets);
     }
     if (Array.isArray(saved.openOrders)) state.openOrders = saved.openOrders;
     if (Array.isArray(saved.orderHistory)) state.orderHistory = saved.orderHistory;
@@ -7730,8 +7753,22 @@
     if (typeof saved.selectedPair === 'string' && /^[A-Z0-9]{2,20}$/.test(saved.selectedPair)) state.selectedPair = saved.selectedPair;
     const validPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'p2p'];
     if (typeof saved.activePage === 'string' && validPages.includes(saved.activePage)) state.activePage = saved.activePage;
-    state.restorePage = state.activePage;
     if (typeof saved.returnPage === 'string' && validPages.includes(saved.returnPage)) state.returnPage = saved.returnPage;
+    try {
+     const savedTabPage = JSON.parse(sessionStorage.getItem(PAGE_SESSION_STORAGE_KEY) || 'null');
+     if (savedTabPage && typeof savedTabPage === 'object') {
+      if (typeof savedTabPage.activePage === 'string' && validPages.includes(savedTabPage.activePage)) {
+       state.activePage = savedTabPage.activePage;
+      }
+      if (typeof savedTabPage.returnPage === 'string' && validPages.includes(savedTabPage.returnPage)) {
+       state.returnPage = savedTabPage.returnPage;
+      }
+     }
+    } catch (error) {
+     console.error('Could not restore the page saved in this tab.', error);
+     notify('The last page in this tab could not be restored');
+    }
+    state.restorePage = state.activePage;
     if (typeof saved.authMode === 'string' && ['login', 'signup'].includes(saved.authMode)) state.authMode = saved.authMode;
     if (['spot', 'futures', 'margin'].includes(saved.tradingMode)) state.tradingMode = saved.tradingMode;
     if (['buy', 'sell'].includes(saved.side)) state.side = saved.side;
@@ -7786,6 +7823,15 @@
   }
 
   function saveDemoState(syncAccount = true) {
+   try {
+    sessionStorage.setItem(PAGE_SESSION_STORAGE_KEY, JSON.stringify({
+     activePage: state.activePage,
+     returnPage: state.returnPage
+    }));
+   } catch (error) {
+    console.error('Unable to save the current page in this tab.', error);
+    notify('Could not save the current page in this tab');
+   }
    try {
     const formFields = ['inputPrice', 'inputAmount', 'inputStopPrice', 'inputTrailRate', 'convertFromAmount', 'marketPageSearch', 'futuresPageSearch', 'assetsPageSearch', 'p2pFiatFilter', 'p2pAssetFilter', 'p2pPaymentFilter', 'p2pFiatAmount'];
     const formState = Object.fromEntries(formFields.map((id) => [id, document.getElementById(id)?.value || '']));
@@ -12857,11 +12903,7 @@
 
   function resetDemoAccount() {
    if (!window.confirm('Reset balances, orders, and transaction history? This cannot be undone.')) return;
-   state.assets = [
-    { asset: 'BTC', total: 0.2441, available: 0.2441, inOrders: 0 },
-    { asset: 'USDT', total: 10000, available: 10000, inOrders: 0 },
-    { asset: 'ETH', total: 1.3425, available: 1.3425, inOrders: 0 }
-   ];
+   state.assets = createDefaultWallet();
    state.fundingAssets = [];
    state.futuresAssets = [];
    state.openOrders = [];

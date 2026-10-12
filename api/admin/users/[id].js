@@ -2,9 +2,9 @@ const crypto = require('node:crypto');
 const { getDb, handleError, methodNotAllowed, parseBody, publicUser, requireSameOrigin, requireUser, sendJson, validWallet } = require('../../_lib/http');
 
 const DEFAULT_WALLET = [
-    { asset: 'BTC', total: 0.2441, available: 0.2441, inOrders: 0 },
-    { asset: 'USDT', total: 10000, available: 10000, inOrders: 0 },
-    { asset: 'ETH', total: 1.3425, available: 1.3425, inOrders: 0 }
+    { asset: 'BTC', total: 0, available: 0, inOrders: 0 },
+    { asset: 'USDT', total: 0, available: 0, inOrders: 0 },
+    { asset: 'ETH', total: 0, available: 0, inOrders: 0 }
 ];
 
 function validAmount(value, allowZero = false) {
@@ -65,7 +65,7 @@ function createTransaction({ id, action, actor, body, now, beforeWallet, afterWa
             type: 'Admin Wallet Reset',
             asset: 'WALLET',
             amount: 0,
-            details: 'Reset to the default practice wallet'
+            details: 'Reset to the zero-balance practice wallet'
         };
     }
     const oldBalance = beforeWallet.find((entry) => entry.asset === body.asset);
@@ -133,7 +133,7 @@ module.exports = async function handler(req, res) {
             let details;
             if (walletReset) {
                 afterWallet.splice(0, afterWallet.length, ...DEFAULT_WALLET);
-                details = { description: 'Reset to default practice wallet' };
+                details = { description: 'Reset to zero-balance practice wallet' };
             } else {
                 let balance = afterWallet.find((entry) => entry.asset === body.asset);
                 if (!balance && body.action === 'balance_credit') {
