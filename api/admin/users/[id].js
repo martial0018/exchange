@@ -123,8 +123,15 @@ module.exports = async function handler(req, res) {
 
             const beforeWallet = Array.isArray(user.wallet) ? user.wallet : [];
             const afterWallet = JSON.parse(JSON.stringify(beforeWallet));
+            const walletReset = body.action === 'wallet_reset';
+            const openOrders = walletReset ? [] : Array.isArray(user.open_orders) ? user.open_orders : [];
+            const orderHistory = (Array.isArray(user.order_history) ? user.order_history : []).map((order) =>
+                walletReset && (Array.isArray(user.open_orders) ? user.open_orders : []).some((openOrder) => openOrder.id === order.id)
+                    ? { ...order, status: 'Canceled' }
+                    : order
+            );
             let details;
-            if (body.action === 'wallet_reset') {
+            if (walletReset) {
                 afterWallet.splice(0, afterWallet.length, ...DEFAULT_WALLET);
                 details = { description: 'Reset to default practice wallet' };
             } else {
@@ -188,6 +195,11 @@ module.exports = async function handler(req, res) {
             const [updatedUser] = await sql`
                 UPDATE users
                 SET wallet = ${JSON.stringify(afterWallet)}::jsonb,
+                    funding_wallet = ${JSON.stringify(walletReset ? [] : user.funding_wallet || [])}::jsonb,
+                    futures_wallet = ${JSON.stringify(walletReset ? [] : user.futures_wallet || [])}::jsonb,
+                    open_orders = ${JSON.stringify(openOrders)}::jsonb,
+                    order_history = ${JSON.stringify(orderHistory)}::jsonb,
+                    futures_positions = ${JSON.stringify(walletReset ? [] : user.futures_positions || [])}::jsonb,
                     transactions = ${JSON.stringify(transactions)}::jsonb,
                     notifications = ${JSON.stringify(notifications)}::jsonb,
                     balance_jobs = ${JSON.stringify(balanceJobs)}::jsonb,

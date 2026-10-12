@@ -3650,7 +3650,7 @@
   </div>
  </div>
 
- <div id="transferModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-labelledby="transferModalTitle" onclick="if (event.target === this) closeModal('transferModal')">
+ <div id="transferModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-labelledby="transferModalTitle" onclick="if (event.target === this) closeModal('transferModal')">
   <form class="w-full max-w-md space-y-4 rounded-xl border border-binanceBorder bg-binanceCard p-5 shadow-2xl" onsubmit="submitWalletTransfer(event)">
    <div class="flex items-center justify-between border-b border-binanceBorder pb-3">
     <div><h2 id="transferModalTitle" class="text-lg font-bold text-white">Transfer between wallets</h2><p class="mt-1 text-[10px] text-binanceMuted">Move available assets between Spot, Funding, and Futures.</p></div>
@@ -4537,6 +4537,10 @@
    soundEnabled: false,
    activePage: 'trade',
    returnPage: 'trade',
+   bottomTab: 'open',
+   rightTab: 'orderbook',
+   restoredFormState: {},
+   restorePage: null,
    homeBalancesVisible: true,
    homeMarketType: 'spot',
    homeMarketCategory: 'hot',
@@ -5125,6 +5129,7 @@
    state.activePage = 'profile';
    updateTradeHeader();
    renderProfilePage();
+   saveDemoState();
   }
 
   async function copyProfileUsername() {
@@ -5206,6 +5211,7 @@
 
   function openAppPage(page) {
    const pages = ['home', 'markets', 'futures', 'assets', 'convert'];
+   const previousPage = state.activePage;
    const isTradingWorkspace = page === 'trade' || page === 'futuresTrade';
    const isLoggedInAssetsView = page === 'assets' && !!state.currentUser;
    document.getElementById('appBody').classList.remove('assets-history-mode');
@@ -5236,7 +5242,7 @@
    }
    else if (page === 'futuresTrade') {
     setTradingMode('futures');
-    switchBottomTab('positions');
+    switchBottomTab(previousPage === 'futuresTrade'? state.bottomTab: 'positions');
     renderAssets();
     renderTransactions();
     drawChart();
@@ -5388,6 +5394,7 @@
    document.getElementById('tradePanelViewButton')?.classList.toggle('text-binanceYellow', view === 'panel');
    document.getElementById('tradePanelViewButton')?.classList.toggle('text-binanceMuted', view !== 'panel');
    if (view === 'canvas') requestAnimationFrame(drawChart);
+   saveDemoState();
   }
 
   function openMobileFutures() {
@@ -5403,6 +5410,7 @@
    state.marketSection = section;
    updateTradeHeader();
    renderMarketsPage();
+   saveDemoState();
   }
 
   function openGuestMarketSearch(event) {
@@ -5416,6 +5424,7 @@
    const marketSearch = document.getElementById('marketPageSearch');
    if (marketSearch) marketSearch.value = query;
    renderMarketsPage();
+   saveDemoState();
   }
 
   function setMobileMarketSearch(query) {
@@ -5435,30 +5444,32 @@
    state.marketTradfiView = product;
    updateTradeHeader();
    renderMarketsPage();
+   saveDemoState();
   }
 
   function setMobileMarketClass(assetClass) {
    if (!['bstocks', 'commodities'].includes(assetClass)) return;
    state.marketTradfiClass = assetClass;
    renderMarketsPage();
+   saveDemoState();
   }
 
   function setFuturesSection(section) {
    if (!['usd-m', 'coin-m', 'options', 'smart-money'].includes(section)) return;
+   state.futuresSection = section;
    if (section === 'usd-m') {
-    state.futuresSection = section;
     if (state.activePage !== 'futuresTrade') openMobileFuturesTrade();
     else updateTradeHeader();
+    saveDemoState();
     return;
    }
    if (state.activePage === 'futuresTrade') {
-    state.futuresSection = section;
     openAppPage('futures');
    }
-   state.futuresSection = section;
    state.futuresPageFilter = 'all';
    updateTradeHeader();
    renderFuturesPage();
+   saveDemoState();
   }
 
   function setAssetsSection(section) {
@@ -5466,18 +5477,21 @@
    state.assetsSection = section;
    updateTradeHeader();
    renderAssetsPage();
+   saveDemoState();
   }
 
   function setAssetsFuturesMarket(market) {
    if (!['usd-m', 'coin-m'].includes(market)) return;
    state.assetsFuturesMarket = market;
    renderAssetsPage();
+   saveDemoState();
   }
 
   function setAssetsFuturesView(view) {
    if (!['assets', 'positions'].includes(view)) return;
    state.assetsFuturesView = view;
    renderAssetsPage();
+   saveDemoState();
   }
 
   function toggleAssetsFuturesAccountInfo() {
@@ -5941,6 +5955,7 @@
    if (!['all', 'favorites', 'gainers'].includes(filter)) return;
    state.futuresPageFilter = filter;
    renderFuturesPage();
+   saveDemoState();
   }
 
   function toggleFuturesMarketFavorite(pair) {
@@ -6191,7 +6206,7 @@
    const priceFor = (asset) => asset === 'USDT'? 1: demoMarketPrice(asset);
    const section = state.assetsSection;
    const fundingBalances = state.fundingAssets;
-   const futuresUsdtBalance = state.futuresAssets.find((balance) => balance.asset === 'USDT') || { total: 0, available: 0, inOrders: 0 };
+   const futuresUsdtBalance = state.futuresAssets.find((balance) => balance.asset === 'USDT') || { asset: 'USDT', total: 0, available: 0, inOrders: 0 };
    const futuresUnrealizedPnl = state.futuresPositions.reduce((sum, position) => {
     const markPrice = position.pair.replace('/', '') === state.selectedPair? state.currentPrice: position.markPrice;
     return sum + futuresPnl(position, markPrice);
@@ -6506,6 +6521,7 @@
    state.homeBalancesVisible = !state.homeBalancesVisible;
    renderUserHomeDashboard();
    renderHeaderAccountMenu();
+   saveDemoState();
   }
 
   function openHomeMarketSearch(event) {
@@ -6556,6 +6572,7 @@
    if (type === 'stocks') state.homeMarketCategory = 'tradfi';
    else if (state.homeMarketCategory === 'tradfi') state.homeMarketCategory = 'hot';
    renderUserHomeDashboard();
+   saveDemoState();
   }
 
   function setHomeMarketCategory(category) {
@@ -6564,6 +6581,7 @@
    if (category === 'tradfi') state.homeMarketType = 'stocks';
    else if (state.homeMarketType === 'stocks') state.homeMarketType = 'spot';
    renderUserHomeDashboard();
+   saveDemoState();
   }
 
   function getHomeMarketRows() {
@@ -7505,20 +7523,34 @@
    calculateTotal();
    saveDemoState();
    if (user) {
-    const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.activePage)
-     ? state.activePage
+    const intendedPage = state.restorePage || state.activePage;
+    state.restorePage = null;
+    const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'p2p'].includes(intendedPage)
+     ? intendedPage
      : 'home';
-    openAppPage(preferredPage);
+    if (preferredPage === 'profile') {
+     openAppPage(['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.returnPage)? state.returnPage: 'trade');
+     openProfilePage();
+    } else if (preferredPage === 'p2p') {
+     openAppPage(['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.returnPage)? state.returnPage: 'trade');
+     openP2PPage();
+    } else {
+     openAppPage(preferredPage);
+    }
    }
   }
 
   async function restoreUserSession() {
    try {
     if (isLocalPreviewMode() && !getLocalPreviewSession()) {
+     state.restorePage = null;
      return;
     }
     const { user } = await requestAuthApi('/api/auth/me', { method: 'GET', headers: {} });
-    if (!user) return;
+    if (!user) {
+     state.restorePage = null;
+     return;
+    }
     if (user.role === 'admin') {
      setAdminSession(user);
      await loadAdminUsers();
@@ -7527,6 +7559,7 @@
     }
     storeAuthenticatedUser(user);
    } catch (error) {
+    state.restorePage = null;
     const message = error && error.message ? error.message : '';
     if (message !== 'Not signed in' && message !== 'Sign in to continue') {
      console.error('Could not restore signed-in account', error);
@@ -7632,7 +7665,7 @@
     const stored = localStorage.getItem(DEMO_STORAGE_KEY);
     if (!stored) return;
     const saved = JSON.parse(stored);
-    if (!saved || saved.version !== 1) return;
+    if (!saved || ![1, 2].includes(saved.version)) return;
     if (Array.isArray(saved.assets) && saved.assets.every((asset) => asset && typeof asset.asset === 'string')) {
      state.assets = saved.assets;
     }
@@ -7658,6 +7691,9 @@
       console.error('Saved futures position data is invalid and was not loaded.');
       notify('Saved futures positions could not be restored');
      }
+    }
+    if (Array.isArray(saved.chartLines) && saved.chartLines.length <= 100 && saved.chartLines.every(Number.isFinite)) {
+     state.chartLines = saved.chartLines;
     }
     if (Array.isArray(saved.transactions)) state.transactions = saved.transactions;
     if (Array.isArray(saved.p2pTrades)) state.p2pTrades = saved.p2pTrades;
@@ -7692,20 +7728,69 @@
     }
     if (typeof saved.asset === 'string' && /^[A-Z0-9]{2,10}$/.test(saved.asset)) state.asset = saved.asset;
     if (typeof saved.selectedPair === 'string' && /^[A-Z0-9]{2,20}$/.test(saved.selectedPair)) state.selectedPair = saved.selectedPair;
-    const validPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile'];
+    const validPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'p2p'];
     if (typeof saved.activePage === 'string' && validPages.includes(saved.activePage)) state.activePage = saved.activePage;
+    state.restorePage = state.activePage;
     if (typeof saved.returnPage === 'string' && validPages.includes(saved.returnPage)) state.returnPage = saved.returnPage;
     if (typeof saved.authMode === 'string' && ['login', 'signup'].includes(saved.authMode)) state.authMode = saved.authMode;
+    if (['spot', 'futures', 'margin'].includes(saved.tradingMode)) state.tradingMode = saved.tradingMode;
+    if (['buy', 'sell'].includes(saved.side)) state.side = saved.side;
+    if (['limit', 'market', 'stop', 'trailing'].includes(saved.orderType)) state.orderType = saved.orderType;
+    if (['Cross', 'Isolated'].includes(saved.marginType)) state.marginType = saved.marginType;
+    if (Number.isFinite(saved.leverage) && saved.leverage >= 1 && saved.leverage <= 125) state.leverage = saved.leverage;
+    if (['candle', 'line'].includes(saved.chartType)) state.chartType = saved.chartType;
+    if (Object.prototype.hasOwnProperty.call(CHART_TIMEFRAMES, saved.timeframe)) state.timeframe = saved.timeframe;
+    if (saved.indicators && typeof saved.indicators === 'object') {
+     for (const key of ['ma', 'bb', 'vol', 'rsi']) {
+      if (typeof saved.indicators[key] === 'boolean') state.indicators[key] = saved.indicators[key];
+     }
+    }
+    if (['canvas', 'panel'].includes(saved.mobileTradeView)) state.mobileTradeView = saved.mobileTradeView;
+    if (typeof saved.soundEnabled === 'boolean') state.soundEnabled = saved.soundEnabled;
+    if (typeof saved.homeBalancesVisible === 'boolean') state.homeBalancesVisible = saved.homeBalancesVisible;
+    if (['spot', 'futures'].includes(saved.homeMarketType)) state.homeMarketType = saved.homeMarketType;
+    if (typeof saved.homeMarketCategory === 'string') state.homeMarketCategory = saved.homeMarketCategory;
+    if (['for-you', 'favorites', 'crypto', 'tradfi'].includes(saved.marketSection)) state.marketSection = saved.marketSection;
+    if (['spot', 'futures', 'stocks'].includes(saved.marketTradfiView)) state.marketTradfiView = saved.marketTradfiView;
+    if (['bstocks', 'commodities'].includes(saved.marketTradfiClass)) state.marketTradfiClass = saved.marketTradfiClass;
+    if (['all', 'favorites', 'gainers'].includes(saved.futuresPageFilter)) state.futuresPageFilter = saved.futuresPageFilter;
+    if (['usd-m', 'coin-m', 'options', 'smart-money'].includes(saved.futuresSection)) state.futuresSection = saved.futuresSection;
+    if (typeof saved.assetsSection === 'string') state.assetsSection = saved.assetsSection;
+    if (typeof saved.assetsDisplayCurrency === 'string' && /^[A-Z0-9]{2,20}$/.test(saved.assetsDisplayCurrency)) state.assetsDisplayCurrency = saved.assetsDisplayCurrency;
+    if (['usd-m', 'coin-m'].includes(saved.assetsFuturesMarket)) state.assetsFuturesMarket = saved.assetsFuturesMarket;
+    if (['assets', 'positions'].includes(saved.assetsFuturesView)) state.assetsFuturesView = saved.assetsFuturesView;
+    if (typeof saved.assetsPageQuery === 'string') state.assetsPageQuery = saved.assetsPageQuery.slice(0, 100);
+    if (['buy', 'sell'].includes(saved.p2pMode)) state.p2pMode = saved.p2pMode;
+    if (['market', 'trades', 'ads'].includes(saved.p2pView)) state.p2pView = saved.p2pView;
+    if (typeof saved.p2pFiat === 'string' && ['USD', 'EUR', 'GBP'].includes(saved.p2pFiat)) state.p2pFiat = saved.p2pFiat;
+    if (saved.activeP2PTradeId === null || ['string', 'number'].includes(typeof saved.activeP2PTradeId)) {
+     state.activeP2PTradeId = saved.activeP2PTradeId;
+    }
+    if (['open', 'positions', 'history', 'assets', 'transactions'].includes(saved.bottomTab)) state.bottomTab = saved.bottomTab;
+    if (['orderbook', 'depth'].includes(saved.rightTab)) state.rightTab = saved.rightTab;
+    if ([0.01, 0.1, 1].includes(saved.orderBookPrecision)) state.orderBookPrecision = saved.orderBookPrecision;
+    if (saved.advancedOrder && typeof saved.advancedOrder === 'object') {
+     if (typeof saved.advancedOrder.reduceOnly === 'boolean') state.advancedOrder.reduceOnly = saved.advancedOrder.reduceOnly;
+     if (typeof saved.advancedOrder.postOnly === 'boolean') state.advancedOrder.postOnly = saved.advancedOrder.postOnly;
+    }
+    if (saved.formState && typeof saved.formState === 'object' && !Array.isArray(saved.formState)) {
+     const formFields = ['inputPrice', 'inputAmount', 'inputStopPrice', 'inputTrailRate', 'convertFromAmount', 'marketPageSearch', 'futuresPageSearch', 'assetsPageSearch', 'p2pFiatFilter', 'p2pAssetFilter', 'p2pPaymentFilter', 'p2pFiatAmount'];
+     state.restoredFormState = Object.fromEntries(formFields
+      .filter((key) => typeof saved.formState[key] === 'string' && saved.formState[key].length <= 100)
+      .map((key) => [key, saved.formState[key]]));
+    }
    } catch (error) {
     console.error('Unable to load the local account state.', error);
     notify('Could not restore saved account data');
    }
   }
 
-  function saveDemoState() {
+  function saveDemoState(syncAccount = true) {
    try {
+    const formFields = ['inputPrice', 'inputAmount', 'inputStopPrice', 'inputTrailRate', 'convertFromAmount', 'marketPageSearch', 'futuresPageSearch', 'assetsPageSearch', 'p2pFiatFilter', 'p2pAssetFilter', 'p2pPaymentFilter', 'p2pFiatAmount'];
+    const formState = Object.fromEntries(formFields.map((id) => [id, document.getElementById(id)?.value || '']));
     localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify({
-     version: 1,
+     version: 2,
      assets: state.assets,
      fundingAssets: state.fundingAssets,
      futuresAssets: state.futuresAssets,
@@ -7722,9 +7807,42 @@
      currentPrice: state.currentPrice,
      activePage: state.activePage,
      returnPage: state.returnPage,
-     authMode: state.authMode
+     authMode: state.authMode,
+     tradingMode: state.tradingMode,
+     side: state.side,
+     orderType: state.orderType,
+     marginType: state.marginType,
+     leverage: state.leverage,
+     chartType: state.chartType,
+     timeframe: state.timeframe,
+     indicators: state.indicators,
+     mobileTradeView: state.mobileTradeView,
+     soundEnabled: state.soundEnabled,
+     homeBalancesVisible: state.homeBalancesVisible,
+     homeMarketType: state.homeMarketType,
+     homeMarketCategory: state.homeMarketCategory,
+     marketSection: state.marketSection,
+     marketTradfiView: state.marketTradfiView,
+     marketTradfiClass: state.marketTradfiClass,
+     futuresPageFilter: state.futuresPageFilter,
+     futuresSection: state.futuresSection,
+     assetsSection: state.assetsSection,
+     assetsDisplayCurrency: state.assetsDisplayCurrency,
+     assetsFuturesMarket: state.assetsFuturesMarket,
+     assetsFuturesView: state.assetsFuturesView,
+     assetsPageQuery: state.assetsPageQuery,
+     p2pMode: state.p2pMode,
+     p2pView: state.p2pView,
+     p2pFiat: state.p2pFiat,
+     activeP2PTradeId: state.activeP2PTradeId,
+     bottomTab: state.bottomTab,
+     rightTab: state.rightTab,
+     orderBookPrecision: state.orderBookPrecision,
+     chartLines: state.chartLines,
+     advancedOrder: state.advancedOrder,
+     formState
     }));
-    if (state.currentUser) {
+    if (syncAccount && state.currentUser) {
      syncCurrentUserWallet();
      queueAuthenticatedAccountSave();
     }
@@ -7774,6 +7892,31 @@
      }
     }
    }, 500);
+  }
+
+  function saveAccountBeforePageExit() {
+   if (!state.currentUser || isLocalPreviewMode()) return;
+   window.clearTimeout(accountSaveTimer);
+   const body = JSON.stringify({
+    wallet: state.assets,
+    fundingWallet: state.fundingAssets,
+    futuresWallet: state.futuresAssets,
+    transactions: state.transactions,
+    openOrders: state.openOrders,
+    orderHistory: state.orderHistory,
+    futuresPositions: state.futuresPositions
+   });
+   fetch('/api/auth/me', {
+    method: 'PUT',
+    credentials: 'same-origin',
+    keepalive: true,
+    headers: { 'Content-Type': 'application/json' },
+    body
+   }).then((response) => {
+    if (!response.ok) console.error(`Could not save account changes before page exit (HTTP ${response.status}).`);
+   }).catch((error) => {
+    console.error('Could not save account changes before page exit.', error);
+   });
   }
 
   function formatMoney(value) {
@@ -9201,6 +9344,7 @@
    sellBtn.classList.toggle('bg-binanceBg', isBuy);
    sellBtn.classList.toggle('text-binanceMuted', isBuy);
    renderP2POffers();
+   saveDemoState();
   }
 
   function renderP2POffers() {
@@ -9353,6 +9497,7 @@
    adsTab.classList.toggle('text-binanceMuted', view !== 'ads');
    renderP2PTrades();
    renderP2PAds();
+   saveDemoState();
   }
 
   function renderP2PProfile() {
@@ -9762,6 +9907,7 @@
    renderP2PChat(trade);
    updateP2PTradeSteps(trade);
    updateP2PCountdown(trade);
+   saveDemoState();
   }
 
   function updateP2PTradeSteps(trade) {
@@ -10247,11 +10393,20 @@
    if (p2pModal) {
     p2pModal.classList.remove('hidden');
     document.getElementById('p2pTradePanel')?.classList.add('hidden');
-    showP2PView('market');
+    const fiatFilter = document.getElementById('p2pFiatFilter');
+    if (fiatFilter && [...fiatFilter.options].some((option) => option.value === state.p2pFiat)) {
+     fiatFilter.value = state.p2pFiat;
+    }
+    showP2PView(state.p2pView);
+    if (state.activeP2PTradeId !== null && getP2PTrade(state.activeP2PTradeId)) {
+     openP2PTrade(state.activeP2PTradeId);
+     setP2PBottomNavActive('chat');
+    }
    }
    state.activePage = 'p2p';
    state.tab = 'p2p';
    updateTradeHeader();
+   saveDemoState();
   }
 
   function closeP2PPage() {
@@ -10461,6 +10616,8 @@
     button.classList.toggle('text-binanceMuted', !active);
    });
    if (tab === 'depth') drawDepth();
+   state.rightTab = tab;
+   saveDemoState();
   }
 
   function setTab(tab) {
@@ -10517,6 +10674,8 @@
     if (isAssets) setMobileBottomNavActive('assets');
     else if (isPositions && state.tradingMode === 'futures') setMobileBottomNavActive('futures');
    }
+   state.bottomTab = tab;
+   saveDemoState();
   }
 
   function setTradingMode(mode) {
@@ -10562,6 +10721,7 @@
    updateTradeHeader();
    if (modeChanged && state.activePage === 'trade') loadSelectedMarketChart();
    if (state.activePage === 'trade') setMobileBottomNavActive('trade');
+   saveDemoState();
   }
 
   function setTradeSide(side) {
@@ -10586,6 +10746,7 @@
    document.getElementById('formAvailLabel').textContent = isBuy? 'Avail Balance:': 'Avail Amount:';
    document.getElementById('postOnlyBtn').disabled = state.orderType !== 'limit';
    calculateTotal();
+   saveDemoState();
   }
 
   function setOrderType(type) {
@@ -10618,6 +10779,7 @@
     document.getElementById('inputPrice').value = state.currentPrice > 0? state.currentPrice.toFixed(pricePrecision()): '';
    }
    calculateTotal();
+   saveDemoState();
   }
 
   function updateLeverage(value) {
@@ -10626,12 +10788,14 @@
    document.getElementById('leverageRange').value = state.leverage;
    updateRiskEstimate();
    calculateTotal();
+   saveDemoState();
   }
 
   function toggleMarginType() {
    state.marginType = state.marginType === 'Cross'? 'Isolated': 'Cross';
    document.getElementById('marginTypeBtn').textContent = state.marginType;
    notify(`${state.marginType} margin selected for new positions`);
+   saveDemoState();
   }
 
   function getBalance(asset) {
@@ -11314,6 +11478,7 @@
    if (![0.01, 0.1, 1].includes(precision)) return;
    state.orderBookPrecision = precision;
    renderOrderBook();
+   saveDemoState();
   }
 
   function formatOrderBookPrice(price) {
@@ -11355,6 +11520,7 @@
     postBtn.classList.toggle('text-binanceMuted', !state.advancedOrder.postOnly);
     postBtn.classList.toggle('bg-binanceHover', !state.advancedOrder.postOnly);
    }
+   saveDemoState();
   }
 
   function setTimeframe(tf, btn) {
@@ -11368,6 +11534,7 @@
    btn.classList.add('bg-binanceHover', 'text-binanceYellow', 'font-semibold');
    btn.classList.remove('text-binanceMuted');
    loadSelectedMarketChart();
+   saveDemoState();
   }
 
   function setChartType(type) {
@@ -11379,6 +11546,7 @@
    lineBtn.classList.toggle('bg-binanceHover', type === 'line');
    lineBtn.classList.toggle('text-binanceYellow', type === 'line');
    drawChart();
+   saveDemoState();
   }
 
   function toggleIndicator(type) {
@@ -11392,18 +11560,21 @@
     document.getElementById('ttRsiRow').classList.toggle('hidden', !state.indicators.rsi);
    }
    drawChart();
+   saveDemoState();
   }
 
   function addHLine() {
    state.chartLines.push(state.currentPrice);
    drawChart();
    notify(`Price line added at ${formatMoney(state.currentPrice)}`);
+   saveDemoState();
   }
 
   function clearDrawings() {
    state.chartLines = [];
    drawChart();
    notify('Chart drawings cleared');
+   saveDemoState();
   }
 
   function toggleSound() {
@@ -11412,6 +11583,7 @@
    button.innerHTML = `<i data-lucide="${state.soundEnabled? 'volume-2': 'volume-x'}" class="w-3.5 h-3.5 ${state.soundEnabled? 'text-binanceYellow': ''}"></i>`;
    if (window.lucide) window.lucide.createIcons();
    notify(`Trade sounds ${state.soundEnabled? 'on': 'off'}`);
+   saveDemoState();
   }
 
   function playTradeSound() {
@@ -13142,28 +13314,91 @@
    renderAssets();
    renderP2POffers();
    drawChart();
-   switchBottomTab('open');
-   switchRightTab('orderbook');
-   setTradingMode('spot');
-   setOrderType('limit');
-   setTradeSide('buy');
-   setP2PMode('buy');
-   updateLeverage('20');
-   document.getElementById('inputPrice').value = state.currentPrice > 0? state.currentPrice.toFixed(pricePrecision()): '';
-   document.getElementById('inputAmount').value = '0.1000';
+   switchBottomTab(state.bottomTab);
+   switchRightTab(state.rightTab);
+   setTradingMode(state.tradingMode);
+   setOrderType(state.orderType);
+   setTradeSide(state.side);
+   setP2PMode(state.p2pMode);
+   updateLeverage(String(state.leverage));
+   document.getElementById('marginTypeBtn').textContent = state.marginType;
+   document.getElementById('orderBookPrecision').value = String(state.orderBookPrecision);
+   const reduceOnlyButton = document.getElementById('reduceOnlyBtn');
+   reduceOnlyButton.classList.toggle('border-binanceYellow', state.advancedOrder.reduceOnly);
+   reduceOnlyButton.classList.toggle('bg-binanceYellow/15', state.advancedOrder.reduceOnly);
+   reduceOnlyButton.classList.toggle('text-binanceYellow', state.advancedOrder.reduceOnly);
+   reduceOnlyButton.classList.toggle('text-binanceMuted', !state.advancedOrder.reduceOnly);
+   reduceOnlyButton.classList.toggle('bg-binanceHover', !state.advancedOrder.reduceOnly);
+   const postOnlyButton = document.getElementById('postOnlyBtn');
+   postOnlyButton.classList.toggle('border-binanceYellow', state.advancedOrder.postOnly);
+   postOnlyButton.classList.toggle('bg-binanceYellow/15', state.advancedOrder.postOnly);
+   postOnlyButton.classList.toggle('text-binanceYellow', state.advancedOrder.postOnly);
+   postOnlyButton.classList.toggle('text-binanceMuted', !state.advancedOrder.postOnly);
+   postOnlyButton.classList.toggle('bg-binanceHover', !state.advancedOrder.postOnly);
+   setMobileTradeView(state.mobileTradeView);
+   setChartType(state.chartType);
+   document.querySelectorAll('.tf-btn').forEach((button) => {
+    const active = button.textContent.trim() === state.timeframe;
+    button.classList.toggle('bg-binanceHover', active);
+    button.classList.toggle('text-binanceYellow', active);
+    button.classList.toggle('font-semibold', active);
+    button.classList.toggle('text-binanceMuted', !active);
+   });
+   for (const key of ['ma', 'bb', 'vol', 'rsi']) {
+    const button = document.getElementById(`${key}ToggleBtn`);
+    button.classList.toggle('text-binanceYellow', state.indicators[key]);
+    button.classList.toggle('text-binanceMuted', !state.indicators[key]);
+    button.classList.toggle('bg-binanceHover', state.indicators[key]);
+   }
+   document.getElementById('rsiPanel').classList.toggle('hidden', !state.indicators.rsi);
+   document.getElementById('ttRsiRow').classList.toggle('hidden', !state.indicators.rsi);
+   const soundButton = document.getElementById('soundBtn');
+   soundButton.innerHTML = `<i data-lucide="${state.soundEnabled? 'volume-2': 'volume-x'}" class="w-3.5 h-3.5 ${state.soundEnabled? 'text-binanceYellow': ''}"></i>`;
+   if (!Object.prototype.hasOwnProperty.call(state.restoredFormState, 'inputAmount')) {
+    document.getElementById('inputAmount').value = '0.1000';
+   }
    calculateTotal();
    saveDemoState();
    tickFundingCountdown();
    if (window.lucide) window.lucide.createIcons();
-   const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.activePage)
+   const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'p2p'].includes(state.activePage)
     ? state.activePage
     : 'home';
-   if (!state.currentUser) openAppPage(preferredPage);
+   if (!state.currentUser) {
+    if (preferredPage === 'p2p') {
+     openAppPage(['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.returnPage)? state.returnPage: 'trade');
+     openP2PPage();
+    }
+    else openAppPage(preferredPage === 'profile'? 'home': preferredPage);
+   }
    window.addEventListener('resize', () => {
     drawChart();
     if (!document.getElementById('depthView').classList.contains('hidden')) drawDepth();
    });
    selectPair(state.selectedPair, state.currentPrice, state.asset, false);
+   for (const [id, value] of Object.entries(state.restoredFormState)) {
+    const field = document.getElementById(id);
+    if (field && (field.tagName !== 'SELECT' || [...field.options].some((option) => option.value === value))) {
+     field.value = value;
+    }
+   }
+   state.restoredFormState = {};
+   if (state.activePage === 'markets') renderMarketsPage();
+   if (state.activePage === 'futures') renderFuturesPage();
+   if (state.activePage === 'assets') renderAssetsPage();
+   calculateTotal();
+   saveDemoState(false);
+   const p2pFiatFilter = document.getElementById('p2pFiatFilter');
+   if (p2pFiatFilter) state.p2pFiat = p2pFiatFilter.value;
+   ['inputPrice', 'inputAmount', 'inputStopPrice', 'inputTrailRate', 'convertFromAmount', 'marketPageSearch', 'futuresPageSearch', 'assetsPageSearch', 'p2pFiatFilter', 'p2pAssetFilter', 'p2pPaymentFilter', 'p2pFiatAmount'].forEach((id) => {
+    const field = document.getElementById(id);
+    const persistFormState = () => {
+     if (id === 'p2pFiatFilter') state.p2pFiat = field.value;
+     saveDemoState(false);
+    };
+    field?.addEventListener('input', persistFormState);
+    field?.addEventListener('change', persistFormState);
+   });
    if (LIVE_MARKET_ASSETS.has(state.asset)) {
     preloadChartIntervals(state.selectedPair, 'spot', null);
    }
@@ -13186,6 +13421,7 @@
    loadMarketPriceAdjustments();
    loadLiveMarketCatalogs();
    window.addEventListener('storage', handleUserStorageChange);
+   window.addEventListener('pagehide', saveAccountBeforePageExit);
    window.setInterval(advanceMarket, 750);
    window.setInterval(tickP2PTrades, 1000);
    window.setInterval(tickFundingCountdown, 1000);
