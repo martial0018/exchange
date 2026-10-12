@@ -27,7 +27,7 @@ module.exports = async function handler(req, res) {
             return sendJson(res, 429, { error: 'Too many sign-in attempts. Try again later.' });
         }
         const [user] = await db`
-            SELECT id, username, email, full_name, role, password_hash, wallet, funding_wallet,
+            SELECT id, username, email, full_name, role, password_hash, wallet, funding_wallet, futures_wallet,
                    transactions, notifications, balance_jobs, open_orders, order_history,
                    futures_positions, created_at, updated_at
             FROM users

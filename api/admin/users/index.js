@@ -6,7 +6,7 @@ module.exports = async function handler(req, res) {
         const admin = await requireUser(req, res, 'admin');
         if (!admin) return;
         const users = await getDb()`
-            SELECT id, username, email, full_name, role, wallet, funding_wallet, transactions,
+            SELECT id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                    notifications, balance_jobs, open_orders, order_history, futures_positions,
                    created_at, updated_at
             FROM users

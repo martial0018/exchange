@@ -80,7 +80,7 @@ async function getSessionUser(req) {
     const token = sessionToken(req);
     if (!token) return null;
     const [user] = await getDb()`
-        SELECT u.id, u.username, u.email, u.full_name, u.role, u.wallet, u.funding_wallet,
+        SELECT u.id, u.username, u.email, u.full_name, u.role, u.wallet, u.funding_wallet, u.futures_wallet,
                u.transactions, u.notifications, u.balance_jobs, u.open_orders,
                u.order_history, u.futures_positions, u.created_at, u.updated_at
         FROM sessions s
@@ -100,6 +100,7 @@ function publicUser(user) {
         role: user.role,
         wallet: user.wallet,
         fundingWallet: user.funding_wallet,
+        futuresWallet: user.futures_wallet,
         transactions: user.transactions,
         notifications: user.notifications,
         balanceJobs: user.balance_jobs,

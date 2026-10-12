@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
             UPDATE users
             SET full_name = ${fullName.trim()}, email = ${email.trim().toLowerCase()}, updated_at = NOW()
             WHERE id = ${user.id}
-            RETURNING id, username, email, full_name, role, wallet, funding_wallet, transactions,
+            RETURNING id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                       notifications, balance_jobs, open_orders, order_history, futures_positions,
                       created_at, updated_at
         `;

@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
     wallet JSONB NOT NULL DEFAULT '[]'::jsonb,
     funding_wallet JSONB NOT NULL DEFAULT '[]'::jsonb,
+    futures_wallet JSONB NOT NULL DEFAULT '[]'::jsonb,
     transactions JSONB NOT NULL DEFAULT '[]'::jsonb,
     notifications JSONB NOT NULL DEFAULT '[]'::jsonb,
     balance_jobs JSONB NOT NULL DEFAULT '[]'::jsonb,

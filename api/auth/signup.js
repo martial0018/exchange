@@ -31,12 +31,12 @@ module.exports = async function handler(req, res) {
                 ${passwordHash},
                 'user',
                 ${JSON.stringify([
-                    { asset: 'BTC', total: 0.2441, available: 0.2441, inOrders: 0 },
-                    { asset: 'USDT', total: 10000, available: 10000, inOrders: 0 },
-                    { asset: 'ETH', total: 1.3425, available: 1.3425, inOrders: 0 }
+                    { asset: 'BTC', total: 0, available: 0, inOrders: 0 },
+                    { asset: 'USDT', total: 0, available: 0, inOrders: 0 },
+                    { asset: 'ETH', total: 0, available: 0, inOrders: 0 }
                 ])}::jsonb
             )
-            RETURNING id, username, email, full_name, role, wallet, funding_wallet, transactions,
+            RETURNING id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                       notifications, balance_jobs, open_orders, order_history, futures_positions,
                       created_at, updated_at
         `;

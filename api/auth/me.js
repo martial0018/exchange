@@ -7,7 +7,8 @@ const {
     parseBody,
     publicUser,
     requireSameOrigin,
-    sendJson
+    sendJson,
+    validWallet
 } = require('../_lib/http');
 
 module.exports = async function handler(req, res) {
@@ -38,11 +39,18 @@ module.exports = async function handler(req, res) {
             if (Buffer.byteLength(JSON.stringify(body), 'utf8') > 200_000) {
                 return sendJson(res, 413, { error: 'Account update is too large' });
             }
-            const allowed = ['notifications', 'openOrders', 'orderHistory', 'futuresPositions'];
+            const allowed = ['wallet', 'fundingWallet', 'futuresWallet', 'transactions', 'notifications', 'openOrders', 'orderHistory', 'futuresPositions'];
             if (Object.keys(body).some((key) => !allowed.includes(key))) {
                 return sendJson(res, 400, { error: 'Unsupported account data field' });
             }
+            for (const field of ['wallet', 'fundingWallet', 'futuresWallet']) {
+                if (body[field] !== undefined && !validWallet(body[field])) {
+                    const walletName = { wallet: 'Spot wallet', fundingWallet: 'Funding wallet', futuresWallet: 'Futures wallet' }[field];
+                    return sendJson(res, 400, { error: `Invalid ${walletName} data` });
+                }
+            }
             const jsonFields = [
+                ['transactions', 'transactions'],
                 ['notifications', 'notifications'],
                 ['openOrders', 'open orders'],
                 ['orderHistory', 'order history'],
@@ -55,13 +63,17 @@ module.exports = async function handler(req, res) {
             }
             const [freshUser] = await getDb()`
                 UPDATE users SET
+                    wallet = COALESCE(${body.wallet === undefined ? null : JSON.stringify(body.wallet)}::jsonb, wallet),
+                    funding_wallet = COALESCE(${body.fundingWallet === undefined ? null : JSON.stringify(body.fundingWallet)}::jsonb, funding_wallet),
+                    futures_wallet = COALESCE(${body.futuresWallet === undefined ? null : JSON.stringify(body.futuresWallet)}::jsonb, futures_wallet),
+                    transactions = COALESCE(${body.transactions === undefined ? null : JSON.stringify(body.transactions)}::jsonb, transactions),
                     notifications = COALESCE(${body.notifications === undefined ? null : JSON.stringify(body.notifications)}::jsonb, notifications),
                     open_orders = COALESCE(${body.openOrders === undefined ? null : JSON.stringify(body.openOrders)}::jsonb, open_orders),
                     order_history = COALESCE(${body.orderHistory === undefined ? null : JSON.stringify(body.orderHistory)}::jsonb, order_history),
                     futures_positions = COALESCE(${body.futuresPositions === undefined ? null : JSON.stringify(body.futuresPositions)}::jsonb, futures_positions),
                     updated_at = NOW()
                 WHERE id = ${user.id}
-                RETURNING id, username, email, full_name, role, wallet, funding_wallet, transactions,
+                RETURNING id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                        notifications, balance_jobs, open_orders, order_history, futures_positions,
                        created_at, updated_at
             `;

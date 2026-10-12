@@ -103,7 +103,7 @@ module.exports = async function handler(req, res) {
             `;
             if (existingAction) {
                 const [existingUser] = await sql`
-                    SELECT id, username, email, full_name, role, wallet, funding_wallet, transactions,
+                    SELECT id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                            notifications, balance_jobs, open_orders, order_history, futures_positions,
                            created_at, updated_at
                     FROM users WHERE id = ${existingAction.target_user_id}
@@ -112,7 +112,7 @@ module.exports = async function handler(req, res) {
             }
 
             const [user] = await sql`
-                SELECT id, username, email, full_name, role, wallet, funding_wallet, transactions,
+                SELECT id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                        notifications, balance_jobs, open_orders, order_history, futures_positions,
                        created_at, updated_at
                 FROM users
@@ -193,7 +193,7 @@ module.exports = async function handler(req, res) {
                     balance_jobs = ${JSON.stringify(balanceJobs)}::jsonb,
                     updated_at = NOW()
                 WHERE id = ${userId}
-                RETURNING id, username, email, full_name, role, wallet, funding_wallet, transactions,
+                RETURNING id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                           notifications, balance_jobs, open_orders, order_history, futures_positions,
                           created_at, updated_at
             `;

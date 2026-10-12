@@ -3221,7 +3221,7 @@
       <span class="flex h-11 w-11 items-center justify-center rounded-full bg-binanceCard text-binanceText"><i data-lucide="repeat-2" class="h-5 w-5"></i></span>
       <span class="text-[10px] text-binanceText">Swap</span>
      </button>
-     <button type="button" onclick="notify('Internal transfers are not available in this view.')" class="flex flex-col items-center gap-1.5">
+     <button type="button" onclick="openWalletTransferModal('funding')" class="flex flex-col items-center gap-1.5">
       <span class="flex h-11 w-11 items-center justify-center rounded-full bg-binanceCard text-binanceText"><i data-lucide="arrow-left-right" class="h-5 w-5"></i></span>
       <span class="text-[10px] text-binanceText">Transfer</span>
      </button>
@@ -3230,7 +3230,7 @@
       <span class="text-[10px] text-binanceText">More</span>
      </button>
     </section>
-    <button type="button" onclick="notify('Internal transfers are not available in this view.')" class="flex w-full items-center justify-between rounded-xl border border-binanceBorder bg-binanceCard px-3 py-2.5 text-left">
+    <button type="button" onclick="openWalletTransferModal('funding')" class="flex w-full items-center justify-between rounded-xl border border-binanceBorder bg-binanceCard px-3 py-2.5 text-left">
      <span class="flex items-center gap-2 text-[10px] font-medium text-binanceText"><span class="flex h-5 w-5 items-center justify-center rounded-full border border-binanceMuted text-[9px]">•</span>Transfer assets between wallets</span>
      <i data-lucide="chevron-right" class="h-4 w-4 text-binanceMuted"></i>
     </button>
@@ -3267,7 +3267,7 @@
      <div class="grid grid-cols-4 gap-1 border-t border-binanceBorder px-2 py-3">
       <button type="button" onclick="openMobileFuturesTrade()" class="flex flex-col items-center gap-2 py-1"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-binanceHover text-binanceYellow"><i data-lucide="chart-candlestick" class="h-4 w-4"></i></span><span class="text-[9px] text-binanceText">Trade</span></button>
       <button type="button" onclick="notify('Futures asset swaps are not available in this view.')" class="flex flex-col items-center gap-2 py-1"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-binanceHover text-binanceYellow"><i data-lucide="repeat-2" class="h-4 w-4"></i></span><span class="text-[9px] text-binanceText">Swap</span></button>
-      <button type="button" onclick="notify('Internal transfers are not available in this view.')" class="flex flex-col items-center gap-2 py-1"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-binanceHover text-binanceYellow"><i data-lucide="arrow-left-right" class="h-4 w-4"></i></span><span class="text-[9px] text-binanceText">Transfer</span></button>
+      <button type="button" onclick="openWalletTransferModal('futures')" class="flex flex-col items-center gap-2 py-1"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-binanceHover text-binanceYellow"><i data-lucide="arrow-left-right" class="h-4 w-4"></i></span><span class="text-[9px] text-binanceText">Transfer</span></button>
       <button type="button" onclick="openMobileFutures()" class="flex flex-col items-center gap-2 py-1"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-binanceHover text-binanceYellow"><i data-lucide="ellipsis" class="h-4 w-4"></i></span><span class="text-[9px] text-binanceText">More</span></button>
      </div>
     </section>
@@ -3289,7 +3289,7 @@
      <div id="mobileAssetsFuturesAssetsList" class="divide-y divide-binanceBorder"></div>
      <div id="mobileAssetsFuturesPositionsList" class="hidden divide-y divide-binanceBorder"></div>
     </section>
-    <div id="mobileAssetsFuturesDemoNote" class="rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-[9px] leading-relaxed text-binanceMuted">Futures collateral is shared with your Spot USDT wallet. COIN-M account trading is not enabled.</div>
+    <div id="mobileAssetsFuturesDemoNote" class="rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-[9px] leading-relaxed text-binanceMuted">USDⓈ-M Futures uses a separate USDT wallet. COIN-M account trading is not enabled.</div>
    </section>
 
    <section id="mobileAssetsActions" class="grid grid-cols-4 gap-2 py-1" aria-label="Wallet actions">
@@ -3301,7 +3301,7 @@
      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-binanceCard text-binanceYellow"><i data-lucide="arrow-up-from-line" class="h-5 w-5"></i></span>
      <span class="text-[10px] font-medium text-binanceText">Send</span>
     </button>
-    <button type="button" onclick="notify('Internal transfers are not available in this view.')" class="flex min-w-0 flex-col items-center gap-2">
+    <button type="button" onclick="openWalletTransferModal('spot')" class="flex min-w-0 flex-col items-center gap-2">
      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-binanceCard text-binanceYellow"><i data-lucide="repeat-2" class="h-5 w-5"></i></span>
      <span class="text-[10px] font-medium text-binanceText">Transfer</span>
     </button>
@@ -3396,9 +3396,10 @@
      <p id="assetsPageDescription" class="mt-1 max-w-2xl text-xs leading-relaxed text-binanceMuted">Track your Spot balances, their estimated USDT value, and recent activity.</p>
     </div>
     <div id="assetsPageActions" class="flex flex-wrap gap-2">
-     <button type="button" onclick="openModal('depositModal')" class="rounded-lg bg-binanceYellow px-4 py-2.5 text-xs font-bold text-binanceBg">Deposit</button>
-     <button type="button" onclick="openModal('withdrawModal')" class="rounded-lg border border-binanceBorder bg-binanceCard px-4 py-2.5 text-xs font-semibold text-white">Withdraw</button>
-     <button type="button" onclick="openConvertPage()" class="rounded-lg border border-binanceBorder bg-binanceCard px-4 py-2.5 text-xs font-semibold text-white">Convert</button>
+     <button id="assetsPageDepositButton" type="button" onclick="openModal('depositModal')" class="rounded-lg bg-binanceYellow px-4 py-2.5 text-xs font-bold text-binanceBg">Deposit</button>
+     <button id="assetsPageWithdrawButton" type="button" onclick="openModal('withdrawModal')" class="rounded-lg border border-binanceBorder bg-binanceCard px-4 py-2.5 text-xs font-semibold text-white">Withdraw</button>
+     <button type="button" onclick="openWalletTransferModal('spot')" class="rounded-lg border border-binanceBorder bg-binanceCard px-4 py-2.5 text-xs font-semibold text-white">Transfer</button>
+     <button id="assetsPageConvertButton" type="button" onclick="openConvertPage()" class="rounded-lg border border-binanceBorder bg-binanceCard px-4 py-2.5 text-xs font-semibold text-white">Convert</button>
     </div>
    </div>
    <div id="assetsSummaryGrid" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -3647,6 +3648,35 @@
     <p class="rounded border border-binanceRed/40 bg-binanceRedBg p-3 text-[10px] leading-relaxed text-binanceRed">Deposits are not monitored or credited automatically. Verify the asset, network, and address before sending.</p>
    </div>
   </div>
+ </div>
+
+ <div id="transferModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-labelledby="transferModalTitle" onclick="if (event.target === this) closeModal('transferModal')">
+  <form class="w-full max-w-md space-y-4 rounded-xl border border-binanceBorder bg-binanceCard p-5 shadow-2xl" onsubmit="submitWalletTransfer(event)">
+   <div class="flex items-center justify-between border-b border-binanceBorder pb-3">
+    <div><h2 id="transferModalTitle" class="text-lg font-bold text-white">Transfer between wallets</h2><p class="mt-1 text-[10px] text-binanceMuted">Move available assets between Spot, Funding, and Futures.</p></div>
+    <button type="button" onclick="closeModal('transferModal')" aria-label="Close transfer" class="text-xl text-binanceMuted hover:text-white">&times;</button>
+   </div>
+   <label class="block text-xs text-binanceMuted">From
+    <select id="transferFromWallet" onchange="updateWalletTransferOptions()" class="mt-1 w-full rounded border border-binanceBorder bg-binanceBg p-2.5 text-white">
+     <option value="spot">Spot</option><option value="funding">Funding</option><option value="futures">Futures</option>
+    </select>
+   </label>
+   <label class="block text-xs text-binanceMuted">To
+    <select id="transferToWallet" onchange="updateWalletTransferAvailability()" class="mt-1 w-full rounded border border-binanceBorder bg-binanceBg p-2.5 text-white"></select>
+   </label>
+   <label class="block text-xs text-binanceMuted">Asset
+    <select id="transferAsset" onchange="updateWalletTransferOptions()" class="mt-1 w-full rounded border border-binanceBorder bg-binanceBg p-2.5 text-white"></select>
+   </label>
+   <div class="flex items-center justify-between text-[10px] text-binanceMuted"><span>Available</span><span id="transferAvailableBalance" class="font-mono text-white">0 USDT</span></div>
+   <label class="block text-xs text-binanceMuted">Amount
+    <div class="mt-1 flex items-center gap-2 rounded border border-binanceBorder bg-binanceBg p-2.5 focus-within:border-binanceYellow">
+     <input id="transferAmount" type="number" min="0" step="0.00000001" inputmode="decimal" required oninput="validateWalletTransferAmount()" class="w-full bg-transparent font-mono text-white outline-none" placeholder="0.00">
+     <button type="button" onclick="setMaxWalletTransfer()" class="text-[10px] font-bold text-binanceYellow">Max</button>
+    </div>
+   </label>
+   <p id="transferFeedback" class="hidden rounded border border-binanceRed/40 bg-binanceRedBg p-2 text-[10px] text-binanceRed" role="alert"></p>
+   <button id="transferSubmitButton" type="submit" class="w-full rounded bg-binanceYellow py-3 text-xs font-bold text-binanceBg">Confirm transfer</button>
+  </form>
  </div>
 
  <div id="buyCryptoModal" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="buyCryptoTitle">
@@ -4564,6 +4594,7 @@
    },
    futuresPositions: [],
    fundingAssets: [],
+   futuresAssets: [],
    p2pMode: 'buy',
    selectedP2POfferId: null,
    activeP2PTradeId: null,
@@ -4837,6 +4868,7 @@
   function ensureUserActivity(user) {
    if (!Array.isArray(user.wallet)) user.wallet = createDefaultWallet();
    if (!Array.isArray(user.fundingWallet)) user.fundingWallet = [];
+   if (!Array.isArray(user.futuresWallet)) user.futuresWallet = [];
    if (!Array.isArray(user.transactions)) user.transactions = [];
    if (!Array.isArray(user.notifications)) user.notifications = [];
    if (!Array.isArray(user.balanceJobs)) user.balanceJobs = [];
@@ -4913,6 +4945,7 @@
    renderAuthUI();
    renderAssets();
    renderTransactions();
+   calculateTotal();
    if (state.activePage === 'profile') renderProfilePage();
    if (state.activePage === 'home') renderUserHomeDashboard();
    user.notifications.forEach((item) => {
@@ -5190,6 +5223,7 @@
    document.getElementById('p2pModal')?.classList.add('hidden');
    state.activePage = page;
    state.tab = page;
+   saveDemoState();
    updateTradeHeader();
    if (isTradingWorkspace) setTab('trade');
    else setTab(page);
@@ -6091,7 +6125,7 @@
    pnl.textContent = `${totalPnl >= 0? '+': ''}${totalPnl.toFixed(2)} USDT`;
    pnl.classList.toggle('text-binanceGreen', totalPnl >= 0);
    pnl.classList.toggle('text-binanceRed', totalPnl < 0);
-   const margin = state.assets.find((balance) => balance.asset === 'USDT') || { available: 0 };
+   const margin = state.futuresAssets.find((balance) => balance.asset === 'USDT') || { available: 0 };
    document.getElementById('futuresPageMargin').textContent = `${Number(margin.available || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })} USDT`;
    document.getElementById('futuresPageMarginMode').textContent = state.marginType;
    document.getElementById('futuresNextMarginMode').textContent = state.marginType === 'Cross'? 'Isolated': 'Cross';
@@ -6157,33 +6191,16 @@
    const priceFor = (asset) => asset === 'USDT'? 1: demoMarketPrice(asset);
    const section = state.assetsSection;
    const fundingBalances = state.fundingAssets;
-   const positionMargin = state.futuresPositions.reduce((sum, position) => sum + Number(position.initialMargin || 0), 0);
-   const futuresOrderMargin = state.openOrders.reduce((sum, order) =>
-    sum + (order.tradingMode === 'futures' && order.reservedAsset === 'USDT'? Number(order.reservedAmount || 0): 0), 0);
+   const futuresUsdtBalance = state.futuresAssets.find((balance) => balance.asset === 'USDT') || { total: 0, available: 0, inOrders: 0 };
    const futuresUnrealizedPnl = state.futuresPositions.reduce((sum, position) => {
     const markPrice = position.pair.replace('/', '') === state.selectedPair? state.currentPrice: position.markPrice;
     return sum + futuresPnl(position, markPrice);
    }, 0);
-   const totalFuturesMargin = positionMargin + futuresOrderMargin;
-   const overviewSpotBalances = listedSpotBalances.map((balance) => {
-    const spotBalance = {...balance };
-    if (balance.asset === 'USDT') {
-     spotBalance.total = Math.max(0, Number(balance.total || 0) - totalFuturesMargin);
-     spotBalance.inOrders = Math.max(0, Number(balance.inOrders || 0) - totalFuturesMargin);
-    }
-    return spotBalance;
-   });
-   const overviewBalances = [...overviewSpotBalances,...fundingBalances.map((balance) => ({...balance, wallet: 'Funding' }))];
-   if (totalFuturesMargin > 0) {
-    overviewBalances.push({
-     asset: 'USDT',
-     total: Math.max(0, totalFuturesMargin + futuresUnrealizedPnl),
-     available: 0,
-     inOrders: totalFuturesMargin,
-     wallet: 'Futures',
-     pnl: futuresUnrealizedPnl
-    });
-   }
+   const overviewBalances = [
+    ...listedSpotBalances,
+    ...fundingBalances.map((balance) => ({...balance, wallet: 'Funding' })),
+    {...futuresUsdtBalance, total: Math.max(0, Number(futuresUsdtBalance.total || 0) + futuresUnrealizedPnl), wallet: 'Futures', pnl: futuresUnrealizedPnl}
+   ];
    const spotTotal = balances.reduce((sum, balance) => sum + Number(balance.total || 0) * priceFor(balance.asset), 0);
    const totalBalances = section === 'spot'? balances
     : section === 'funding'? fundingBalances
@@ -6196,10 +6213,10 @@
    const fundingUsdt = fundingBalances.find((balance) => balance.asset === 'USDT') || { available: 0, inOrders: 0 };
    const availableUsdt = section === 'spot'? Number(spotUsdt.available || 0)
     : section === 'funding'? Number(fundingUsdt.available || 0)
-     : Number(spotUsdt.available || 0) + Number(fundingUsdt.available || 0);
+     : Number(spotUsdt.available || 0) + Number(fundingUsdt.available || 0) + Number(futuresUsdtBalance.available || 0);
    const ordersUsdt = section === 'spot'? Number(spotUsdt.inOrders || 0)
     : section === 'funding'? Number(fundingUsdt.inOrders || 0)
-     : Number(spotUsdt.inOrders || 0) + Number(fundingUsdt.inOrders || 0);
+     : Number(spotUsdt.inOrders || 0) + Number(fundingUsdt.inOrders || 0) + Number(futuresUsdtBalance.inOrders || 0);
    const user = state.currentUser? state.users.find((entry) => entry.username === state.currentUser.username): null;
    const pending = user && Array.isArray(user.balanceJobs)? user.balanceJobs.filter((job) => job.status === 'Processing').length: 0;
    const visible = state.homeBalancesVisible;
@@ -6218,7 +6235,7 @@
     overview: ['Assets overview', 'Your combined Spot, Funding, and Futures balances, with values in USDT.', 'All supported assets', 'Supported Spot assets plus Funding and Futures balances · estimated in USDT'],
     spot: ['Spot wallet', 'Browse supported Spot assets and view their balances, estimated in USDT.', 'Supported assets', 'All supported crypto assets · balances and values are estimated in USDT'],
     funding: ['Funding wallet', 'Completed P2P purchases are held in your Funding wallet.', 'Funding balances', 'P2P-purchased assets · values are estimated in USDT'],
-    futures: ['Futures positions', 'Review open positions and their unrealized profit or loss. Futures funds are not held separately here.', 'Open positions', 'Positions · margin details are shown per position']
+    futures: ['Futures positions', 'Review open USDⓈ-M positions and manage their separate Futures wallet.', 'Open positions', 'Positions · margin details are shown per position']
    }[section];
    document.getElementById('assetsPageTitle').textContent = sectionTitles[0];
    document.getElementById('assetsPageDescription').textContent = sectionTitles[1];
@@ -6238,7 +6255,10 @@
    pendingNotice.textContent = `${pending} balance update${pending === 1? '': 's'} processing. Your wallet value will reflect each update when it completes.`;
    document.getElementById('assetsTransactionsSection').classList.toggle('hidden', section !== 'overview');
    document.getElementById('assetsPageSearchLabel').classList.toggle('hidden', section === 'futures');
-   document.getElementById('assetsPageActions').classList.toggle('hidden', section === 'funding' || section === 'futures');
+   document.getElementById('assetsPageActions').classList.remove('hidden');
+   document.getElementById('assetsPageDepositButton').classList.toggle('hidden', section === 'funding' || section === 'futures');
+   document.getElementById('assetsPageWithdrawButton').classList.toggle('hidden', section === 'funding' || section === 'futures');
+   document.getElementById('assetsPageConvertButton').classList.toggle('hidden', section === 'funding' || section === 'futures');
    document.getElementById('assetsPageTotalLabel').textContent = section === 'spot'? 'Estimated Spot value'
     : section === 'funding'? 'Estimated Funding value': 'Estimated total wallet value';
    document.getElementById('assetsPageTotal').textContent = visible? formatMoney(total): mask;
@@ -6289,7 +6309,7 @@
    const futuresMarket = state.assetsFuturesMarket;
    const futuresView = state.assetsFuturesView;
    const futuresSupported = futuresMarket === 'usd-m';
-   const futuresWalletBalance = futuresSupported? totalFuturesMargin: 0;
+   const futuresWalletBalance = futuresSupported? Number(futuresUsdtBalance.total || 0): 0;
    const displayedFuturesPnl = futuresSupported? futuresUnrealizedPnl: 0;
    const futuresMarginBalance = futuresWalletBalance + displayedFuturesPnl;
    const futuresVisibilityIcon = document.getElementById('mobileAssetsFuturesVisibilityIcon');
@@ -6312,7 +6332,7 @@
    document.getElementById('mobileAssetsFuturesUnrealizedPnl').textContent = `${visible? `${displayedFuturesPnl >= 0? '+': '−'}${Math.abs(displayedFuturesPnl).toFixed(2)}`: mask} USDT`;
    document.getElementById('mobileAssetsFuturesPnlFiat').textContent = `≈ ${visible? formatMoney(displayedFuturesPnl): mask}`;
    document.getElementById('mobileAssetsFuturesDemoNote').textContent = futuresSupported
-    ? 'USDⓈ-M Futures collateral is shared with your Spot USDT wallet. COIN-M account trading is not enabled.'
+    ? 'USDⓈ-M Futures uses a separate USDT wallet. Transfer available USDT between Spot and Futures; locked position margin cannot be moved.'
     : 'COIN-M futures trading is not enabled in this view. No Coin-M wallet balances or positions are available.';
    futuresVisibilityIcon.setAttribute('data-lucide', visible? 'eye': 'eye-off');
    const futuresAssetsTab = document.getElementById('mobileAssetsFuturesAssetsTab');
@@ -6333,7 +6353,7 @@
       <div><div class="text-[9px] text-binanceMuted">Wallet Balance</div><div class="mt-1 font-mono text-[10px] text-white">${futuresVisibilityValue(futuresWalletBalance)}</div></div>
       <div><div class="text-[9px] text-binanceMuted">Unrealized PNL</div><div class="mt-1 font-mono text-[10px] ${displayedFuturesPnl >= 0? 'text-binanceGreen': 'text-binanceRed'}">${visible? `${displayedFuturesPnl >= 0? '+': '−'}${Math.abs(displayedFuturesPnl).toFixed(2)}`: mask}</div></div>
       <div><div class="text-[9px] text-binanceMuted">Margin Balance</div><div class="mt-1 font-mono text-[10px] text-white">${futuresVisibilityValue(futuresMarginBalance)}</div></div>
-      <div><div class="text-[9px] text-binanceMuted">Available for Transfer</div><div class="mt-1 font-mono text-[10px] text-white">0.00</div></div>
+      <div><div class="text-[9px] text-binanceMuted">Available for Transfer</div><div class="mt-1 font-mono text-[10px] text-white">${visible? Number(futuresUsdtBalance.available || 0).toFixed(2): mask}</div></div>
      </div>
     </article>
    `: '<div class="p-6 text-center text-[10px] text-binanceMuted">No COIN-M wallet balances. COIN-M trading is not enabled in this view.</div>';
@@ -6475,8 +6495,8 @@
    const transactions = state.transactions.slice(0, 6);
    document.getElementById('assetsPageTransactions').innerHTML = transactions.length? transactions.map((transaction) => `
     <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
-     <div class="min-w-0"><div class="truncate text-xs font-semibold text-white">${escapeHTML(transaction.type || 'Transaction')}</div><div class="mt-1 truncate text-[9px] text-binanceMuted">${escapeHTML(transaction.time || '—')}${transaction.network? ` · ${escapeHTML(transaction.network)}`: ''}</div></div>
-     <div class="text-right"><div class="font-mono text-[10px] ${transaction.side === 'sell'? 'text-binanceRed': 'text-binanceGreen'}">${transaction.side === 'sell'? '−': '+'}${visible? Number(transaction.amount || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(transaction.asset || '')}</div><div class="mt-1 text-[9px] ${String(transaction.status || '').toLowerCase().includes('completed')? 'text-binanceGreen': 'text-binanceYellow'}">${escapeHTML(transaction.status || '—')}</div></div>
+     <div class="min-w-0"><div class="truncate text-xs font-semibold text-white">${escapeHTML(transaction.type || 'Transaction')}</div><div class="mt-1 truncate text-[9px] text-binanceMuted">${escapeHTML(transaction.time || '—')}${transaction.network? ` · ${escapeHTML(transaction.network)}`: ''}${transaction.fromWallet && transaction.toWallet? ` · ${escapeHTML(transaction.fromWallet)} → ${escapeHTML(transaction.toWallet)}`: ''}</div></div>
+     <div class="text-right"><div class="font-mono text-[10px] ${transaction.side === 'sell'? 'text-binanceRed': transaction.side === 'transfer'? 'text-binanceText': 'text-binanceGreen'}">${transaction.side === 'sell'? '−': transaction.side === 'transfer'? '': '+'}${visible? Number(transaction.amount || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(transaction.asset || '')}</div><div class="mt-1 text-[9px] ${String(transaction.status || '').toLowerCase().includes('completed')? 'text-binanceGreen': 'text-binanceYellow'}">${escapeHTML(transaction.status || '—')}</div></div>
     </div>
    `).join(''): '<div class="p-6 text-center text-xs text-binanceMuted">Your wallet activity will appear here.</div>';
    if (window.lucide) window.lucide.createIcons();
@@ -6774,7 +6794,7 @@
      <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3">
       <div class="min-w-0">
        <div class="truncate text-xs font-semibold text-white">${escapeHTML(transaction.type || 'Transaction')}</div>
-       <div class="mt-1 truncate text-[10px] text-binanceMuted">${escapeHTML(transaction.time || '—')}${transaction.network? ` · ${escapeHTML(transaction.network)}`: ''}</div>
+       <div class="mt-1 truncate text-[10px] text-binanceMuted">${escapeHTML(transaction.time || '—')}${transaction.network? ` · ${escapeHTML(transaction.network)}`: ''}${transaction.fromWallet && transaction.toWallet? ` · ${escapeHTML(transaction.fromWallet)} → ${escapeHTML(transaction.toWallet)}`: ''}</div>
       </div>
       <div class="text-right">
        <div class="font-mono text-xs ${transaction.side === 'sell'? 'text-binanceRed': 'text-binanceGreen'}">${transaction.side === 'sell'? '−': '+'}${visible? Number(transaction.amount || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(transaction.asset || '')}</div>
@@ -7072,6 +7092,7 @@
     role: user.role || 'user',
     wallet: Array.isArray(user.wallet)? user.wallet: createDefaultWallet(),
     fundingWallet: Array.isArray(user.fundingWallet)? user.fundingWallet: [],
+    futuresWallet: Array.isArray(user.futuresWallet)? user.futuresWallet: [],
     transactions: Array.isArray(user.transactions)? user.transactions: [],
     notifications: Array.isArray(user.notifications)? user.notifications: [],
     balanceJobs: Array.isArray(user.balanceJobs)? user.balanceJobs: [],
@@ -7093,6 +7114,7 @@
     password: 'admin123',
     wallet: createDefaultWallet(),
     fundingWallet: [],
+    futuresWallet: [],
     notifications: []
    });
   }
@@ -7153,7 +7175,12 @@
      email,
      fullName,
      role: 'user',
-     password
+     password,
+     wallet: [
+      { asset: 'BTC', total: 0, available: 0, inOrders: 0 },
+      { asset: 'USDT', total: 0, available: 0, inOrders: 0 },
+      { asset: 'ETH', total: 0, available: 0, inOrders: 0 }
+     ]
     });
     const credentials = getLocalPreviewCredentials();
     credentials[normalizeLocalPreviewIdentifier(username)] = password;
@@ -7447,12 +7474,14 @@
    if (!user) return;
    user.wallet = cloneWallet(state.assets);
    user.fundingWallet = cloneWallet(state.fundingAssets);
+   user.futuresWallet = cloneWallet(state.futuresAssets);
    user.transactions = state.transactions;
    user.openOrders = state.openOrders;
    user.orderHistory = state.orderHistory;
    user.futuresPositions = state.futuresPositions;
    user.updatedAt = new Date().toISOString();
    saveUsers();
+   if (isLocalPreviewMode()) setLocalPreviewSession(user);
   }
 
   function setCurrentUser(user) {
@@ -7462,17 +7491,25 @@
     ensureUserActivity(user);
     state.assets = cloneWallet(user.wallet || createDefaultWallet());
     state.fundingAssets = hasFundingWallet? cloneWallet(user.fundingWallet): [];
-    if (!hasFundingWallet) migrateP2PPurchasesToFunding([], user.transactions);
+    state.futuresAssets = Array.isArray(user.futuresWallet)? cloneWallet(user.futuresWallet): [];
     state.transactions = user.transactions;
     state.openOrders = Array.isArray(user.openOrders)? user.openOrders: [];
     state.orderHistory = Array.isArray(user.orderHistory)? user.orderHistory: [];
     state.futuresPositions = Array.isArray(user.futuresPositions)? user.futuresPositions: [];
+    if (!hasFundingWallet) migrateP2PPurchasesToFunding([], user.transactions);
+    migrateLegacyFuturesCollateral();
    }
    renderAuthUI();
    renderAssets();
    renderTransactions();
+   calculateTotal();
    saveDemoState();
-   if (user) openUserHome();
+   if (user) {
+    const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.activePage)
+     ? state.activePage
+     : 'home';
+    openAppPage(preferredPage);
+   }
   }
 
   async function restoreUserSession() {
@@ -7575,6 +7612,7 @@
    state.currentUser = null;
    state.assets = createDefaultWallet();
    state.fundingAssets = [];
+   state.futuresAssets = [];
    state.transactions = [];
    state.openOrders = [];
    state.orderHistory = [];
@@ -7638,12 +7676,26 @@
      console.error('Saved Funding wallet data is invalid and was not loaded.');
      notify('Saved Funding wallet could not be restored');
     }
+    if (Array.isArray(saved.futuresAssets) && saved.futuresAssets.every((balance) =>
+     balance
+     && typeof balance.asset === 'string'
+     && ['total', 'available', 'inOrders'].every((key) => Number.isFinite(balance[key]) && balance[key] >= 0)
+    )) {
+     state.futuresAssets = saved.futuresAssets;
+    } else if (Array.isArray(saved.futuresAssets)) {
+     console.error('Saved Futures wallet data is invalid and was not loaded.');
+     notify('Saved Futures wallet could not be restored');
+    }
     if (Array.isArray(saved.p2pAds)) state.p2pAds = saved.p2pAds;
     if (Array.isArray(saved.favoritePairs) && saved.favoritePairs.every((pair) => typeof pair === 'string' && /^[A-Z0-9]{2,20}$/.test(pair))) {
      state.favoritePairs = [...new Set(saved.favoritePairs)];
     }
     if (typeof saved.asset === 'string' && /^[A-Z0-9]{2,10}$/.test(saved.asset)) state.asset = saved.asset;
     if (typeof saved.selectedPair === 'string' && /^[A-Z0-9]{2,20}$/.test(saved.selectedPair)) state.selectedPair = saved.selectedPair;
+    const validPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile'];
+    if (typeof saved.activePage === 'string' && validPages.includes(saved.activePage)) state.activePage = saved.activePage;
+    if (typeof saved.returnPage === 'string' && validPages.includes(saved.returnPage)) state.returnPage = saved.returnPage;
+    if (typeof saved.authMode === 'string' && ['login', 'signup'].includes(saved.authMode)) state.authMode = saved.authMode;
    } catch (error) {
     console.error('Unable to load the local account state.', error);
     notify('Could not restore saved account data');
@@ -7656,6 +7708,7 @@
      version: 1,
      assets: state.assets,
      fundingAssets: state.fundingAssets,
+     futuresAssets: state.futuresAssets,
      openOrders: state.openOrders,
      orderHistory: state.orderHistory,
      futuresPositions: state.futuresPositions,
@@ -7666,13 +7719,61 @@
      favoritePairs: state.favoritePairs,
      asset: state.asset,
      selectedPair: state.selectedPair,
-     currentPrice: state.currentPrice
+     currentPrice: state.currentPrice,
+     activePage: state.activePage,
+     returnPage: state.returnPage,
+     authMode: state.authMode
     }));
-    if (state.currentUser) syncCurrentUserWallet();
+    if (state.currentUser) {
+     syncCurrentUserWallet();
+     queueAuthenticatedAccountSave();
+    }
    } catch (error) {
     console.error('Unable to save the local account state.', error);
     notify('Could not save account data in this browser');
    }
+  }
+
+  let accountSaveTimer = null;
+  let accountSaveInFlight = false;
+  let accountSaveQueued = false;
+
+  function queueAuthenticatedAccountSave() {
+   if (!state.currentUser || isLocalPreviewMode()) return;
+   window.clearTimeout(accountSaveTimer);
+   accountSaveTimer = window.setTimeout(async () => {
+    accountSaveTimer = null;
+    if (accountSaveInFlight) {
+     accountSaveQueued = true;
+     return;
+    }
+    const user = state.currentUser;
+    if (!user) return;
+    accountSaveInFlight = true;
+    try {
+     await requestAuthApi('/api/auth/me', {
+      method: 'PUT',
+      body: JSON.stringify({
+       wallet: state.assets,
+       fundingWallet: state.fundingAssets,
+       futuresWallet: state.futuresAssets,
+       transactions: state.transactions,
+       openOrders: state.openOrders,
+       orderHistory: state.orderHistory,
+       futuresPositions: state.futuresPositions
+      })
+     });
+    } catch (error) {
+     console.error('Could not sync account changes to the server', error);
+     notify(`Could not sync account changes: ${error.message}`);
+    } finally {
+     accountSaveInFlight = false;
+     if (accountSaveQueued) {
+      accountSaveQueued = false;
+      queueAuthenticatedAccountSave();
+     }
+    }
+   }, 500);
   }
 
   function formatMoney(value) {
@@ -10557,6 +10658,185 @@
    return balance;
   }
 
+  function getFuturesBalance(asset) {
+   let balance = state.futuresAssets.find((item) => item.asset === asset);
+   if (!balance) {
+    balance = { asset, total: 0, available: 0, inOrders: 0 };
+    state.futuresAssets.push(balance);
+   }
+   balance.total = Number(balance.total);
+   balance.available = Number(balance.available);
+   balance.inOrders = Number(balance.inOrders);
+   return balance;
+  }
+
+  function migrateLegacyFuturesCollateral() {
+   const spotBalance = state.assets.find((item) => item.asset === 'USDT');
+   const futuresCollateral = state.futuresPositions.reduce((sum, position) => sum + Math.max(0, Number(position.initialMargin) || 0), 0)
+    + state.openOrders.reduce((sum, order) => sum
+     + (order.tradingMode === 'futures' && order.reservedAsset === 'USDT'? Math.max(0, Number(order.reservedAmount) || 0): 0), 0);
+   if (state.futuresAssets.length || !spotBalance || futuresCollateral <= 0) return;
+   const amount = Math.min(futuresCollateral, Math.max(0, Number(spotBalance.inOrders) || 0), Math.max(0, Number(spotBalance.total) || 0));
+   if (amount <= 0) {
+    console.error('Legacy Futures margin could not be moved because no Spot USDT was locked.');
+    notify('Legacy Futures collateral could not be migrated from Spot');
+    return;
+   }
+   spotBalance.total -= amount;
+   spotBalance.inOrders = Math.max(0, spotBalance.inOrders - amount);
+   state.futuresAssets.push({ asset: 'USDT', total: amount, available: 0, inOrders: amount });
+  }
+
+  function walletBalances(wallet) {
+   if (wallet === 'funding') return state.fundingAssets;
+   if (wallet === 'futures') return state.futuresAssets;
+   return state.assets;
+  }
+
+  function getWalletBalance(wallet, asset) {
+   const balances = walletBalances(wallet);
+   let balance = balances.find((item) => item.asset === asset);
+   if (!balance) {
+    balance = { asset, total: 0, available: 0, inOrders: 0 };
+    balances.push(balance);
+   }
+   balance.total = Number(balance.total);
+   balance.available = Number(balance.available);
+   balance.inOrders = Number(balance.inOrders);
+   return balance;
+  }
+
+  function walletLabel(wallet) {
+   return ({ spot: 'Spot', funding: 'Funding', futures: 'Futures' })[wallet];
+  }
+
+  function openWalletTransferModal(sourceWallet = 'spot') {
+   if (!state.currentUser) {
+    openAuthModal('login');
+    return;
+   }
+   const source = ['spot', 'funding', 'futures'].includes(sourceWallet)? sourceWallet: 'spot';
+   document.getElementById('transferFromWallet').value = source;
+   document.getElementById('transferAmount').value = '';
+   document.getElementById('transferFeedback').classList.add('hidden');
+   const destination = source === 'futures'? 'spot': source === 'spot'? 'funding': 'spot';
+   document.getElementById('transferToWallet').dataset.preferred = destination;
+   updateWalletTransferOptions();
+   openModal('transferModal');
+   document.getElementById('transferAmount').focus();
+  }
+
+  function updateWalletTransferOptions() {
+   const source = document.getElementById('transferFromWallet').value;
+   const toSelect = document.getElementById('transferToWallet');
+   const assetSelect = document.getElementById('transferAsset');
+   const previousAsset = assetSelect.value;
+   const preferredDestination = toSelect.dataset.preferred || toSelect.value;
+   const sourceBalances = walletBalances(source);
+   const assets = source === 'futures'
+    ? ['USDT']
+    : [...new Set([...sourceBalances.map((balance) => balance.asset), ...(state.futuresAssets.length? ['USDT']: [])])].sort();
+   const assetOptions = assets.map((asset) => `<option value="${escapeHTML(asset)}">${escapeHTML(asset)}</option>`).join('');
+   assetSelect.innerHTML = assetOptions || '<option value="">No assets available</option>';
+   if (assets.includes(previousAsset)) assetSelect.value = previousAsset;
+   const selectedAsset = assetSelect.value;
+   const destinations = ['spot', 'funding', 'futures'].filter((wallet) =>
+    wallet !== source && (wallet !== 'futures' || selectedAsset === 'USDT')
+   );
+   toSelect.innerHTML = destinations.map((wallet) => `<option value="${wallet}">${walletLabel(wallet)}</option>`).join('');
+   if (destinations.includes(preferredDestination)) toSelect.value = preferredDestination;
+   toSelect.dataset.preferred = '';
+   updateWalletTransferAvailability();
+  }
+
+  function getWalletTransferAvailable() {
+   const source = document.getElementById('transferFromWallet').value;
+   const asset = document.getElementById('transferAsset').value;
+   if (!asset) return 0;
+   return Math.max(0, Number(getWalletBalance(source, asset).available) || 0);
+  }
+
+  function updateWalletTransferAvailability() {
+   const fromWallet = document.getElementById('transferFromWallet').value;
+   const asset = document.getElementById('transferAsset').value;
+   const toWallet = document.getElementById('transferToWallet');
+   if (asset !== 'USDT' && toWallet.value === 'futures') {
+    updateWalletTransferOptions();
+    return;
+   }
+   const available = getWalletTransferAvailable();
+   document.getElementById('transferAvailableBalance').textContent = `${available.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${asset || ''}`;
+   document.getElementById('transferAmount').max = String(available);
+   validateWalletTransferAmount();
+  }
+
+  function validateWalletTransferAmount() {
+   const amountInput = document.getElementById('transferAmount');
+   const amount = Number(amountInput.value);
+   const available = getWalletTransferAvailable();
+   const valid = Number.isFinite(amount) && amount > 0 && amount <= available + Number.EPSILON;
+   const feedback = document.getElementById('transferFeedback');
+   feedback.textContent = amount > available? 'Amount exceeds the available balance. Funds locked in orders or positions cannot be transferred.': 'Enter an amount greater than zero.';
+   feedback.classList.toggle('hidden', valid || !amountInput.value);
+   document.getElementById('transferSubmitButton').disabled = !valid;
+   document.getElementById('transferSubmitButton').classList.toggle('opacity-50', !valid);
+   document.getElementById('transferSubmitButton').classList.toggle('cursor-not-allowed', !valid);
+   return valid;
+  }
+
+  function setMaxWalletTransfer() {
+   document.getElementById('transferAmount').value = String(getWalletTransferAvailable());
+   validateWalletTransferAmount();
+  }
+
+  function submitWalletTransfer(event) {
+   event.preventDefault();
+   if (!state.currentUser) {
+    closeModal('transferModal');
+    openAuthModal('login');
+    return;
+   }
+   if (!validateWalletTransferAmount()) return;
+   const fromWallet = document.getElementById('transferFromWallet').value;
+   const toWallet = document.getElementById('transferToWallet').value;
+   const asset = document.getElementById('transferAsset').value;
+   const amount = Number(document.getElementById('transferAmount').value);
+   if (!['spot', 'funding', 'futures'].includes(fromWallet)
+    || !['spot', 'funding', 'futures'].includes(toWallet)
+    || fromWallet === toWallet
+    || (toWallet === 'futures' && asset !== 'USDT')) {
+    notify('Choose valid source and destination wallets');
+    return;
+   }
+   const source = getWalletBalance(fromWallet, asset);
+   const destination = getWalletBalance(toWallet, asset);
+   if (!Number.isFinite(amount) || amount <= 0 || amount > source.available + Number.EPSILON) {
+    notify('Transfer amount is greater than the available balance');
+    updateWalletTransferAvailability();
+    return;
+   }
+   source.total -= amount;
+   source.available -= amount;
+   destination.total += amount;
+   destination.available += amount;
+   state.transactions.unshift({
+    type: 'Internal Transfer',
+    asset,
+    amount,
+    side: 'transfer',
+    fromWallet: walletLabel(fromWallet),
+    toWallet: walletLabel(toWallet),
+    status: 'Completed',
+    time: new Date().toLocaleString()
+   });
+   renderAssets();
+   renderTransactions();
+   calculateTotal();
+   saveDemoState();
+   closeModal('transferModal');
+   notify(`Transferred ${amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${asset} from ${walletLabel(fromWallet)} to ${walletLabel(toWallet)}`);
+  }
+
   function migrateP2PPurchasesToFunding(trades, transactions) {
    const purchases = new Map();
    const completedTrades = Array.isArray(trades)? trades.filter((trade) =>
@@ -10606,7 +10886,9 @@
 
   function releaseOrderReserve(order) {
    if (!order.reservedAsset || !order.reservedAmount) return;
-   const balance = getBalance(order.reservedAsset);
+   const balance = order.tradingMode === 'futures'
+    ? getFuturesBalance(order.reservedAsset)
+    : getBalance(order.reservedAsset);
    balance.inOrders = Math.max(0, balance.inOrders - order.reservedAmount);
    balance.available += order.reservedAmount;
    order.reservedAmount = 0;
@@ -10619,7 +10901,7 @@
     if (order.reduceOnly) return true;
     const asset = 'USDT';
     const amount = order.price * order.amount / order.leverage;
-    const balance = getBalance(asset);
+    const balance = getFuturesBalance(asset);
     if (balance.available + Number.EPSILON < amount) {
      notify(`Insufficient ${asset} balance for futures initial margin`);
      return false;
@@ -10722,7 +11004,7 @@
   }
 
   function settleFuturesExecution(order, executionPrice) {
-   const quoteBalance = getBalance('USDT');
+   const quoteBalance = getFuturesBalance('USDT');
    const pair = order.pair;
    const openingSide = order.side === 'Buy'? 'Long': 'Short';
    const closeSide = order.side === 'Buy'? 'Short': 'Long';
@@ -10814,7 +11096,7 @@
    const marginReleased = position.initialMargin * (closeSize / position.size);
    const realizedPnl = futuresPnl({...position, size: closeSize }, price);
    const creditedPnl = Math.max(realizedPnl, -marginReleased);
-   const quoteBalance = getBalance('USDT');
+   const quoteBalance = getFuturesBalance('USDT');
    quoteBalance.inOrders = Math.max(0, quoteBalance.inOrders - marginReleased);
    quoteBalance.available += marginReleased + creditedPnl;
    quoteBalance.total += creditedPnl;
@@ -10979,7 +11261,7 @@
    const total = amount * price;
    totalInput.value = Number.isFinite(total)? total.toFixed(2): '0.00';
    const balanceAsset = state.side === 'buy' || state.tradingMode !== 'spot'? 'USDT': state.asset;
-   const balance = getBalance(balanceAsset);
+   const balance = state.tradingMode === 'futures'? getFuturesBalance(balanceAsset): getBalance(balanceAsset);
    document.getElementById('formAvailBalance').textContent = `${balance.available.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${balanceAsset}`;
    const maxAmount = state.tradingMode === 'futures'
     ? (balance.available * state.leverage) / state.currentPrice
@@ -11009,7 +11291,7 @@
    const normalizedMultiplier = Math.min(1, Math.max(0, Number(multiplier) || 0));
    const amountInput = document.getElementById('inputAmount');
    const balanceAsset = state.side === 'buy' || state.tradingMode !== 'spot'? 'USDT': state.asset;
-   const balance = getBalance(balanceAsset);
+   const balance = state.tradingMode === 'futures'? getFuturesBalance(balanceAsset): getBalance(balanceAsset);
    const maxAmt = state.tradingMode === 'futures'
     ? (balance.available * state.leverage) / state.currentPrice
     : state.side === 'buy'? balance.available / state.currentPrice: balance.available;
@@ -12186,10 +12468,11 @@
        <div class="mt-1 text-[10px] text-binanceMuted">Received from · ${escapeHTML(transaction.network || 'Network not specified')}</div>
        <div class="max-w-xs break-all text-[10px] text-binanceMuted" title="${escapeHTML(transaction.fromAddress)}">${escapeHTML(transaction.fromAddress)}</div>
       `: ''}
+      ${transaction.fromWallet && transaction.toWallet? `<div class="mt-1 text-[10px] text-binanceMuted">${escapeHTML(transaction.fromWallet)} → ${escapeHTML(transaction.toWallet)}</div>`: ''}
       ${transaction.details? `<div class="mt-1 text-[10px] text-binanceMuted">${escapeHTML(transaction.details)}</div>`: ''}
      </td>
      <td class="p-2.5">${escapeHTML(transaction.asset || '—')}</td>
-     <td class="p-2.5 ${transaction.side === 'sell'? 'text-binanceRed': 'text-binanceGreen'}">${transaction.side === 'sell'? '−': '+'}${Number(transaction.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })}</td>
+     <td class="p-2.5 ${transaction.side === 'sell'? 'text-binanceRed': transaction.side === 'transfer'? 'text-binanceText': 'text-binanceGreen'}">${transaction.side === 'sell'? '−': transaction.side === 'transfer'? '': '+'}${Number(transaction.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })}</td>
      <td class="p-2.5 ${String(transaction.status || '').toLowerCase().includes('completed')? 'text-binanceGreen': 'text-binanceYellow'}">${escapeHTML(transaction.status || '—')}</td>
     </tr>
    `).join('');
@@ -12243,7 +12526,9 @@
     const isNegative = transaction.side === 'sell' || (!transaction.side && /withdraw|sale|pay|debit|adjustment/i.test(rawType));
     const amountText = `${isNegative? '−': normalizedType.includes('transfer')? '': '+'}${Math.abs(Number.isFinite(amount)? amount: 0).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${escapeHTML(transaction.asset || '')}`.trim();
     const timestamp = escapeHTML(transaction.time || '—');
-    const description = transaction.details || transaction.counterparty || transaction.network || '';
+    const description = transaction.fromWallet && transaction.toWallet
+     ? `${transaction.fromWallet} → ${transaction.toWallet}`
+     : transaction.details || transaction.counterparty || transaction.network || '';
     const status = String(transaction.status || '—').replace(/\s*\( \)/i, '');
     const valueColor = isNegative? 'text-binanceRed': /deposit|purchase|convert|buy|credit/i.test(rawType)? 'text-binanceGreen': 'text-binanceText';
     return `
@@ -12406,6 +12691,7 @@
     { asset: 'ETH', total: 1.3425, available: 1.3425, inOrders: 0 }
    ];
    state.fundingAssets = [];
+   state.futuresAssets = [];
    state.openOrders = [];
    state.orderHistory = [];
    state.futuresPositions = [];
@@ -12869,7 +13155,10 @@
    saveDemoState();
    tickFundingCountdown();
    if (window.lucide) window.lucide.createIcons();
-   if (!state.currentUser) openUserHome();
+   const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.activePage)
+    ? state.activePage
+    : 'home';
+   if (!state.currentUser) openAppPage(preferredPage);
    window.addEventListener('resize', () => {
     drawChart();
     if (!document.getElementById('depthView').classList.contains('hidden')) drawDepth();
