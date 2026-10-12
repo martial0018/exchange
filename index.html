@@ -7005,7 +7005,12 @@
   }
 
   function isLocalPreviewMode() {
-   return window.location.protocol === 'file:';
+   const host = window.location.hostname;
+   return window.location.protocol === 'file:'
+    || host === 'localhost'
+    || host === '127.0.0.1'
+    || host === '[::1]'
+    || host === '::1';
   }
 
   function getLocalPreviewSession() {
@@ -7472,6 +7477,9 @@
 
   async function restoreUserSession() {
    try {
+    if (isLocalPreviewMode() && !getLocalPreviewSession()) {
+     return;
+    }
     const { user } = await requestAuthApi('/api/auth/me', { method: 'GET', headers: {} });
     if (!user) return;
     if (user.role === 'admin') {
@@ -7482,9 +7490,10 @@
     }
     storeAuthenticatedUser(user);
    } catch (error) {
-    if (error.message !== 'Not signed in') {
+    const message = error && error.message ? error.message : '';
+    if (message !== 'Not signed in' && message !== 'Sign in to continue') {
      console.error('Could not restore signed-in account', error);
-     notify(error.message);
+     notify(message);
     }
    }
   }
