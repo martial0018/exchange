@@ -2187,8 +2187,8 @@
 
     <!-- Ticker Price Display -->
     <div>
-     <div id="currentPriceDisplay" class="text-xl font-bold text-binanceGreen font-mono">$91,800.00</div>
-     <div id="currentPriceUSD" class="text-[11px] text-binanceMuted font-mono">≈ $91,800.00 USD</div>
+     <div id="currentPriceDisplay" class="text-xl font-bold text-binanceGreen font-mono">—</div>
+     <div id="currentPriceUSD" class="text-[11px] text-binanceMuted font-mono">≈ — USD</div>
      <div id="priceAdjustmentNotice" class="hidden text-[9px] font-semibold text-binanceYellow"></div>
      <div data-market-feed-status class="text-[9px] text-binanceMuted">Binance spot · Connecting</div>
      <div class="text-[8px] text-binanceMuted">Chart, order book, and trade tape</div>
@@ -2208,7 +2208,7 @@
    <div class="flex items-center space-x-6 text-xs text-binanceMuted font-mono shrink-0">
     <div class="hidden sm:block">
      <span class="block text-[10px]">Spot price</span>
-     <span id="markPrice" class="text-white">$91,802.10</span>
+     <span id="markPrice" class="text-white">—</span>
     </div>
     <div class="hidden sm:block">
      <span class="block text-[10px]">Spot reference</span>
@@ -2316,7 +2316,7 @@
 
     <!-- Mid Current Price -->
     <div class="py-1 px-2 border-y border-binanceBorder bg-binanceBg flex items-center justify-between my-0.5">
-     <span id="obCurrentPrice" class="font-bold text-sm text-binanceGreen font-mono">$91,800.00</span>
+     <span id="obCurrentPrice" class="font-bold text-sm text-binanceGreen font-mono">—</span>
      <span id="orderBookSpread" class="text-[10px] text-binanceMuted font-mono">Spread</span>
     </div>
     <div class="px-2 pb-1">
@@ -2415,7 +2415,7 @@
      <div id="limitPriceGroup">
       <label class="block text-binanceMuted mb-1">Price</label>
       <div class="flex items-center bg-binanceBg border border-binanceBorder rounded px-2.5 py-2 focus-within:border-binanceYellow">
-       <input type="number" step="0.01" id="inputPrice" placeholder="91800.00" oninput="calculateTotal()" class="w-full bg-transparent outline-none text-white font-mono">
+       <input type="number" step="0.01" id="inputPrice" placeholder="Live price unavailable" oninput="calculateTotal()" class="w-full bg-transparent outline-none text-white font-mono">
        <span class="text-binanceMuted ml-1">USDT</span>
       </div>
      </div>
@@ -4503,17 +4503,9 @@
    futuresQuotes: {},
    futuresQuoteChanges: {},
    futuresTickerStats: {},
-   marketQuotes: {
-    BTC: 91800, ETH: 3480, SOL: 192, BNB: 635, XRP: 0.62, ADA: 0.78,
-    DOGE: 0.19, AVAX: 34.9, SPY: 779.95, QQQ: 751.22, AAPL: 336.64,
-    TSLA: 383.05, NVDA: 230.87, XAU: 4199.19, XAG: 60.84, CL: 91.37
-   },
-   marketQuoteChanges: {
-    BTC: 2.84, ETH: 1.26, SOL: -0.72, BNB: 0.48, XRP: -0.31, ADA: 1.08,
-    DOGE: 3.42, AVAX: -1.14, SPY: 0, QQQ: -0.013, AAPL: 0,
-    TSLA: 0.065, NVDA: 0.156, XAU: 0.046, XAG: -0.115, CL: 0.705
-   },
-   currentPrice: 91800,
+   marketQuotes: {},
+   marketQuoteChanges: {},
+   currentPrice: 0,
    asset: 'BTC',
    selectedPair: 'BTCUSDT',
    convertFromAsset: 'BTC',
@@ -4602,55 +4594,20 @@
     { asset: 'USDT', total: 10000, available: 10000, inOrders: 0 },
     { asset: 'ETH', total: 1.3425, available: 1.3425, inOrders: 0 }
    ],
-   trades: [
-    { price: 91818.44, amount: 0.21, time: '12:42:45', side: 'buy' },
-    { price: 91825.30, amount: 0.12, time: '12:42:41', side: 'sell' },
-    { price: 91813.10, amount: 0.38, time: '12:42:36', side: 'buy' },
-    { price: 91832.15, amount: 0.09, time: '12:42:31', side: 'sell' },
-    { price: 91806.11, amount: 0.26, time: '12:42:27', side: 'buy' },
-    { price: 91827.98, amount: 0.14, time: '12:42:22', side: 'sell' }
-   ],
+   trades: [],
    lastTick: Date.now()
   };
   const CRYPTO_MARKET_CATALOG = [
-   { asset: 'BTC', price: 91800, change: 2.84, volume: '1.42B' },
-   { asset: 'ETH', price: 3480, change: 1.26, volume: '684.2M' },
-   { asset: 'SOL', price: 192, change: -0.72, volume: '328.6M' },
-   { asset: 'BNB', price: 635, change: 0.48, volume: '96.4M' },
-   { asset: 'XRP', price: 0.62, change: -0.31, volume: '172.8M' },
-   { asset: 'ADA', price: 0.78, change: 1.08, volume: '42.1M' },
-   { asset: 'DOGE', price: 0.19, change: 3.42, volume: '117.5M' },
-   { asset: 'AVAX', price: 34.9, change: -1.14, volume: '31.9M' },
-   { asset: 'LTC', price: 85, change: 0.5, volume: '—' },
-   { asset: 'LINK', price: 14, change: 0.5, volume: '—' },
-   { asset: 'DOT', price: 6, change: 0.5, volume: '—' },
-   { asset: 'BCH', price: 350, change: 0.5, volume: '—' },
-   { asset: 'TRX', price: 0.12, change: 0.5, volume: '—' },
-   { asset: 'SUI', price: 1.5, change: 0.5, volume: '—' },
-   { asset: 'UNI', price: 8, change: 0.5, volume: '—' },
-   { asset: 'APT', price: 8, change: 0.5, volume: '—' },
-   { asset: 'NEAR', price: 5, change: 0.5, volume: '—' },
-   { asset: 'ETC', price: 20, change: 0.5, volume: '—' },
-   { asset: 'FIL', price: 4, change: 0.5, volume: '—' },
-   { asset: 'ARB', price: 0.5, change: 0.5, volume: '—' },
-   { asset: 'OP', price: 2, change: 0.5, volume: '—' },
-   { asset: 'INJ', price: 20, change: 0.5, volume: '—' },
-   { asset: 'ICP', price: 10, change: 0.5, volume: '—' },
-   { asset: 'ATOM', price: 8, change: 0.5, volume: '—' },
-   { asset: 'XLM', price: 0.1, change: 0.5, volume: '—' },
-   { asset: 'HBAR', price: 0.1, change: 0.5, volume: '—' },
-   { asset: 'SHIB', price: 0.00002, change: 0.5, volume: '—' },
-   { asset: 'PEPE', price: 0.00001, change: 0.5, volume: '—' },
-   { asset: 'FET', price: 1, change: 0.5, volume: '—' },
-   { asset: 'RENDER', price: 7, change: 0.5, volume: '—' },
-   { asset: 'SEI', price: 0.3, change: 0.5, volume: '—' },
-   { asset: 'TIA', price: 5, change: 0.5, volume: '—' },
-   { asset: 'AAVE', price: 100, change: 0.5, volume: '—' }
-  ];
-  CRYPTO_MARKET_CATALOG.forEach(({ asset, price, change }) => {
-   if (!Number.isFinite(state.marketQuotes[asset])) state.marketQuotes[asset] = price;
-   if (!Number.isFinite(state.marketQuoteChanges[asset])) state.marketQuoteChanges[asset] = change;
-  });
+   'BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'AVAX',
+   'LTC', 'LINK', 'DOT', 'BCH', 'TRX', 'SUI', 'UNI', 'APT',
+   'NEAR', 'ETC', 'FIL', 'ARB', 'OP', 'INJ', 'ICP', 'ATOM',
+   'XLM', 'HBAR', 'SHIB', 'PEPE', 'FET', 'RENDER', 'SEI', 'TIA', 'AAVE'
+  ].map((asset) => ({
+   asset,
+   symbol: `${asset}USDT`,
+   price: 0,
+   volume: '—'
+  }));
   const LIVE_MARKET_ASSETS = new Set(CRYPTO_MARKET_CATALOG.map(({ asset }) => asset));
   const TRADFI_BINANCE_SYMBOLS = {
    SPY: 'SPYUSDT',
@@ -5756,25 +5713,25 @@
     ...coin,
     pair: `${coin.asset}USDT`,
     price: demoMarketPrice(coin.asset),
-    change: state.marketQuoteChanges[coin.asset] ?? coin.change,
+    change: state.marketQuoteChanges[coin.asset],
     volume: state.marketTickerStats[coin.asset]? formatMarketVolume(state.marketTickerStats[coin.asset].quoteVolume): coin.volume,
     category: 'crypto',
     display: `${coin.asset} / USDT`,
     subtitle: 'Binance spot · USDT market'
    }));
    const tradfiCatalog = [
-    { asset: 'SPY', name: 'S&P 500 ETF', price: 779.95, change: 0, volume: '—', tradfiClass: 'bstocks' },
-    { asset: 'QQQ', name: 'Nasdaq-100 ETF', price: 751.22, change: -0.013, volume: '—', tradfiClass: 'bstocks' },
-    { asset: 'AAPL', name: 'Apple', price: 336.64, change: 0, volume: '—', tradfiClass: 'bstocks' },
-    { asset: 'TSLA', name: 'Tesla', price: 383.05, change: 0.065, volume: '—', tradfiClass: 'bstocks' },
-    { asset: 'NVDA', name: 'NVIDIA', price: 230.87, change: 0.156, volume: '—', tradfiClass: 'bstocks' },
-    { asset: 'XAU', name: 'Gold', price: 4199.19, change: 0.046, volume: '—', tradfiClass: 'commodities' },
-    { asset: 'XAG', name: 'Silver', price: 60.84, change: -0.115, volume: '—', tradfiClass: 'commodities' },
-    { asset: 'CL', name: 'Crude Oil', price: 91.37, change: 0.705, volume: '—', tradfiClass: 'commodities' }
+    { asset: 'SPY', name: 'S&P 500 ETF', price: 0, volume: '—', tradfiClass: 'bstocks' },
+    { asset: 'QQQ', name: 'Nasdaq-100 ETF', price: 0, volume: '—', tradfiClass: 'bstocks' },
+    { asset: 'AAPL', name: 'Apple', price: 0, volume: '—', tradfiClass: 'bstocks' },
+    { asset: 'TSLA', name: 'Tesla', price: 0, volume: '—', tradfiClass: 'bstocks' },
+    { asset: 'NVDA', name: 'NVIDIA', price: 0, volume: '—', tradfiClass: 'bstocks' },
+    { asset: 'XAU', name: 'Gold', price: 0, volume: '—', tradfiClass: 'commodities' },
+    { asset: 'XAG', name: 'Silver', price: 0, volume: '—', tradfiClass: 'commodities' },
+    { asset: 'CL', name: 'Crude Oil', price: 0, volume: '—', tradfiClass: 'commodities' }
    ].map((instrument) => ({
     ...instrument,
     price: demoMarketPrice(instrument.asset),
-    change: state.marketQuoteChanges[instrument.asset] ?? instrument.change,
+    change: state.marketQuoteChanges[instrument.asset],
     volume: Number.isFinite(state.marketTickerStats[instrument.asset]?.quoteVolume)
      ? formatMarketVolume(state.marketTickerStats[instrument.asset].quoteVolume)
      : instrument.volume,
@@ -5873,8 +5830,8 @@
        <span class="block truncate text-xs font-bold text-white">${escapeHTML(coin.display)}</span>
        <span class="mt-1 block truncate text-[9px] text-binanceMuted">${escapeHTML(coin.subtitle)}</span>
       </button>
-      <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.asset)}`}" class="text-right font-mono text-[11px] text-white">${formatMoney(coin.price)}</span>
-      <span data-market-quote-change="${escapeHTML(coin.asset)}" class="text-right font-mono text-[10px] ${coin.change >= 0? 'text-binanceGreen': 'text-binanceRed'}">${coin.change >= 0? '+': ''}${coin.change.toFixed(2)}%</span>
+      <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.asset)}`}" class="text-right font-mono text-[11px] text-white">${formatMarketPrice(coin.price)}</span>
+      <span data-market-quote-change="${escapeHTML(coin.asset)}" class="text-right font-mono text-[10px] ${Number.isFinite(coin.change)? coin.change >= 0? 'text-binanceGreen': 'text-binanceRed': 'text-binanceMuted'}">${Number.isFinite(coin.change)? `${coin.change >= 0? '+': ''}${coin.change.toFixed(2)}%`: '—'}</span>
       <span data-market-quote-volume="${escapeHTML(coin.asset)}" class="hidden text-right font-mono text-[10px] text-binanceMuted sm:block">$${coin.volume}</span>
       <div class="flex items-center gap-1">
        <button type="button" onclick="toggleMarketFavorite('${coin.pair}')" aria-label="${favorite? 'Remove from': 'Add to'} favorites" aria-pressed="${favorite}" class="rounded p-1.5 ${favorite? 'text-binanceYellow': 'text-binanceMuted'}"><i data-lucide="star" class="h-4 w-4" ${favorite? 'fill="currentColor"': ''}></i></button>
@@ -5900,12 +5857,12 @@
        </span>
       </button>
       <button type="button" onclick="${action}" class="min-w-0 flex-1 text-right">
-       <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.asset)}`}" class="block truncate font-mono text-[13px] font-semibold text-white">${formatMoney(coin.price)}</span>
-       <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.asset)}`}" class="block text-[10px] text-binanceMuted">${formatMoney(coin.price)}</span>
+       <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.asset)}`}" class="block truncate font-mono text-[13px] font-semibold text-white">${formatMarketPrice(coin.price)}</span>
+       <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.asset)}`}" class="block text-[10px] text-binanceMuted">${formatMarketPrice(coin.price)}</span>
       </button>
       <div class="flex shrink-0 items-center gap-1">
        <button type="button" onclick="toggleMarketFavorite('${coin.pair}')" aria-label="${favorite? 'Remove from': 'Add to'} favorites" aria-pressed="${favorite}" class="rounded p-1 ${favorite? 'text-binanceYellow': 'text-binanceMuted'}"><i data-lucide="star" class="h-3.5 w-3.5" ${favorite? 'fill="currentColor"': ''}></i></button>
-       <button type="button" data-market-quote-change="${escapeHTML(coin.asset)}" onclick="${action}" class="min-w-[4.25rem] rounded px-1.5 py-2 text-[11px] font-bold text-white ${coin.change >= 0? 'bg-binanceGreen': 'bg-binanceRed'}">${coin.change >= 0? '+': ''}${coin.change.toFixed(2)}%</button>
+       <button type="button" data-market-quote-change="${escapeHTML(coin.asset)}" onclick="${action}" class="min-w-[4.25rem] rounded px-1.5 py-2 text-[11px] font-bold text-white ${Number.isFinite(coin.change)? coin.change >= 0? 'bg-binanceGreen': 'bg-binanceRed': 'bg-binanceHover'}">${Number.isFinite(coin.change)? `${coin.change >= 0? '+': ''}${coin.change.toFixed(2)}%`: '—'}</button>
       </div>
      </div>
     `;
@@ -6262,10 +6219,9 @@
    const ordersLabel = section === 'overview'? 'USDT in orders / Futures margin': 'USDT currently in orders';
    document.getElementById('assetsPageOrders').textContent = visible? `${ordersUsdt.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${ordersLabel}`: 'Order balance hidden';
    document.getElementById('assetsVisibilityIcon').setAttribute('data-lucide', visible? 'eye': 'eye-off');
-   const dailyChanges = { BTC: 2.84, ETH: 1.26, SOL: -0.72, BNB: 0.48, XRP: -0.31, ADA: 1.08, DOGE: 3.42, AVAX: -1.14, USDT: 0 };
    const dailyPnl = totalBalances.reduce((sum, balance) => {
     const value = Number(balance.total || 0) * priceFor(balance.asset);
-    return sum + value * (dailyChanges[balance.asset] || 0) / 100;
+    return sum + value * (Number(state.marketQuoteChanges[balance.asset]) || 0) / 100;
    }, 0);
    const dailyPnlPercent = total > 0? dailyPnl / total * 100: 0;
    const spotConvertedTotal = convertFromUsdt(spotTotal);
@@ -6463,7 +6419,7 @@
      const assetPrice = priceFor(balance.asset);
      const estimate = Number(balance.total || 0) * assetPrice;
      const btcEstimate = estimate / Math.max(priceFor('BTC'), 1);
-     const change = dailyChanges[balance.asset] || 0;
+     const change = Number(state.marketQuoteChanges[balance.asset]) || 0;
      const dailyValue = estimate * change / 100;
      const tradeButton = balance.wallet !== 'Futures' && balance.asset !== 'USDT'
       ? `<button type="button" onclick="openMarketPair('${escapeHTML(balance.asset)}USDT', ${assetPrice}, '${escapeHTML(balance.asset)}')" class="rounded-md border border-binanceBorder px-3 py-1.5 text-[10px] font-semibold text-binanceYellow">Trade</button>`
@@ -6570,7 +6526,7 @@
    const cryptoMarkets = CRYPTO_MARKET_CATALOG.map((market) => ({
     ...market,
     price: demoMarketPrice(market.asset),
-    change: state.marketQuoteChanges[market.asset] || 0,
+    change: state.marketQuoteChanges[market.asset],
     volume: state.marketTickerStats[market.asset]? formatMarketVolume(state.marketTickerStats[market.asset].quoteVolume): market.volume
    }));
    const stockMarkets = [
@@ -6582,7 +6538,7 @@
    ].map((market) => ({
     ...market,
     price: demoMarketPrice(market.asset),
-    change: state.marketQuoteChanges[market.asset] || 0,
+    change: state.marketQuoteChanges[market.asset],
     volume: Number.isFinite(state.marketTickerStats[market.asset]?.quoteVolume)
      ? formatMarketVolume(state.marketTickerStats[market.asset].quoteVolume)
      : market.volume
@@ -6592,7 +6548,9 @@
     if (state.homeMarketCategory === 'favorites') {
      rows = rows.filter((market) => state.favoritePairs.includes(`${market.asset}USDT`));
     } else if (state.homeMarketCategory === 'hot') {
-     rows = [...rows].filter((market) => market.change > 0).sort((left, right) => right.change - left.change).slice(0, 5);
+     rows = rows.some((market) => Number.isFinite(market.change))
+      ? [...rows].filter((market) => Number.isFinite(market.change) && market.change > 0).sort((left, right) => right.change - left.change).slice(0, 5)
+      : rows.slice(0, 5);
     } else if (state.homeMarketCategory === 'alpha') {
      rows = rows.filter((market) => ['SOL', 'XRP', 'DOGE'].includes(market.asset));
     } else if (state.homeMarketCategory === 'new') {
@@ -6639,7 +6597,8 @@
     button.classList.toggle('font-medium', !active);
    });
    const markup = marketRows.length? marketRows.map((market) => {
-    const positive = market.change >= 0;
+    const hasChange = Number.isFinite(market.change);
+    const positive = hasChange && market.change >= 0;
     const pair = `${market.asset}${state.homeMarketType === 'stocks'? 'USD': 'USDT'}`;
     const openMarket = state.homeMarketType === 'futures'
      ? `openFuturesPair('${pair}', demoMarketPrice('${market.asset}'), '${market.asset}')`
@@ -6652,8 +6611,8 @@
        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${market.asset === 'BTC'? 'bg-[#f7931a]': market.asset === 'BNB'? 'bg-[#f0b90b] text-binanceBg': 'bg-binanceHover'} text-[10px] font-bold text-white">${escapeHTML(market.asset.slice(0, 1))}</span>
        <span class="min-w-0"><span class="block truncate text-xs font-semibold text-white">${escapeHTML(market.asset)}${market.name? `<span class="ml-1 text-[9px] font-normal text-binanceMuted">${escapeHTML(market.name)}</span>`: ''}</span><span class="mt-0.5 block truncate text-[9px] text-binanceMuted">${escapeHTML(market.name? market.name: market.asset === 'BTC'? 'Bitcoin': market.asset)} · <span data-market-quote-volume="${escapeHTML(market.asset)}">$${escapeHTML(market.volume)}</span></span></span>
       </span>
-      <span class="text-right"><span data-home-quote-price="${escapeHTML(market.asset)}" class="block font-mono text-[11px] text-white">${formatMoney(market.price)}</span><span class="mt-0.5 block text-[8px] text-binanceMuted">USDT</span></span>
-      <span data-home-quote-change="${escapeHTML(market.asset)}" class="min-w-[4.5rem] rounded bg-binanceGreen px-1.5 py-1.5 text-right font-mono text-[10px] font-medium text-white ${positive? 'bg-binanceGreen': 'bg-binanceRed'}">${positive? '+': ''}${market.change.toFixed(2)}%</span>
+      <span class="text-right"><span data-home-quote-price="${escapeHTML(market.asset)}" class="block font-mono text-[11px] text-white">${formatMarketPrice(market.price)}</span><span class="mt-0.5 block text-[8px] text-binanceMuted">USDT</span></span>
+      <span data-home-quote-change="${escapeHTML(market.asset)}" class="min-w-[4.5rem] rounded px-1.5 py-1.5 text-right font-mono text-[10px] font-medium text-white ${hasChange? positive? 'bg-binanceGreen': 'bg-binanceRed': 'bg-binanceHover'}">${hasChange? `${positive? '+': ''}${market.change.toFixed(2)}%`: '—'}</span>
      </button>`;
    }).join(''): `<div class="p-6 text-center text-[10px] text-binanceMuted">${state.homeMarketCategory === 'favorites'? 'No favorite markets yet. Save a pair from Markets to see it here.': 'No markets available in this selection.'}</div>`;
    ['homeMarketList', 'guestHomeMarketList'].forEach((id) => {
@@ -6699,9 +6658,8 @@
     estimatedValue: Number(balance.total || 0) * priceFor(balance.asset)
    }));
    const portfolioValue = valuedAssets.reduce((total, balance) => total + balance.estimatedValue, 0);
-   const dailyChanges = { BTC: 2.84, ETH: 1.26, SOL: -0.72, BNB: 0.48, XRP: -0.31, ADA: 1.08, DOGE: 3.42, AVAX: -1.14, USDT: 0 };
    const portfolioChange = portfolioValue > 0
-    ? valuedAssets.reduce((total, balance) => total + balance.estimatedValue * (dailyChanges[balance.asset] || 0) / 100, 0)
+    ? valuedAssets.reduce((total, balance) => total + balance.estimatedValue * (Number(state.marketQuoteChanges[balance.asset]) || 0) / 100, 0)
     : 0;
    const portfolioChangePercent = portfolioValue > 0? portfolioChange / portfolioValue * 100: 0;
    const usdt = user.wallet.find((balance) => balance.asset === 'USDT') || { available: 0, inOrders: 0 };
@@ -7653,7 +7611,6 @@
     }
     if (typeof saved.asset === 'string' && /^[A-Z0-9]{2,10}$/.test(saved.asset)) state.asset = saved.asset;
     if (typeof saved.selectedPair === 'string' && /^[A-Z0-9]{2,20}$/.test(saved.selectedPair)) state.selectedPair = saved.selectedPair;
-    if (Number.isFinite(saved.currentPrice) && saved.currentPrice > 0) state.currentPrice = saved.currentPrice;
    } catch (error) {
     console.error('Unable to load the local account state.', error);
     notify('Could not restore saved account data');
@@ -7695,6 +7652,10 @@
    }).format(value);
   }
 
+  function formatMarketPrice(value) {
+   return Number.isFinite(value) && value > 0? formatMoney(value): '—';
+  }
+
   function formatMarketVolume(value) {
    return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(value);
   }
@@ -7711,8 +7672,7 @@
   }
 
   function demoMarketPrice(asset) {
-   const referencePrices = { BTC: 91800, ETH: 3480, SOL: 192, BNB: 635, XRP: 0.62, ADA: 0.78, DOGE: 0.19, AVAX: 34.9 };
-   const referencePrice = state.marketQuotes[asset] || referencePrices[asset] || 0;
+   const referencePrice = Number(state.marketQuotes[asset]) || 0;
    if (TRADFI_ASSETS.has(asset)) return referencePrice;
    return adjustedMarketPrice('spot', `${asset}USDT`, referencePrice);
   }
@@ -7823,7 +7783,7 @@
    } else {
     state.currentPrice = demoMarketPrice(state.asset);
    }
-   const priceText = formatMoney(state.currentPrice);
+   const priceText = formatMarketPrice(state.currentPrice);
    const currentPriceDisplay = document.getElementById('currentPriceDisplay');
    if (currentPriceDisplay) currentPriceDisplay.textContent = priceText;
    const currentPriceUSD = document.getElementById('currentPriceUSD');
@@ -7836,7 +7796,7 @@
    if (orderBookPrice) orderBookPrice.textContent = priceText;
    const priceInput = document.getElementById('inputPrice');
    if (priceInput && state.orderType === 'market') {
-    priceInput.value = state.currentPrice.toFixed(pricePrecision());
+    priceInput.value = state.currentPrice > 0? state.currentPrice.toFixed(pricePrecision()): '';
     calculateTotal();
    }
    if (state.activePage === 'trade') loadSelectedMarketChart();
@@ -7957,7 +7917,7 @@
   function updatePairSelectorPrices() {
    document.querySelectorAll('[data-pair-price]').forEach((element) => {
     const price = demoMarketPrice(element.dataset.pairPrice);
-    if (Number.isFinite(price) && price > 0) element.textContent = formatMoney(price);
+    element.textContent = formatMarketPrice(price);
    });
   }
 
@@ -8027,6 +7987,10 @@
    if (lowDisplay) lowDisplay.textContent = formatMoney(low);
    if (volumeDisplay) volumeDisplay.textContent = formatMarketVolume(quoteVolume);
    document.getElementById('obCurrentPrice').textContent = priceText;
+   const priceInput = document.getElementById('inputPrice');
+   if (previousPrice <= 0 && priceInput && !priceInput.value) {
+    priceInput.value = price.toFixed(pricePrecision());
+   }
    if (state.orderType === 'market') {
     document.getElementById('inputPrice').value = price.toFixed(pricePrecision());
     calculateTotal();
@@ -8431,6 +8395,10 @@
    if (state.selectedPair !== symbol || state.tradingMode !== 'futures') return;
    const previousPrice = state.currentPrice;
    state.currentPrice = adjustedPrice;
+   const priceInput = document.getElementById('inputPrice');
+   if (previousPrice <= 0 && priceInput && !priceInput.value) {
+    priceInput.value = adjustedPrice.toFixed(pricePrecision());
+   }
    updateLiveCandleFromTicker(adjustedPrice, eventTime);
    const priceText = formatMoney(adjustedPrice);
    const currentPriceDisplay = document.getElementById('currentPriceDisplay');
@@ -8974,7 +8942,7 @@
    list.innerHTML = CRYPTO_MARKET_CATALOG.map(({ asset }) => `
     <button type="button" data-market-pair onclick="selectPair('${asset}USDT', demoMarketPrice('${asset}'), '${asset}')" class="w-full px-3 py-2 text-xs flex justify-between cursor-pointer hover:bg-binanceHover">
      <span class="font-bold text-white font-mono">${asset}/USDT</span>
-     <span data-pair-price="${asset}" class="text-binanceMuted font-mono">${formatMoney(demoMarketPrice(asset))}</span>
+     <span data-pair-price="${asset}" class="text-binanceMuted font-mono">${formatMarketPrice(demoMarketPrice(asset))}</span>
     </button>
    `).join('');
   }
@@ -8996,7 +8964,7 @@
    closePairMenu();
 
    const pairText = `${asset}/USDT`;
-   const priceText = formatMoney(state.currentPrice);
+   const priceText = formatMarketPrice(state.currentPrice);
    const selectedPairText = document.getElementById('selectedPairText');
    const currentPriceDisplay = document.getElementById('currentPriceDisplay');
    const currentPriceUSD = document.getElementById('currentPriceUSD');
@@ -9010,12 +8978,12 @@
    if (selectedPairText) selectedPairText.textContent = pairText;
    if (currentPriceDisplay) currentPriceDisplay.textContent = priceText;
    if (currentPriceUSD) currentPriceUSD.textContent = `≈ ${priceText} USD`;
-   if (markPrice) markPrice.textContent = formatMoney(state.currentPrice);
-   if (indexPrice) indexPrice.textContent = formatMoney(state.currentPrice);
+   if (markPrice) markPrice.textContent = formatMarketPrice(state.currentPrice);
+   if (indexPrice) indexPrice.textContent = formatMarketPrice(state.currentPrice);
    if (tickerVolAsset) tickerVolAsset.textContent = asset;
    if (priceInput) {
     priceInput.step = (10 ** -pricePrecision()).toString();
-    priceInput.value = state.currentPrice.toFixed(pricePrecision());
+    priceInput.value = state.currentPrice > 0? state.currentPrice.toFixed(pricePrecision()): '';
    }
    if (p2pAssetFilter && [...p2pAssetFilter.options].some((option) => option.value === asset)) {
     p2pAssetFilter.value = asset;
@@ -10404,7 +10372,7 @@
    const orderName = type === 'market'? 'Market': type === 'limit'? 'Limit': type === 'stop'? 'Stop-Limit': 'Trailing Stop';
    document.getElementById('btnSubmitOrder').textContent = `${sideLabel} ${state.asset} ${orderName}`;
    if (type === 'market' || type === 'trailing') {
-    document.getElementById('inputPrice').value = state.currentPrice.toFixed(pricePrecision());
+    document.getElementById('inputPrice').value = state.currentPrice > 0? state.currentPrice.toFixed(pricePrecision()): '';
    }
    calculateTotal();
   }
@@ -11047,6 +11015,12 @@
   }
 
   function generateCandles() {
+   if (!Number.isFinite(state.currentPrice) || state.currentPrice <= 0) {
+    state.candles = [];
+    chartViewport.offset = 0;
+    drawChart();
+    return;
+   }
    const candles = [];
    let close = state.currentPrice;
    const points = 60;
@@ -11825,6 +11799,17 @@
    const current = Number.isFinite(state.currentPrice) && state.currentPrice > 0
     ? state.currentPrice
     : state.candles?.[state.candles.length - 1]?.close;
+   if (!Number.isFinite(current) || current <= 0) {
+    asksContainer.innerHTML = '';
+    bidsContainer.innerHTML = '';
+    document.getElementById('orderBookSpread').textContent = 'Waiting for live price';
+    document.getElementById('orderBookBidShare').textContent = 'Bid —';
+    document.getElementById('orderBookAskShare').textContent = 'Ask —';
+    document.getElementById('orderBookBidRatio').style.width = '50%';
+    document.getElementById('orderBookAskRatio').style.width = '50%';
+    document.getElementById('obCurrentPrice').textContent = '—';
+    return;
+   }
    const { asks, bids } = getOrderBookLevels(current);
    const spread = asks[0].price - bids[0].price;
    document.getElementById('orderBookSpread').textContent = `Spread: ${formatOrderBookPrice(spread)}`;
@@ -11989,6 +11974,10 @@
   function renderTrades() {
    const container = document.getElementById('liveTradesContainer');
    if (!container) return;
+   if (!state.trades.length) {
+    container.innerHTML = '<div class="p-3 text-center text-[10px] text-binanceMuted">No trade updates yet.</div>';
+    return;
+   }
    container.innerHTML = state.trades.map((trade) => `
     <div class="grid grid-cols-3 px-2 py-1 border-b border-binanceBorder/60 hover:bg-binanceHover/30">
      <div class="font-mono ${trade.side === 'buy'? 'text-binanceGreen': 'text-binanceRed'}">${formatMoney(trade.price)}</div>
@@ -12215,10 +12204,9 @@
 
   function renderAssets() {
    const tbody = document.getElementById('assetsList');
-   const marketPrices = { USDT: 1, BTC: 91800, ETH: 3480, SOL: 192, BNB: 635, XRP: 0.62, ADA: 0.78, DOGE: 0.19, AVAX: 34.9 };
-   marketPrices[state.asset] = state.currentPrice;
-   const walletTotal = state.assets.reduce((sum, asset) => sum + Number(asset.total || 0) * (marketPrices[asset.asset] || 0), 0);
-   const fundingTotal = state.fundingAssets.reduce((sum, asset) => sum + Number(asset.total || 0) * (marketPrices[asset.asset] || demoMarketPrice(asset.asset)), 0);
+   const priceFor = (asset) => asset === 'USDT'? 1: asset === state.asset? state.currentPrice: demoMarketPrice(asset);
+   const walletTotal = state.assets.reduce((sum, asset) => sum + Number(asset.total || 0) * priceFor(asset.asset), 0);
+   const fundingTotal = state.fundingAssets.reduce((sum, asset) => sum + Number(asset.total || 0) * priceFor(asset.asset), 0);
    const futuresUnrealized = state.futuresPositions.reduce((sum, position) => {
     const mark = position.pair.replace('/', '') === state.selectedPair? state.currentPrice: position.markPrice;
     return sum + futuresPnl(position, mark);
@@ -12286,11 +12274,11 @@
    state.p2pTrades = [];
    state.p2pAds = [];
    state.p2pPaymentMethods = [];
-   state.currentPrice = 91800;
+   state.currentPrice = demoMarketPrice('BTC');
    state.asset = 'BTC';
    state.selectedPair = 'BTCUSDT';
    document.getElementById('inputAmount').value = '0.1000';
-   document.getElementById('inputPrice').value = state.currentPrice.toFixed(pricePrecision());
+   document.getElementById('inputPrice').value = state.currentPrice > 0? state.currentPrice.toFixed(pricePrecision()): '';
    renderOpenOrders();
    renderFuturesPositions();
    renderHistory();
@@ -12529,6 +12517,10 @@
   function executeOrder(event) {
    event.preventDefault();
    if (!requireSignedInForTrading()) return;
+   if (!Number.isFinite(state.currentPrice) || state.currentPrice <= 0) {
+    notify('Waiting for a valid live market price');
+    return;
+   }
    const amount = Number(document.getElementById('inputAmount').value || 0);
    const price = Number(document.getElementById('inputPrice').value);
    const stopPrice = Number(document.getElementById('inputStopPrice').value);
@@ -12744,7 +12736,7 @@
    setTradeSide('buy');
    setP2PMode('buy');
    updateLeverage('20');
-   document.getElementById('inputPrice').value = state.currentPrice.toFixed(pricePrecision());
+   document.getElementById('inputPrice').value = state.currentPrice > 0? state.currentPrice.toFixed(pricePrecision()): '';
    document.getElementById('inputAmount').value = '0.1000';
    calculateTotal();
    saveDemoState();
