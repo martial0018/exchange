@@ -1,20 +1,47 @@
-const NETWORKS_BY_ASSET = {
-    USDT: ['Ethereum (ERC-20)', 'BNB Smart Chain (BEP-20)', 'Tron (TRC-20)', 'Solana'],
-    BTC: ['Bitcoin'],
-    ETH: ['Ethereum (ERC-20)'],
-    SOL: ['Solana'],
-    BNB: ['BNB Smart Chain (BEP-20)'],
-    XRP: ['XRP Ledger'],
-    ADA: ['Cardano'],
-    DOGE: ['Dogecoin'],
-    AVAX: ['Avalanche C-Chain']
-};
+const DEPOSIT_NETWORKS = [
+    'Algorand',
+    'Aptos',
+    'Arbitrum One',
+    'Avalanche C-Chain',
+    'Base',
+    'Bitcoin',
+    'Bitcoin Cash',
+    'BNB Smart Chain (BEP-20)',
+    'Cardano',
+    'Celo',
+    'Cosmos Hub',
+    'Cronos',
+    'Dogecoin',
+    'Ethereum (ERC-20)',
+    'Filecoin',
+    'Gnosis Chain',
+    'Hedera',
+    'Injective',
+    'Litecoin',
+    'Linea',
+    'Mantle',
+    'NEAR',
+    'Optimism',
+    'Osmosis',
+    'Polkadot',
+    'Polygon PoS',
+    'Scroll',
+    'Sei',
+    'Solana',
+    'Stellar',
+    'Sui',
+    'Tezos',
+    'TON',
+    'Tron (TRC-20)',
+    'XRP Ledger',
+    'zkSync Era'
+];
 
 function validDepositNetwork(asset, network) {
     return typeof asset === 'string'
         && typeof network === 'string'
-        && Array.isArray(NETWORKS_BY_ASSET[asset])
-        && NETWORKS_BY_ASSET[asset].includes(network);
+        && /^[A-Z0-9]{2,20}$/.test(asset)
+        && DEPOSIT_NETWORKS.includes(network);
 }
 
 module.exports = { validDepositNetwork };

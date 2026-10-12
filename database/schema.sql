@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS market_price_adjustments (
 
 CREATE TABLE IF NOT EXISTS crypto_deposit_addresses (
     asset TEXT NOT NULL CHECK (asset IN ('USDT', 'BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'AVAX')),
-    network TEXT NOT NULL CHECK (network IN ('Bitcoin', 'Ethereum (ERC-20)', 'BNB Smart Chain (BEP-20)', 'Tron (TRC-20)', 'Solana', 'XRP Ledger', 'Cardano', 'Dogecoin', 'Avalanche C-Chain')),
+    network TEXT NOT NULL CHECK (network IN ('Algorand', 'Aptos', 'Arbitrum One', 'Avalanche C-Chain', 'Base', 'Bitcoin', 'Bitcoin Cash', 'BNB Smart Chain (BEP-20)', 'Cardano', 'Celo', 'Cosmos Hub', 'Cronos', 'Dogecoin', 'Ethereum (ERC-20)', 'Filecoin', 'Gnosis Chain', 'Hedera', 'Injective', 'Litecoin', 'Linea', 'Mantle', 'NEAR', 'Optimism', 'Osmosis', 'Polkadot', 'Polygon PoS', 'Scroll', 'Sei', 'Solana', 'Stellar', 'Sui', 'Tezos', 'TON', 'Tron (TRC-20)', 'XRP Ledger', 'zkSync Era')),
     address TEXT NOT NULL CHECK (length(address) BETWEEN 1 AND 200),
     memo TEXT NOT NULL DEFAULT '' CHECK (length(memo) <= 120),
     updated_by BIGINT REFERENCES users(id) ON DELETE SET NULL,

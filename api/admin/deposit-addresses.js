@@ -40,7 +40,7 @@ module.exports = async function handler(req, res) {
         const address = typeof body.address === 'string' ? body.address.trim() : '';
         const memo = typeof body.memo === 'string' ? body.memo.trim() : '';
         if (!validDepositNetwork(asset, network) || address.length > 200 || memo.length > 120) {
-            sendJson(res, 400, { error: 'Choose a supported asset and network. Addresses are limited to 200 characters and memo/tag values to 120 characters.' });
+            sendJson(res, 400, { error: 'Choose an asset ticker and available network. Addresses are limited to 200 characters and memo/tag values to 120 characters.' });
             return;
         }
 

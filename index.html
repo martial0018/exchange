@@ -477,6 +477,186 @@
   .p2p-mobile-header {
    display: none;
   }
+  #adminPanel {
+   align-items: center;
+  }
+  #adminPanel > .admin-panel-surface {
+   overscroll-behavior: contain;
+   scrollbar-gutter: stable;
+   scroll-behavior: smooth;
+  }
+  #adminDashboard [data-admin-section] {
+   scroll-margin-top: 150px;
+  }
+  .admin-mobile-nav {
+   scrollbar-width: none;
+  }
+  .admin-mobile-nav::-webkit-scrollbar {
+   display: none;
+  }
+  @media (max-width: 767px) {
+   #adminPanel {
+    align-items: stretch;
+    padding: 0;
+   }
+   #adminPanel > .admin-panel-surface {
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 0;
+    border-radius: 0;
+    padding: max(12px, env(safe-area-inset-top)) 12px max(24px, env(safe-area-inset-bottom));
+   }
+   #adminPanel > .admin-panel-surface > .admin-panel-header {
+    position: sticky;
+    top: calc(-1 * max(12px, env(safe-area-inset-top)));
+    z-index: 10;
+    margin: calc(-1 * max(12px, env(safe-area-inset-top))) -12px 12px;
+    padding: max(12px, env(safe-area-inset-top)) 12px 10px;
+    border-bottom: 1px solid #2b3139;
+    background: rgba(30, 35, 41, .97);
+    backdrop-filter: blur(14px);
+   }
+   .admin-mobile-nav {
+    position: sticky;
+    top: 59px;
+    z-index: 9;
+    margin: 0 -12px 14px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #2b3139;
+    background: rgba(30, 35, 41, .96);
+    backdrop-filter: blur(14px);
+   }
+   #adminDashboard > .admin-account-row {
+    margin-bottom: 12px;
+   }
+   #adminDashboard > .admin-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+   }
+   #adminDashboard > .admin-metrics-grid > article {
+    min-width: 0;
+    padding: 12px;
+   }
+   #adminDashboard > .admin-metrics-grid > article > div:nth-child(2) {
+    margin-top: 6px;
+    font-size: 20px;
+   }
+   #adminUsersSection,
+   #adminDashboard [data-admin-section] {
+    margin-bottom: 12px;
+    padding: 12px;
+   }
+   #adminUsersSection > .admin-users-toolbar {
+    gap: 10px;
+   }
+   #adminUsersSection > .overflow-x-auto,
+   #adminBalanceEditor > .overflow-x-auto,
+   #adminAuditSection > .overflow-x-auto {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+   }
+   #adminUsersTable {
+    min-width: 0;
+   }
+   #adminUsersTable thead {
+    display: none;
+   }
+   #adminUsersTable tbody {
+    display: grid;
+    gap: 8px;
+   }
+   #adminUsersTable tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px 12px;
+    padding: 12px;
+    border: 1px solid #2b3139;
+    border-radius: 10px;
+    background: #181a20;
+   }
+   #adminUsersTable tbody td {
+    min-width: 0;
+    padding: 0;
+    overflow-wrap: anywhere;
+   }
+   #adminUsersTable tbody td[data-label="Wallet"],
+   #adminUsersTable tbody td[data-label="Action"] {
+    grid-column: 1 / -1;
+   }
+   #adminUsersTable tbody td::before {
+    display: block;
+    margin-bottom: 3px;
+    color: #848e9c;
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    content: attr(data-label);
+   }
+   #adminUsersTable tbody td[data-label="Action"] {
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #2b3139;
+    padding-top: 8px;
+   }
+   #adminUsersTable tbody td[data-label="Action"]::before {
+    display: none;
+   }
+   #adminBalanceEditor > .overflow-x-auto table,
+   #adminAuditSection > .overflow-x-auto table {
+    min-width: 0;
+   }
+   #adminBalanceEditor > .overflow-x-auto thead,
+   #adminAuditSection > .overflow-x-auto thead {
+    display: none;
+   }
+   #adminBalanceTableBody,
+   #adminAuditTableBody {
+    display: grid;
+    gap: 8px;
+   }
+   #adminBalanceTableBody tr,
+   #adminAuditTableBody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px 12px;
+    padding: 10px;
+    border: 1px solid #2b3139;
+    border-radius: 10px;
+    background: #181a20;
+   }
+   #adminBalanceTableBody td,
+   #adminAuditTableBody td {
+    min-width: 0;
+    padding: 0;
+    overflow-wrap: anywhere;
+   }
+   #adminBalanceTableBody td::before,
+   #adminAuditTableBody td::before {
+    display: block;
+    margin-bottom: 3px;
+    color: #848e9c;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    content: attr(data-label);
+   }
+   #adminBalanceTableBody td[data-label="Action"] {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #2b3139;
+    padding-top: 8px;
+   }
+   #adminBalanceTableBody td[data-label="Action"]::before {
+    display: none;
+   }
+  }
   .p2p-bottom-nav {
    display: none;
   }
@@ -3100,9 +3280,9 @@
    <section id="mobileAssetsBalancesSection" class="overflow-hidden rounded-xl border border-binanceBorder bg-binanceCard">
     <div class="flex items-center justify-between px-4 py-3">
      <div><h2 class="text-sm font-semibold text-white">Balance</h2><p id="mobileAssetsBalanceCaption" class="mt-0.5 text-[9px] text-binanceMuted">Spot wallet · values estimated in USDT</p></div>
-     <button type="button" onclick="toggleMobileAssetsSearch()" aria-label="Search wallet balances" class="rounded p-2 text-binanceMuted hover:bg-binanceHover hover:text-white"><i data-lucide="search" class="h-4 w-4"></i></button>
+     <button type="button" onclick="toggleMobileAssetsSearch()" aria-label="Search assets" class="rounded p-2 text-binanceMuted hover:bg-binanceHover hover:text-white"><i data-lucide="search" class="h-4 w-4"></i></button>
     </div>
-    <label id="mobileAssetsSearchWrap" class="hidden border-t border-binanceBorder px-4 py-2"><input id="mobileAssetsSearch" type="search" oninput="setMobileAssetsSearch(this.value)" placeholder="Search balances" class="w-full rounded-lg bg-binanceBg px-3 py-2 text-xs text-white outline-none placeholder:text-binanceMuted focus:ring-1 focus:ring-binanceYellow"></label>
+    <label id="mobileAssetsSearchWrap" class="hidden border-t border-binanceBorder px-4 py-2"><input id="mobileAssetsSearch" type="search" oninput="setMobileAssetsSearch(this.value)" placeholder="Search assets" class="w-full rounded-lg bg-binanceBg px-3 py-2 text-xs text-white outline-none placeholder:text-binanceMuted focus:ring-1 focus:ring-binanceYellow"></label>
     <div id="mobileAssetsHoldings"></div>
    </section>
    <div class="rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-[9px] leading-relaxed text-binanceMuted">Wallet summary. Balances, values, and returns are shown in this browser.</div>
@@ -3203,7 +3383,7 @@
    <section id="assetsListSection" class="overflow-hidden rounded-xl border border-binanceBorder bg-binanceCard">
     <div class="flex flex-col gap-3 border-b border-binanceBorder p-4 sm:flex-row sm:items-center sm:justify-between">
      <div><h2 id="assetsListTitle" class="text-sm font-bold text-white">Spot balances</h2><p id="assetsListDescription" class="mt-1 text-[10px] text-binanceMuted">Your Spot holdings · values are estimated in USDT</p></div>
-     <label id="assetsPageSearchLabel" class="relative block sm:w-72"><i data-lucide="search" class="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-binanceMuted"></i><input id="assetsPageSearch" type="search" oninput="renderAssetsPage()" placeholder="Search balances" class="w-full rounded-lg border border-binanceBorder bg-binanceBg py-2.5 pl-9 pr-3 text-xs text-white outline-none focus:border-binanceYellow"></label>
+     <label id="assetsPageSearchLabel" class="relative block sm:w-72"><i data-lucide="search" class="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-binanceMuted"></i><input id="assetsPageSearch" type="search" oninput="renderAssetsPage()" placeholder="Search assets" class="w-full rounded-lg border border-binanceBorder bg-binanceBg py-2.5 pl-9 pr-3 text-xs text-white outline-none focus:border-binanceYellow"></label>
     </div>
     <div id="assetsPageList" class="divide-y divide-binanceBorder"></div>
    </section>
@@ -3415,21 +3595,12 @@
    <div class="space-y-3 text-xs">
     <div>
      <label class="text-binanceMuted block mb-1">Select Asset</label>
-     <select id="depositAsset" onchange="updateDepositAddressDisplay()" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
-      <option value="USDT">USDT - Tether USD</option>
-      <option value="BTC">BTC - Bitcoin</option>
-      <option value="ETH">ETH - Ethereum</option>
-      <option value="SOL">SOL - Solana</option>
-      <option value="BNB">BNB - BNB</option>
-      <option value="XRP">XRP - XRP</option>
-      <option value="ADA">ADA - Cardano</option>
-      <option value="DOGE">DOGE - Dogecoin</option>
-      <option value="AVAX">AVAX - Avalanche</option>
-     </select>
+     <select id="depositAsset" onchange="updateDepositAddressDisplay()" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono"></select>
     </div>
     <div>
      <label class="text-binanceMuted block mb-1">Network</label>
      <select id="depositNetwork" onchange="updateDepositAddressDisplay()" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono"></select>
+     <p class="mt-1 text-[10px] leading-relaxed text-binanceMuted">Choose the network configured for this address. Verify it supports the selected asset and matches the sending wallet.</p>
     </div>
     <div class="rounded border border-binanceBorder bg-binanceBg p-3">
      <div class="mb-2 flex items-center justify-between gap-2">
@@ -3932,8 +4103,8 @@
  </div>
 
  <div id="adminPanel" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-[60] p-4">
-  <div class="bg-binanceCard border border-binanceBorder rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto p-4 md:p-6 shadow-2xl">
-   <div class="flex items-center justify-between border-b border-binanceBorder pb-4 mb-5">
+  <div class="admin-panel-surface bg-binanceCard border border-binanceBorder rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto p-4 md:p-6 shadow-2xl">
+   <div class="admin-panel-header flex items-center justify-between border-b border-binanceBorder pb-4 mb-5">
     <div>
      <div class="flex items-center gap-2">
       <i data-lucide="shield-check" class="w-5 h-5 text-binanceYellow"></i>
@@ -3966,8 +4137,16 @@
      </form>
     </div>
 
+   <nav id="adminMobileNav" class="admin-mobile-nav hidden flex gap-2 overflow-x-auto md:hidden" aria-label="Admin sections">
+    <button type="button" onclick="scrollToAdminSection('adminUsersSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Users</button>
+    <button type="button" onclick="scrollToAdminSection('adminWalletSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Wallets</button>
+    <button type="button" onclick="scrollToAdminSection('adminDepositsSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Deposit addresses</button>
+    <button type="button" onclick="scrollToAdminSection('adminPricingSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Pricing</button>
+    <button type="button" onclick="scrollToAdminSection('adminAuditSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Activity</button>
+   </nav>
+
    <div id="adminDashboard" class="hidden">
-    <div class="flex items-center justify-between mb-5">
+    <div class="admin-account-row flex items-center justify-between mb-5">
      <div>
       <div class="text-[10px] uppercase tracking-wide text-binanceMuted">Account</div>
       <div id="adminAccountName" class="text-lg font-bold text-white">DemoTrader</div>
@@ -3975,31 +4154,31 @@
      <button onclick="logoutAdmin()" class="rounded border border-binanceBorder bg-binanceHover px-3 py-1.5 text-xs text-white hover:text-binanceYellow">Logout</button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-     <div class="bg-binanceBg border border-binanceBorder rounded-lg p-4">
+    <div class="admin-metrics-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6" aria-label="Admin overview">
+     <article class="bg-binanceBg border border-binanceBorder rounded-lg p-4">
       <div class="text-[10px] uppercase tracking-wide text-binanceMuted">Total users</div>
       <div id="adminTotalUsers" class="mt-2 text-2xl font-bold text-white">0</div>
       <div class="mt-1 text-xs text-binanceMuted">Registered accounts</div>
-     </div>
-     <div class="bg-binanceBg border border-binanceBorder rounded-lg p-4">
-      <div class="text-[10px] uppercase tracking-wide text-binanceMuted">24h volume</div>
-      <div class="mt-2 text-2xl font-bold text-white">$3.24B</div>
-      <div class="mt-1 text-xs text-binanceGreen">+12.4% vs yesterday</div>
-     </div>
-     <div class="bg-binanceBg border border-binanceBorder rounded-lg p-4">
-      <div class="text-[10px] uppercase tracking-wide text-binanceMuted">P2P trades</div>
-      <div class="mt-2 text-2xl font-bold text-white">1,248</div>
-      <div class="mt-1 text-xs text-binanceGreen">96.4% completion</div>
-     </div>
-     <div class="bg-binanceBg border border-binanceBorder rounded-lg p-4">
-      <div class="text-[10px] uppercase tracking-wide text-binanceMuted">Open orders</div>
-      <div class="mt-2 text-2xl font-bold text-white">8,492</div>
-      <div class="mt-1 text-xs text-binanceYellow">6.2% require review</div>
-     </div>
+     </article>
+     <article class="bg-binanceBg border border-binanceBorder rounded-lg p-4">
+      <div class="text-[10px] uppercase tracking-wide text-binanceMuted">Spot markets</div>
+      <div id="adminSpotMarketCount" class="mt-2 text-2xl font-bold text-white">0</div>
+      <div class="mt-1 text-xs text-binanceMuted">Supported market assets</div>
+     </article>
+     <article class="bg-binanceBg border border-binanceBorder rounded-lg p-4">
+      <div class="text-[10px] uppercase tracking-wide text-binanceMuted">Deposit addresses</div>
+      <div id="adminDepositAddressCount" class="mt-2 text-2xl font-bold text-white">0</div>
+      <div class="mt-1 text-xs text-binanceMuted">Configured asset/network pairs</div>
+     </article>
+     <article class="bg-binanceBg border border-binanceBorder rounded-lg p-4">
+      <div class="text-[10px] uppercase tracking-wide text-binanceMuted">Network options</div>
+      <div id="adminDepositNetworkCount" class="mt-2 text-2xl font-bold text-white">0</div>
+      <div class="mt-1 text-xs text-binanceMuted">Available in the address editor</div>
+     </article>
     </div>
 
-    <div class="bg-binanceBg border border-binanceBorder rounded-lg p-4 mb-5">
-     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    <div id="adminUsersSection" data-admin-section="users" class="bg-binanceBg border border-binanceBorder rounded-lg p-4 mb-5">
+     <div class="admin-users-toolbar flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
       <div>
        <h4 class="text-sm font-bold text-white">Registered users</h4>
        <p id="adminUsersSummary" class="mt-1 text-[10px] text-binanceMuted">0 accounts</p>
@@ -4007,7 +4186,7 @@
       <input id="adminUserSearch" type="search" oninput="renderAdminUsers()" placeholder="Search name, username, or email" aria-label="Search registered users" class="w-full sm:w-72 bg-binanceCard border border-binanceBorder rounded px-3 py-2 text-xs text-white outline-none focus:border-binanceYellow">
      </div>
      <div class="overflow-x-auto">
-      <table class="w-full min-w-[880px] text-left text-xs">
+      <table id="adminUsersTable" class="w-full min-w-[880px] text-left text-xs">
        <thead class="text-binanceMuted uppercase tracking-wide">
         <tr>
          <th class="pb-2 pr-4">Username</th>
@@ -4023,7 +4202,7 @@
      </div>
     </div>
 
-    <section class="bg-binanceBg border border-binanceBorder rounded-lg p-4 mb-5">
+    <section id="adminPricingSection" data-admin-section="pricing" class="bg-binanceBg border border-binanceBorder rounded-lg p-4 mb-5">
      <div class="mb-3">
       <h4 class="text-sm font-bold text-white">Pair price adjustment</h4>
       <p class="mt-1 text-[10px] leading-relaxed text-binanceMuted">Override applied to Binance reference prices and trades. Use a negative percentage to lower the price; enter 0 or leave blank to remove an adjustment.</p>
@@ -4048,7 +4227,7 @@
      <p id="adminPriceAdjustmentFeedback" role="status" class="mt-3 hidden rounded border px-3 py-2 text-xs"></p>
     </section>
 
-    <section class="mb-5 rounded-lg border border-binanceBorder bg-binanceBg p-4">
+    <section id="adminDepositsSection" data-admin-section="deposits" class="mb-5 rounded-lg border border-binanceBorder bg-binanceBg p-4">
      <div class="mb-3">
       <h4 class="text-sm font-bold text-white">Shared crypto deposit addresses</h4>
       <p class="mt-1 text-[10px] leading-relaxed text-binanceMuted">These addresses are visible to every account in the deposit form. Leave the address blank and save to remove it. This demo does not monitor blockchain deposits or credit them automatically; do not use real funds.</p>
@@ -4073,7 +4252,7 @@
      <p id="adminDepositAddressFeedback" role="status" class="mt-3 hidden rounded border px-3 py-2 text-xs"></p>
     </section>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+    <div id="adminWalletSection" data-admin-section="wallet" class="grid grid-cols-1 xl:grid-cols-3 gap-5">
      <div class="bg-binanceBg border border-binanceBorder rounded-lg p-4">
       <div class="flex items-center justify-between mb-4">
        <h4 class="text-sm font-bold text-white">Balance manager</h4>
@@ -4135,7 +4314,7 @@
        <span class="text-[10px] text-binanceMuted">Edit values and save each asset row</span>
       </div>
       <div class="overflow-x-auto">
-       <table class="w-full text-left text-xs">
+       <table id="adminBalanceTable" class="w-full text-left text-xs">
         <thead class="text-binanceMuted uppercase tracking-wide">
          <tr>
           <th class="pb-2 pr-4">Asset</th>
@@ -4148,7 +4327,7 @@
         <tbody id="adminBalanceTableBody" class="text-white"></tbody>
        </table>
       </div>
-      <div class="mt-5 rounded-lg border border-binanceBorder bg-binanceBg p-4">
+      <div id="adminAuditSection" data-admin-section="activity" class="mt-5 rounded-lg border border-binanceBorder bg-binanceBg p-4">
        <div class="mb-3 flex items-center justify-between gap-3">
         <div>
          <h4 class="text-sm font-bold text-white">Administrator action history</h4>
@@ -4157,7 +4336,7 @@
         <span id="adminAuditStatus" class="text-[10px] text-binanceMuted"></span>
        </div>
        <div class="overflow-x-auto">
-        <table class="w-full min-w-[640px] text-left text-xs">
+        <table id="adminAuditTable" class="w-full min-w-[640px] text-left text-xs">
          <thead class="text-binanceMuted uppercase tracking-wide">
           <tr>
            <th class="pb-2 pr-4">Time</th>
@@ -4247,17 +4426,44 @@
  <div id="toast" class="fixed right-4 bottom-4 px-3 py-2 rounded bg-binanceCard border border-binanceBorder text-white text-xs font-mono shadow-xl opacity-0 pointer-events-none transition-all duration-200 z-[60]"></div>
 
  <script>
-  const DEPOSIT_NETWORKS_BY_ASSET = {
-   USDT: ['Ethereum (ERC-20)', 'BNB Smart Chain (BEP-20)', 'Tron (TRC-20)', 'Solana'],
-   BTC: ['Bitcoin'],
-   ETH: ['Ethereum (ERC-20)'],
-   SOL: ['Solana'],
-   BNB: ['BNB Smart Chain (BEP-20)'],
-   XRP: ['XRP Ledger'],
-   ADA: ['Cardano'],
-   DOGE: ['Dogecoin'],
-   AVAX: ['Avalanche C-Chain']
-  };
+  const DEPOSIT_NETWORK_OPTIONS = [
+   'Algorand',
+   'Aptos',
+   'Arbitrum One',
+   'Avalanche C-Chain',
+   'Base',
+   'Bitcoin',
+   'Bitcoin Cash',
+   'BNB Smart Chain (BEP-20)',
+   'Cardano',
+   'Celo',
+   'Cosmos Hub',
+   'Cronos',
+   'Dogecoin',
+   'Ethereum (ERC-20)',
+   'Filecoin',
+   'Gnosis Chain',
+   'Hedera',
+   'Injective',
+   'Litecoin',
+   'Linea',
+   'Mantle',
+   'NEAR',
+   'Optimism',
+   'Osmosis',
+   'Polkadot',
+   'Polygon PoS',
+   'Scroll',
+   'Sei',
+   'Solana',
+   'Stellar',
+   'Sui',
+   'Tezos',
+   'TON',
+   'Tron (TRC-20)',
+   'XRP Ledger',
+   'zkSync Era'
+  ];
   const state = {
    tab: 'trade',
    tradingMode: 'spot',
@@ -4462,9 +4668,15 @@
   let marketDataReconnectTimer = null;
   let marketDataStaleTimer = null;
   let marketDataReconnectDelay = 1000;
+  let marketDataLastMessageAt = 0;
   let futuresDataSocket = null;
   let futuresDataReconnectTimer = null;
+  let futuresDataStaleTimer = null;
   let futuresDataReconnectDelay = 1000;
+  let futuresDataLastMessageAt = 0;
+  let quoteFallbackRequestActive = false;
+  let quoteCatalogFallbackRequestActive = false;
+  let quoteFallbackLastErrorAt = 0;
   let chartDataSocket = null;
   let chartDataReconnectTimer = null;
   let chartDataStaleTimer = null;
@@ -5948,7 +6160,17 @@
 
   function renderAssetsPage() {
    const balances = state.assets;
+   const balancesByAsset = new Map(balances.map((balance) => [balance.asset, balance]));
+   const supportedSpotAssets = [...new Set(['BTC', 'ETH', 'USDT', ...CRYPTO_MARKET_CATALOG.map(({ asset }) => asset)])];
+   const listedSpotBalances = [
+    ...supportedSpotAssets.map((asset) => ({
+     ...(balancesByAsset.get(asset) || { asset, total: 0, available: 0, inOrders: 0 }),
+     wallet: 'Spot'
+    })),
+    ...balances.filter((balance) => !supportedSpotAssets.includes(balance.asset)).map((balance) => ({...balance, wallet: 'Spot' }))
+   ];
    const priceFor = (asset) => asset === 'USDT'? 1: demoMarketPrice(asset);
+   const depositNetworksLabel = () => DEPOSIT_NETWORK_OPTIONS.join(' · ');
    const section = state.assetsSection;
    const fundingBalances = state.fundingAssets;
    const positionMargin = state.futuresPositions.reduce((sum, position) => sum + Number(position.initialMargin || 0), 0);
@@ -5959,8 +6181,8 @@
     return sum + futuresPnl(position, markPrice);
    }, 0);
    const totalFuturesMargin = positionMargin + futuresOrderMargin;
-   const overviewSpotBalances = balances.map((balance) => {
-    const spotBalance = {...balance, wallet: 'Spot' };
+   const overviewSpotBalances = listedSpotBalances.map((balance) => {
+    const spotBalance = {...balance };
     if (balance.asset === 'USDT') {
      spotBalance.total = Math.max(0, Number(balance.total || 0) - totalFuturesMargin);
      spotBalance.inOrders = Math.max(0, Number(balance.inOrders || 0) - totalFuturesMargin);
@@ -5984,7 +6206,7 @@
      : section === 'overview'? overviewBalances: [];
    const displayBalances = section === 'overview'? overviewBalances
     : section === 'funding'? fundingBalances
-     : balances.map((balance) => ({...balance, wallet: 'Spot' }));
+     : listedSpotBalances;
    const total = totalBalances.reduce((sum, balance) => sum + Number(balance.total || 0) * priceFor(balance.asset), 0);
    const spotUsdt = balances.find((balance) => balance.asset === 'USDT') || { available: 0, inOrders: 0 };
    const fundingUsdt = fundingBalances.find((balance) => balance.asset === 'USDT') || { available: 0, inOrders: 0 };
@@ -6009,8 +6231,8 @@
     maximumFractionDigits: displayDecimals
    });
    const sectionTitles = {
-    overview: ['Assets overview', 'Your combined Spot, Funding, and Futures balances, with values in USDT.', 'All wallet balances', 'Balances across Spot, Funding, and Futures wallets · estimated in USDT'],
-    spot: ['Spot wallet', 'Your assets are held in Spot. Values are estimated in USDT.', 'Spot balances', 'Available balances, funds in orders, and estimated values'],
+    overview: ['Assets overview', 'Your combined Spot, Funding, and Futures balances, with values in USDT.', 'All supported assets', 'Supported Spot assets plus Funding and Futures balances · estimated in USDT'],
+    spot: ['Spot wallet', 'Browse supported Spot assets and view their balances, estimated in USDT.', 'Supported assets', 'All supported crypto assets · balances and values are estimated in USDT'],
     funding: ['Funding wallet', 'Completed P2P purchases are held in your Funding wallet.', 'Funding balances', 'P2P-purchased assets · values are estimated in USDT'],
     futures: ['Futures positions', 'Review open positions and their unrealized profit or loss. Futures funds are not held separately here.', 'Open positions', 'Positions · margin details are shown per position']
    }[section];
@@ -6186,6 +6408,7 @@
         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${balance.asset === 'BTC'? 'bg-[#f7931a]': balance.asset === 'USDT'? 'bg-[#26a17b]': 'bg-binanceHover'} text-xs font-bold text-white">${escapeHTML(balance.asset.slice(0, 1))}</span>
         <div class="min-w-0">
          <div class="flex items-center gap-1"><span class="text-xs font-semibold text-white">${escapeHTML(balance.asset)}</span><span class="truncate text-[10px] text-binanceMuted">${escapeHTML(balance.name || (balance.asset === 'USDT'? 'Tether': balance.asset))}</span></div>
+         <div class="mt-1 break-words text-[9px] leading-relaxed text-binanceMuted">Network options: ${escapeHTML(depositNetworksLabel())}</div>
          <div class="mt-1 font-mono text-[10px] text-binanceMuted">${visible? Number(balance.total || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(balance.asset)}</div>
          <div class="mt-0.5 text-[9px] text-binanceMuted">${visible? `Available ${Number(balance.available || 0).toLocaleString('en-US', { maximumFractionDigits: 8 })} · In orders ${Number(balance.inOrders || 0).toLocaleString('en-US', { maximumFractionDigits: 8 })}`: '••••••'}</div>
         </div>
@@ -6221,6 +6444,7 @@
      <article class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4">
       <div class="min-w-0">
        <div class="flex items-center gap-2"><span class="text-xs font-bold text-white">${escapeHTML(balance.asset)}</span><span class="rounded bg-binanceHover px-1.5 py-0.5 text-[9px] text-binanceMuted">${escapeHTML(balance.wallet)}</span></div>
+       <div class="mt-1 break-words text-[9px] leading-relaxed text-binanceMuted">Network options: ${escapeHTML(depositNetworksLabel())}</div>
        <div class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[9px] text-binanceMuted sm:flex sm:gap-4"><span>Total <b class="font-mono text-binanceText">${visible? Number(balance.total || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask}</b></span><span>Available <b class="font-mono text-binanceText">${visible? Number(balance.available || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask}</b></span><span>In orders <b class="font-mono text-binanceText">${visible? Number(balance.inOrders || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask}</b></span></div>
       </div>
       <div class="text-right"><div class="font-mono text-xs font-semibold text-white">${visible? formatMoney(estimate): mask}</div><div class="mt-1 text-[9px] text-binanceMuted">${formatMoney(assetPrice)} / ${escapeHTML(balance.asset)}</div>${balance.wallet !== 'Futures' && balance.asset !== 'USDT'? `<button type="button" onclick="openMarketPair('${escapeHTML(balance.asset)}USDT', ${assetPrice}, '${escapeHTML(balance.asset)}')" class="mt-2 rounded border border-binanceBorder px-2.5 py-1 text-[9px] font-semibold text-binanceYellow">Trade</button>`: ''}</div>
@@ -6229,10 +6453,10 @@
     }).join(''): '<div class="p-8 text-center text-xs text-binanceMuted">No matching assets. Try a different search.</div>';
    }
    document.getElementById('mobileAssetsBalanceCaption').textContent = section === 'spot'
-    ? 'Spot wallet · BTC equivalent and estimated values'
-    : section === 'overview'? 'Spot, Funding, and Futures wallet balances'
+    ? 'Supported Spot assets · balances and values estimated in USDT'
+    : section === 'overview'? 'Supported Spot assets plus Funding and Futures balances'
      : section === 'funding'? 'Completed P2P purchases · values estimated in USDT': sectionTitles[3];
-   document.querySelector('#mobileAssetsBalancesSection h2').textContent = section === 'funding' || section === 'spot'? 'Assets': 'Balance';
+   document.querySelector('#mobileAssetsBalancesSection h2').textContent = 'Assets';
    const mobileHoldings = document.getElementById('mobileAssetsHoldings');
    if (section === 'overview' || section === 'spot') {
     mobileHoldings.innerHTML = visibleDisplayBalances.length? visibleDisplayBalances.map((balance) => {
@@ -6250,6 +6474,7 @@
         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${balance.asset === 'BTC'? 'bg-[#f7931a]': balance.asset === 'USDT'? 'bg-[#26a17b]': 'bg-binanceHover'} text-xs font-bold text-white">${escapeHTML(balance.asset.slice(0, 1))}</span>
         <div class="min-w-0 flex-1">
          <div class="flex flex-wrap items-center gap-1.5"><span class="text-xs font-bold text-white">${escapeHTML(balance.asset)}</span><span class="truncate text-[10px] text-binanceMuted">${escapeHTML(balance.name || (balance.asset === 'BTC'? 'Bitcoin': balance.asset === 'USDT'? 'Tether': balance.asset))}</span>${section !== 'spot'? `<span class="rounded bg-binanceHover px-1.5 py-0.5 text-[8px] text-binanceMuted">${escapeHTML(balance.wallet)}</span>`: ''}</div>
+         <div class="mt-1 break-words text-[9px] leading-relaxed text-binanceMuted">Network options: ${escapeHTML(depositNetworksLabel())}</div>
          <div class="mt-1 font-mono text-[10px] text-binanceMuted">${visible? Number(balance.total || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(balance.asset)}</div>
         </div>
         <div class="text-right">
@@ -7104,7 +7329,7 @@
       : entry.action === 'balance_credit'
        ? `Credited ${escapeHTML(entry.details.amount)} ${escapeHTML(entry.details.asset)}`
        : `Adjusted ${escapeHTML(entry.details.asset)} balance`;
-     return `<tr class="border-t border-binanceBorder"><td class="py-2 pr-4 text-binanceMuted">${escapeHTML(time)}</td><td class="py-2 pr-4">${escapeHTML(entry.actorUsername)}</td><td class="py-2 pr-4">${escapeHTML(entry.targetUsername)}</td><td class="py-2">${details}</td></tr>`;
+     return `<tr class="border-t border-binanceBorder"><td data-label="Time" class="py-2 pr-4 text-binanceMuted">${escapeHTML(time)}</td><td data-label="Administrator" class="py-2 pr-4">${escapeHTML(entry.actorUsername)}</td><td data-label="Account" class="py-2 pr-4">${escapeHTML(entry.targetUsername)}</td><td data-label="Action" class="py-2">${details}</td></tr>`;
     }).join(''): '<tr><td colspan="4" class="py-5 text-center text-binanceMuted">No administrator actions have been recorded.</td></tr>';
    } catch (error) {
     console.error('Could not load administrator action history', error);
@@ -7585,7 +7810,11 @@
 
   function refreshAdjustedMarketDisplays() {
    updateMarketCatalogs();
-   if (state.admin.loggedIn) updateAdminPricePairOptions();
+   if (state.admin.loggedIn) {
+    updateAdminPricePairOptions();
+    updateAdminDepositNetworkOptions();
+   }
+   if (!document.getElementById('depositModal').classList.contains('hidden')) updateDepositNetworkOptions();
    updatePairSelectorPrices();
    updateMarketQuoteDisplays();
    updateHomeQuoteDisplays();
@@ -7701,23 +7930,25 @@
 
   function setMarketFeedStatus(status) {
    state.marketFeedStatus = status;
+   const marketLabel = state.tradingMode === 'futures'? 'Binance futures': 'Binance spot';
    const labels = {
     connecting: 'Connecting',
     waiting: 'Waiting for data',
     live: `Live · ${new Date().toLocaleTimeString()}`,
+    fallback: `REST backup · Live · ${new Date().toLocaleTimeString()}`,
     reconnecting: 'Reconnecting · quotes may be stale',
     stale: 'No recent data · quotes may be stale',
     unavailable: 'Feed unavailable · quotes may be stale'
    };
    const label = labels[status] || labels.unavailable;
    document.querySelectorAll('[data-market-feed-status]').forEach((element) => {
-    element.textContent = element.closest('#tradeMarketSummary')? `Binance spot · ${label}`: label;
-    element.classList.toggle('text-binanceGreen', status === 'live');
+    element.textContent = element.closest('#tradeMarketSummary')? `${marketLabel} · ${label}`: label;
+    element.classList.toggle('text-binanceGreen', status === 'live' || status === 'fallback');
     element.classList.toggle('text-binanceRed', status === 'unavailable' || status === 'reconnecting' || status === 'stale');
-    element.classList.toggle('text-binanceMuted', status !== 'live' && status !== 'unavailable' && status !== 'reconnecting' && status !== 'stale');
+    element.classList.toggle('text-binanceMuted', status !== 'live' && status !== 'fallback' && status !== 'unavailable' && status !== 'reconnecting' && status !== 'stale');
    });
    document.querySelectorAll('[data-market-feed-dot]').forEach((element) => {
-    element.classList.toggle('bg-binanceGreen', status === 'live');
+    element.classList.toggle('bg-binanceGreen', status === 'live' || status === 'fallback');
     element.classList.toggle('bg-binanceRed', status === 'unavailable' || status === 'reconnecting' || status === 'stale');
     element.classList.toggle('bg-binanceYellow', status === 'connecting' || status === 'waiting');
    });
@@ -7730,29 +7961,37 @@
    });
   }
 
-  function applyBinanceTicker(ticker) {
-   const symbol = ticker.s;
+  function applyBinanceTicker(ticker, source = 'websocket') {
+   const symbol = ticker.s || ticker.symbol;
+   if (typeof symbol !== 'string' || !symbol.endsWith('USDT')) return;
    const asset = symbol.slice(0, -4);
-   const referencePrice = Number(ticker.c);
-   const change = Number(ticker.P);
+   const referencePrice = Number(ticker.c === undefined? ticker.lastPrice: ticker.c);
+   const change = Number(ticker.P === undefined? ticker.priceChangePercent: ticker.P);
    const factor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey('spot', symbol)] || 0) / 100;
    const price = referencePrice * factor;
-   const high = Number(ticker.h) * factor;
-   const low = Number(ticker.l) * factor;
-   const quoteVolume = Number(ticker.q);
+   const high = Number(ticker.h === undefined? ticker.highPrice: ticker.h) * factor;
+   const low = Number(ticker.l === undefined? ticker.lowPrice: ticker.l) * factor;
+   const quoteVolume = Number(ticker.q === undefined? ticker.quoteVolume: ticker.q);
    if (!LIVE_MARKET_ASSETS.has(asset) || !Number.isFinite(price) || price <= 0 || !Number.isFinite(change)) return;
 
    state.marketQuotes[asset] = referencePrice;
    state.marketQuoteChanges[asset] = change;
-   state.marketTickerStats[asset] = { high, low, quoteVolume, updatedAt: Number(ticker.E) || Date.now() };
-   marketDataReconnectDelay = 1000;
-   if (marketDataStaleTimer) window.clearTimeout(marketDataStaleTimer);
-   marketDataStaleTimer = window.setTimeout(() => setMarketFeedStatus('stale'), 10_000);
+   state.marketTickerStats[asset] = {
+    high,
+    low,
+    quoteVolume,
+    updatedAt: Number(ticker.E === undefined? ticker.closeTime: ticker.E) || Date.now()
+   };
+   if (source === 'websocket') {
+    marketDataLastMessageAt = Date.now();
+    marketDataReconnectDelay = 1000;
+    resetMarketDataWatchdog(false, marketDataSocket);
+   }
    updatePairSelectorPrices();
    document.querySelectorAll('[data-market-quote-volume]').forEach((element) => {
     if (element.dataset.marketQuoteVolume === asset) element.textContent = `$${formatMarketVolume(quoteVolume)}`;
    });
-   setMarketFeedStatus('live');
+   if (state.tradingMode !== 'futures') setMarketFeedStatus(source === 'websocket'? 'live': 'fallback');
 
    if (state.asset !== asset || state.selectedPair !== `${asset}USDT` || state.tradingMode === 'futures') {
     updateMarketQuoteDisplays();
@@ -7762,7 +8001,7 @@
 
    const previousPrice = state.currentPrice;
    state.currentPrice = price;
-   const eventTime = Number(ticker.E) || Date.now();
+   const eventTime = Number(ticker.E === undefined? ticker.closeTime: ticker.E) || Date.now();
    updateLiveCandleFromTicker(price, eventTime);
 
    const priceText = formatMoney(price);
@@ -7816,10 +8055,148 @@
    updateHomeQuoteDisplays();
   }
 
-  async function fetchBinanceJson(url) {
-   const response = await fetch(url);
+  async function fetchBinanceJson(url, options) {
+   const response = await fetch(url, options);
    if (!response.ok) throw new Error(`Binance request failed with HTTP ${response.status}`);
    return response.json();
+  }
+
+  async function refreshActiveQuoteFallback() {
+   if (quoteFallbackRequestActive) return;
+   const isFutures = state.tradingMode === 'futures';
+   const socket = isFutures? futuresDataSocket: marketDataSocket;
+   const lastMessageAt = isFutures? futuresDataLastMessageAt: marketDataLastMessageAt;
+   const socketOpen = Boolean(window.WebSocket && socket?.readyState === WebSocket.OPEN);
+   if (socketOpen && lastMessageAt && Date.now() - lastMessageAt < 10_000) return;
+   if (isFutures
+    ? !FUTURES_MARKET_CATALOG.some((market) => market.symbol === state.selectedPair)
+    : !LIVE_MARKET_ASSETS.has(state.asset) || state.selectedPair !== `${state.asset}USDT`) return;
+
+   quoteFallbackRequestActive = true;
+   const pair = state.selectedPair;
+   const controller = new AbortController();
+   const timeout = window.setTimeout(() => controller.abort(), 5_000);
+   try {
+    const endpoint = isFutures? 'https://fapi.binance.com/fapi/v1/ticker/24hr': 'https://api.binance.com/api/v3/ticker/24hr';
+    const query = new URLSearchParams({ symbol: pair });
+    const response = await fetch(`${endpoint}?${query}`, { signal: controller.signal });
+    if (!response.ok) throw new Error(`Binance quote backup failed with HTTP ${response.status}`);
+    const ticker = await response.json();
+    if ((ticker.s || ticker.symbol) !== pair) throw new Error('Binance quote backup returned an unexpected market');
+    if (pair !== state.selectedPair || isFutures !== (state.tradingMode === 'futures')) return;
+    if (isFutures) applyBinanceFuturesTicker(ticker, 'rest');
+    else applyBinanceTicker(ticker, 'rest');
+    quoteFallbackLastErrorAt = 0;
+   } catch (error) {
+    if (error.name !== 'AbortError' || !controller.signal.aborted) {
+     if (Date.now() - quoteFallbackLastErrorAt >= 30_000) {
+      console.warn('Unable to refresh the selected market quote from Binance REST.', error);
+      quoteFallbackLastErrorAt = Date.now();
+     }
+    }
+    const activeSocket = isFutures? futuresDataSocket: marketDataSocket;
+    const activeLastMessageAt = isFutures? futuresDataLastMessageAt: marketDataLastMessageAt;
+    const activeSocketOpen = Boolean(window.WebSocket && activeSocket?.readyState === WebSocket.OPEN);
+    if ((!activeSocketOpen || !activeLastMessageAt
+      || Date.now() - activeLastMessageAt >= 10_000)
+     && isFutures === (state.tradingMode === 'futures')) {
+     setMarketFeedStatus('unavailable');
+    }
+   } finally {
+    window.clearTimeout(timeout);
+    quoteFallbackRequestActive = false;
+   }
+  }
+
+  async function refreshMarketCatalogFallback() {
+   if (quoteCatalogFallbackRequestActive) return;
+   const now = Date.now();
+   const spotNeedsRefresh = CRYPTO_MARKET_CATALOG.some((market) => typeof market.symbol === 'string')
+    && (!marketDataLastMessageAt || now - marketDataLastMessageAt >= 10_000);
+   const futuresNeedsRefresh = FUTURES_MARKET_CATALOG.some((market) => typeof market.symbol === 'string')
+    && (!futuresDataLastMessageAt || now - futuresDataLastMessageAt >= 10_000);
+   if (!spotNeedsRefresh && !futuresNeedsRefresh) return;
+
+   quoteCatalogFallbackRequestActive = true;
+   const controller = new AbortController();
+   const timeout = window.setTimeout(() => controller.abort(), 8_000);
+   try {
+    const [spotTickers, futuresTickers] = await Promise.all([
+     spotNeedsRefresh
+      ? fetchBinanceJson('https://api.binance.com/api/v3/ticker/24hr', { signal: controller.signal })
+      : Promise.resolve(null),
+     futuresNeedsRefresh
+      ? fetchBinanceJson('https://fapi.binance.com/fapi/v1/ticker/24hr', { signal: controller.signal })
+      : Promise.resolve(null)
+    ]);
+    if ((spotNeedsRefresh && !Array.isArray(spotTickers))
+     || (futuresNeedsRefresh && !Array.isArray(futuresTickers))) {
+     throw new Error('Binance returned an invalid market quote list');
+    }
+    const observedAt = Date.now();
+    const spotBySymbol = new Map(Array.isArray(spotTickers)? spotTickers.map((ticker) => [ticker.symbol, ticker]): []);
+    const futuresBySymbol = new Map(Array.isArray(futuresTickers)? futuresTickers.map((ticker) => [ticker.symbol, ticker]): []);
+    CRYPTO_MARKET_CATALOG.forEach(({ asset, symbol }) => {
+     const ticker = spotBySymbol.get(symbol);
+     if (!ticker) return;
+     const price = Number(ticker.lastPrice);
+     const change = Number(ticker.priceChangePercent);
+     const quoteVolume = Number(ticker.quoteVolume);
+     const high = Number(ticker.highPrice);
+     const low = Number(ticker.lowPrice);
+     if (![price, change, quoteVolume, high, low].every(Number.isFinite) || price <= 0) return;
+     state.marketQuotes[asset] = price;
+     state.marketQuoteChanges[asset] = change;
+     const adjustmentFactor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey('spot', symbol)] || 0) / 100;
+     state.marketTickerStats[asset] = {
+      high: high * adjustmentFactor,
+      low: low * adjustmentFactor,
+      quoteVolume,
+      updatedAt: observedAt
+     };
+    });
+    FUTURES_MARKET_CATALOG.forEach(({ symbol }) => {
+     const ticker = futuresBySymbol.get(symbol);
+     if (!ticker) return;
+     const price = Number(ticker.lastPrice);
+     const change = Number(ticker.priceChangePercent);
+     const quoteVolume = Number(ticker.quoteVolume);
+     if (![price, change, quoteVolume].every(Number.isFinite) || price <= 0) return;
+     state.futuresQuotes[symbol] = price;
+     state.futuresQuoteChanges[symbol] = change;
+     state.futuresTickerStats[symbol] = {
+      quoteVolume,
+      updatedAt: observedAt
+     };
+    });
+    updatePairSelectorPrices();
+    updateMarketQuoteDisplays();
+    updateHomeQuoteDisplays();
+    document.querySelectorAll('[data-market-quote-volume]').forEach((element) => {
+     const volume = state.marketTickerStats[element.dataset.marketQuoteVolume]?.quoteVolume;
+     if (Number.isFinite(volume)) element.textContent = `$${formatMarketVolume(volume)}`;
+    });
+    document.querySelectorAll('[data-futures-quote-volume]').forEach((element) => {
+     const volume = state.futuresTickerStats[element.dataset.futuresQuoteVolume]?.quoteVolume;
+     if (Number.isFinite(volume)) element.textContent = `$${formatMarketVolume(volume)}`;
+    });
+    const selectedSpotTicker = spotBySymbol.get(state.selectedPair);
+    const selectedFuturesTicker = futuresBySymbol.get(state.selectedPair);
+    if (state.tradingMode === 'futures' && selectedFuturesTicker) {
+     applyBinanceFuturesTicker(selectedFuturesTicker, 'rest');
+    } else if (state.tradingMode !== 'futures' && selectedSpotTicker) {
+     applyBinanceTicker(selectedSpotTicker, 'rest');
+    }
+    quoteFallbackLastErrorAt = 0;
+   } catch (error) {
+    if (error.name !== 'AbortError' && Date.now() - quoteFallbackLastErrorAt >= 30_000) {
+     console.warn('Unable to refresh Binance market lists from REST.', error);
+     quoteFallbackLastErrorAt = Date.now();
+    }
+   } finally {
+    window.clearTimeout(timeout);
+    quoteCatalogFallbackRequestActive = false;
+   }
   }
 
   function updateMarketCatalogs() {
@@ -7910,6 +8287,7 @@
     if (state.admin.loggedIn) updateAdminPricePairOptions();
     connectMarketData();
     connectFuturesMarketData();
+    refreshMarketCatalogFallback();
     if (state.activePage === 'trade') loadSelectedMarketChart();
     console.info(`Loaded ${spotMarkets.length} Binance spot pairs and ${futuresMarkets.length} USDⓈ-M perpetuals.`);
    } catch (error) {
@@ -7921,23 +8299,48 @@
    }
   }
 
+  function resetMarketDataWatchdog(isFutures, socket) {
+   const previousTimer = isFutures? futuresDataStaleTimer: marketDataStaleTimer;
+   if (previousTimer) window.clearTimeout(previousTimer);
+   const timer = window.setTimeout(() => {
+    const currentSocket = isFutures? futuresDataSocket: marketDataSocket;
+    if (currentSocket !== socket) return;
+    if ((isFutures && state.tradingMode === 'futures') || (!isFutures && state.tradingMode !== 'futures')) {
+     setMarketFeedStatus('stale');
+    }
+    if (socket.readyState !== WebSocket.CLOSED && socket.readyState !== WebSocket.CLOSING) socket.close();
+   }, 10_000);
+   if (isFutures) futuresDataStaleTimer = timer;
+   else marketDataStaleTimer = timer;
+  }
+
   function connectMarketData() {
    if (!window.WebSocket) {
     setMarketFeedStatus('unavailable');
     return;
    }
+   if (marketDataSocket && [WebSocket.CONNECTING, WebSocket.OPEN].includes(marketDataSocket.readyState)) return;
    if (marketDataReconnectTimer) {
     window.clearTimeout(marketDataReconnectTimer);
     marketDataReconnectTimer = null;
    }
    setMarketFeedStatus(marketDataSocket? 'reconnecting': 'connecting');
    try {
-    const streams = [...LIVE_MARKET_ASSETS].map((asset) => `${asset.toLowerCase()}usdt@ticker`);
-    const socket = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams.join('/')}`);
+    const socket = new WebSocket('wss://stream.binance.com:9443/ws');
     marketDataSocket = socket;
+    resetMarketDataWatchdog(false, socket);
     socket.addEventListener('open', () => {
      if (marketDataSocket !== socket) return;
+     try {
+      const streams = [...LIVE_MARKET_ASSETS].map((asset) => `${asset.toLowerCase()}usdt@ticker`);
+      socket.send(JSON.stringify({ method: 'SUBSCRIBE', params: streams, id: 1 }));
+     } catch (error) {
+      console.error('Unable to subscribe to Binance spot market data.', error);
+      socket.close();
+      return;
+     }
      setMarketFeedStatus('waiting');
+     resetMarketDataWatchdog(false, socket);
     });
     socket.addEventListener('message', (event) => {
      if (marketDataSocket !== socket) return;
@@ -7947,6 +8350,12 @@
      } catch (error) {
       console.error('Unable to parse Binance market data.', error);
       setMarketFeedStatus('unavailable');
+      socket.close();
+      return;
+     }
+     if (message.code) {
+      console.error('Binance spot market-data subscription failed.', message);
+      socket.close();
       return;
      }
      if (message.data && typeof message.data.s === 'string') applyBinanceTicker(message.data);
@@ -7955,6 +8364,7 @@
      if (marketDataSocket === socket) {
       console.warn('Binance market-data connection reported an error.');
       setMarketFeedStatus('reconnecting');
+      socket.close();
      }
     });
     socket.addEventListener('close', () => {
@@ -7964,31 +8374,38 @@
       window.clearTimeout(marketDataStaleTimer);
       marketDataStaleTimer = null;
      }
-     setMarketFeedStatus('reconnecting');
+     if (state.tradingMode !== 'futures') setMarketFeedStatus('reconnecting');
      marketDataReconnectTimer = window.setTimeout(connectMarketData, marketDataReconnectDelay);
      marketDataReconnectDelay = Math.min(marketDataReconnectDelay * 2, 30_000);
     });
    } catch (error) {
     console.error('Unable to start the Binance market-data connection.', error);
     marketDataSocket = null;
-    setMarketFeedStatus('unavailable');
+    if (state.tradingMode !== 'futures') setMarketFeedStatus('unavailable');
     marketDataReconnectTimer = window.setTimeout(connectMarketData, marketDataReconnectDelay);
     marketDataReconnectDelay = Math.min(marketDataReconnectDelay * 2, 30_000);
    }
   }
 
-  function applyBinanceFuturesTicker(ticker) {
-   const symbol = ticker.s;
-   const price = Number(ticker.c);
-   const change = Number(ticker.P);
-   const quoteVolume = Number(ticker.q);
+  function applyBinanceFuturesTicker(ticker, source = 'websocket') {
+   const symbol = ticker.s || ticker.symbol;
+   const price = Number(ticker.c === undefined? ticker.lastPrice: ticker.c);
+   const change = Number(ticker.P === undefined? ticker.priceChangePercent: ticker.P);
+   const quoteVolume = Number(ticker.q === undefined? ticker.quoteVolume: ticker.q);
    if (!FUTURES_MARKET_CATALOG.some((market) => market.symbol === symbol)
     || !Number.isFinite(price) || price <= 0 || !Number.isFinite(change)) return;
 
    state.futuresQuotes[symbol] = price;
    const adjustedPrice = futuresMarketPrice(symbol);
    state.futuresQuoteChanges[symbol] = change;
-   state.futuresTickerStats[symbol] = { quoteVolume, updatedAt: Number(ticker.E) || Date.now() };
+   const eventTime = Number(ticker.E === undefined? ticker.closeTime: ticker.E) || Date.now();
+   state.futuresTickerStats[symbol] = { quoteVolume, updatedAt: eventTime };
+   if (source === 'websocket') {
+    futuresDataLastMessageAt = Date.now();
+    futuresDataReconnectDelay = 1000;
+    resetMarketDataWatchdog(true, futuresDataSocket);
+   }
+   if (state.tradingMode === 'futures') setMarketFeedStatus(source === 'websocket'? 'live': 'fallback');
    updateMarketQuoteDisplays();
    const asset = FUTURES_MARKET_CATALOG.find((market) => market.symbol === symbol)?.asset;
    if (asset && state.tradingMode === 'futures' && state.selectedPair === symbol) {
@@ -8014,7 +8431,7 @@
    if (state.selectedPair !== symbol || state.tradingMode !== 'futures') return;
    const previousPrice = state.currentPrice;
    state.currentPrice = adjustedPrice;
-   updateLiveCandleFromTicker(adjustedPrice, Number(ticker.E) || Date.now());
+   updateLiveCandleFromTicker(adjustedPrice, eventTime);
    const priceText = formatMoney(adjustedPrice);
    const currentPriceDisplay = document.getElementById('currentPriceDisplay');
    currentPriceDisplay.textContent = priceText;
@@ -8033,43 +8450,68 @@
    processOpenOrders();
    processFuturesRisk();
    renderOrderBook();
-   setMarketFeedStatus('live');
   }
 
   function connectFuturesMarketData() {
    if (!window.WebSocket || !FUTURES_MARKET_CATALOG.length) return;
+   if (futuresDataSocket && [WebSocket.CONNECTING, WebSocket.OPEN].includes(futuresDataSocket.readyState)) return;
    if (futuresDataReconnectTimer) {
     window.clearTimeout(futuresDataReconnectTimer);
     futuresDataReconnectTimer = null;
    }
    try {
-    const streams = FUTURES_MARKET_CATALOG.map(({ symbol }) => `${symbol.toLowerCase()}@ticker`);
-    const socket = new WebSocket(`wss://fstream.binance.com/stream?streams=${streams.join('/')}`);
+    const socket = new WebSocket('wss://fstream.binance.com/ws');
     futuresDataSocket = socket;
+    resetMarketDataWatchdog(true, socket);
     socket.addEventListener('open', () => {
-     if (futuresDataSocket === socket) futuresDataReconnectDelay = 1000;
+     if (futuresDataSocket !== socket) return;
+     try {
+      const streams = FUTURES_MARKET_CATALOG.map(({ symbol }) => `${symbol.toLowerCase()}@ticker`);
+      socket.send(JSON.stringify({ method: 'SUBSCRIBE', params: streams, id: 1 }));
+     } catch (error) {
+      console.error('Unable to subscribe to Binance USDⓈ-M market data.', error);
+      socket.close();
+      return;
+     }
+     if (state.tradingMode === 'futures') setMarketFeedStatus('waiting');
+     resetMarketDataWatchdog(true, socket);
     });
     socket.addEventListener('message', (event) => {
      if (futuresDataSocket !== socket) return;
      try {
       const message = JSON.parse(event.data);
+      if (message.code) {
+       console.error('Binance USDⓈ-M market-data subscription failed.', message);
+       socket.close();
+       return;
+      }
       if (message.data && typeof message.data.s === 'string') applyBinanceFuturesTicker(message.data);
      } catch (error) {
       console.error('Unable to parse Binance USDⓈ-M market data.', error);
      }
     });
     socket.addEventListener('error', () => {
-     if (futuresDataSocket === socket) console.warn('Binance USDⓈ-M market-data connection reported an error.');
+     if (futuresDataSocket === socket) {
+      console.warn('Binance USDⓈ-M market-data connection reported an error.');
+      if (state.tradingMode === 'futures') setMarketFeedStatus('reconnecting');
+      socket.close();
+     }
     });
     socket.addEventListener('close', () => {
      if (futuresDataSocket !== socket) return;
      futuresDataSocket = null;
+     if (futuresDataStaleTimer) {
+      window.clearTimeout(futuresDataStaleTimer);
+      futuresDataStaleTimer = null;
+     }
+     if (state.tradingMode === 'futures') setMarketFeedStatus('reconnecting');
      futuresDataReconnectTimer = window.setTimeout(connectFuturesMarketData, futuresDataReconnectDelay);
      futuresDataReconnectDelay = Math.min(futuresDataReconnectDelay * 2, 30_000);
     });
    } catch (error) {
     console.error('Unable to start the Binance USDⓈ-M market-data connection.', error);
     futuresDataSocket = null;
+    if (state.tradingMode === 'futures') setMarketFeedStatus('unavailable');
     futuresDataReconnectTimer = window.setTimeout(connectFuturesMarketData, futuresDataReconnectDelay);
     futuresDataReconnectDelay = Math.min(futuresDataReconnectDelay * 2, 30_000);
    }
@@ -9346,12 +9788,12 @@
 
     return `
      <tr class="border-t border-binanceBorder">
-      <td class="py-3 pr-4 font-semibold text-binanceYellow">${escapeHTML(user.username || '—')}</td>
-      <td class="py-3 pr-4">${escapeHTML(user.fullName || '—')}</td>
-      <td class="py-3 pr-4 text-binanceMuted">${escapeHTML(user.email || '—')}</td>
-      <td class="py-3 pr-4 text-[10px] font-mono text-binanceMuted">${walletSummary}</td>
-      <td class="py-3 pr-4">${escapeHTML(registered)}</td>
-      <td class="py-3 text-right">
+      <td data-label="Username" class="py-3 pr-4 font-semibold text-binanceYellow">${escapeHTML(user.username || '—')}</td>
+      <td data-label="Full name" class="py-3 pr-4">${escapeHTML(user.fullName || '—')}</td>
+      <td data-label="Email" class="py-3 pr-4 text-binanceMuted">${escapeHTML(user.email || '—')}</td>
+      <td data-label="Wallet" class="py-3 pr-4 text-[10px] font-mono text-binanceMuted">${walletSummary}</td>
+      <td data-label="Registered" class="py-3 pr-4">${escapeHTML(registered)}</td>
+      <td data-label="Action" class="py-3 text-right">
        <button type="button" data-admin-select-user="${escapeHTML(user.username)}" class="rounded border border-binanceBorder px-2 py-1 text-[10px] text-binanceYellow hover:border-binanceYellow">${state.admin.selectedUser === user.username? 'Selected': 'Edit balance'}</button>
       </td>
      </tr>
@@ -9366,6 +9808,7 @@
   function renderAdminPanel() {
    const loginView = document.getElementById('adminLoginView');
    const dashboard = document.getElementById('adminDashboard');
+   const mobileNav = document.getElementById('adminMobileNav');
    const userBadge = document.getElementById('adminUserBadge');
    const userLabel = document.getElementById('adminAccountName');
    const selectedUser = document.getElementById('adminSelectedUser');
@@ -9378,8 +9821,13 @@
    const loggedIn = state.admin.loggedIn;
    loginView.classList.toggle('hidden', loggedIn);
    dashboard.classList.toggle('hidden', !loggedIn);
+   mobileNav.classList.toggle('hidden', !loggedIn);
    userBadge.classList.toggle('hidden', !loggedIn);
+   document.getElementById('adminSpotMarketCount').textContent = String(CRYPTO_MARKET_CATALOG.length);
+   document.getElementById('adminDepositAddressCount').textContent = String(state.cryptoDepositAddresses.length);
+   document.getElementById('adminDepositNetworkCount').textContent = String(DEPOSIT_NETWORK_OPTIONS.length);
    if (loggedIn) {
+    updateAdminCreditOptions();
     const accounts = Array.isArray(state.users)? state.users: [];
     if (!accounts.some((user) => user.username === state.admin.selectedUser)) {
      state.admin.selectedUser = accounts.length? accounts[0].username: '';
@@ -9406,13 +9854,13 @@
      const assetName = escapeHTML(balance.asset);
      return `
       <tr class="border-t border-binanceBorder">
-       <td class="py-2 pr-4 font-semibold text-binanceYellow">${assetName}</td>
+       <td data-label="Asset" class="py-2 pr-4 font-semibold text-binanceYellow">${assetName}</td>
        ${['total', 'available', 'inOrders'].map((field) => `
-        <td class="py-2 pr-4">
+        <td data-label="${field === 'inOrders'? 'In orders': field}" class="py-2 pr-4">
          <input type="number" min="0" step="any" required data-admin-asset="${assetName}" data-admin-field="${field}" value="${Number(balance[field] || 0).toFixed(precision)}" aria-label="${assetName} ${field} for ${escapeHTML(selectedAccount.username)}" class="w-28 bg-binanceCard border border-binanceBorder rounded px-2 py-1 text-white font-mono text-right outline-none focus:border-binanceYellow">
         </td>
        `).join('')}
-       <td class="py-2 text-right">
+       <td data-label="Action" class="py-2 text-right">
         <button type="button" onclick="updateAdminBalanceInput(this)" data-admin-save-asset="${assetName}" ${state.admin.saving? 'disabled': ''} class="rounded border border-binanceBorder px-2 py-1 text-[10px] text-binanceYellow hover:border-binanceYellow disabled:opacity-40">Save</button>
        </td>
       </tr>
@@ -9428,6 +9876,31 @@
     tableBody.innerHTML = '';
    }
    renderAdminUsers();
+  }
+
+  function scrollToAdminSection(sectionId) {
+   const section = document.getElementById(sectionId);
+   if (!section) {
+    console.error(`Admin section "${sectionId}" is unavailable.`);
+    return;
+   }
+   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function updateAdminCreditOptions() {
+   const assetSelect = document.getElementById('adminCreditAsset');
+   const networkSelect = document.getElementById('adminCreditNetwork');
+   const assets = supportedDepositAssets();
+   if (assetSelect) {
+    const selectedAsset = assetSelect.value;
+    assetSelect.innerHTML = assets.map((asset) => `<option value="${escapeHTML(asset)}">${escapeHTML(asset)}</option>`).join('');
+    if (assets.includes(selectedAsset)) assetSelect.value = selectedAsset;
+   }
+   if (networkSelect) {
+    const selectedNetwork = networkSelect.value;
+    networkSelect.innerHTML = DEPOSIT_NETWORK_OPTIONS.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
+    if (DEPOSIT_NETWORK_OPTIONS.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
+   }
   }
 
   function getSelectedAdminUser() {
@@ -11863,13 +12336,34 @@
    return state.cryptoDepositAddresses.find((entry) => entry.asset === asset && entry.network === network) || null;
   }
 
-  function updateDepositNetworkOptions() {
+  function supportedDepositAssets() {
+   return [...new Set([
+    'USDT',
+    ...CRYPTO_MARKET_CATALOG.map(({ asset }) => asset),
+    ...state.assets.map(({ asset }) => asset),
+    ...state.fundingAssets.map(({ asset }) => asset),
+    ...state.cryptoDepositAddresses.map(({ asset }) => asset)
+   ])].filter((asset) => /^[A-Z0-9]{2,20}$/.test(asset)).sort();
+  }
+
+  function updateDepositAssetOptions() {
    const assetSelect = document.getElementById('depositAsset');
+   if (!assetSelect) return;
+   const assets = supportedDepositAssets();
+   const selectedAsset = assetSelect.value;
+   assetSelect.innerHTML = assets.map((asset) => `<option value="${escapeHTML(asset)}">${escapeHTML(asset)}</option>`).join('');
+   if (assets.includes(selectedAsset)) assetSelect.value = selectedAsset;
+   else if (assets.includes('USDT')) assetSelect.value = 'USDT';
+  }
+
+  function updateDepositNetworkOptions() {
    const networkSelect = document.getElementById('depositNetwork');
-   if (!assetSelect || !networkSelect) return;
-   const networks = DEPOSIT_NETWORKS_BY_ASSET[assetSelect.value] || [];
-   networkSelect.innerHTML = networks.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
-   networkSelect.disabled = !networks.length;
+   if (!networkSelect) return;
+   updateDepositAssetOptions();
+   const selectedNetwork = networkSelect.value;
+   networkSelect.innerHTML = DEPOSIT_NETWORK_OPTIONS.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
+   if (DEPOSIT_NETWORK_OPTIONS.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
+   networkSelect.disabled = !DEPOSIT_NETWORK_OPTIONS.length;
    updateDepositAddressDisplay();
   }
 
@@ -11925,10 +12419,14 @@
    const assetSelect = document.getElementById('adminDepositAsset');
    const networkSelect = document.getElementById('adminDepositNetwork');
    if (!assetSelect || !networkSelect) return;
-   const networks = DEPOSIT_NETWORKS_BY_ASSET[assetSelect.value] || [];
+   const assets = supportedDepositAssets();
+   const selectedAsset = assetSelect.value;
+   assetSelect.innerHTML = assets.map((asset) => `<option value="${escapeHTML(asset)}">${escapeHTML(asset)}</option>`).join('');
+   if (assets.includes(selectedAsset)) assetSelect.value = selectedAsset;
+   else assetSelect.value = assets.includes('USDT')? 'USDT': assets[0] || '';
    const selectedNetwork = networkSelect.value;
-   networkSelect.innerHTML = networks.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
-   if (networks.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
+   networkSelect.innerHTML = DEPOSIT_NETWORK_OPTIONS.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
+   if (DEPOSIT_NETWORK_OPTIONS.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
    updateAdminDepositAddressInput();
   }
 
@@ -11946,6 +12444,7 @@
    try {
     const { addresses } = await requestAuthApi('/api/admin/deposit-addresses', { method: 'GET', headers: {} });
     state.cryptoDepositAddresses = addresses;
+    document.getElementById('adminDepositAddressCount').textContent = String(addresses.length);
     updateAdminDepositNetworkOptions();
     updateDepositAddressDisplay();
     return true;
@@ -12261,6 +12760,10 @@
     preloadChartIntervals(state.selectedPair, 'spot', null);
    }
    setMarketFeedStatus('connecting');
+   refreshActiveQuoteFallback();
+   window.setInterval(refreshActiveQuoteFallback, 5_000);
+   refreshMarketCatalogFallback();
+   window.setInterval(refreshMarketCatalogFallback, 15_000);
    loadTradfiQuotes();
    window.setInterval(loadTradfiQuotes, 15_000);
    loadMarketPriceAdjustments();
