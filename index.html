@@ -3611,15 +3611,8 @@
      <code id="depositAddressValue" class="block break-all font-mono text-[11px] text-white">Loading address…</code>
      <p id="depositAddressMemo" class="mt-2 hidden break-all text-[10px] text-binanceMuted"></p>
     </div>
-    <p class="rounded border border-binanceRed/40 bg-binanceRedBg p-3 text-[10px] leading-relaxed text-binanceRed">Demo only. Blockchain deposits are not monitored or credited automatically. Do not send real funds.</p>
+    <p class="rounded border border-binanceRed/40 bg-binanceRedBg p-3 text-[10px] leading-relaxed text-binanceRed">Deposits are not monitored or credited automatically. Verify the asset, network, and address before sending.</p>
    </div>
-   <details class="rounded border border-binanceBorder bg-binanceBg p-3">
-    <summary class="cursor-pointer text-xs font-semibold text-binanceMuted">Wallet credit (demo only)</summary>
-    <label class="mt-3 block text-xs text-binanceMuted">Credit amount
-     <input id="depositAmount" type="number" min="0" step="any" placeholder="0.00" class="mt-1 w-full bg-binanceCard border border-binanceBorder rounded p-2.5 text-white font-mono">
-    </label>
-    <button onclick="depositDemoFunds()" class="mt-3 w-full py-2.5 rounded font-bold bg-binanceYellow text-binanceBg hover:bg-binanceYellowHover">Credit Wallet</button>
-   </details>
   </div>
  </div>
 
@@ -3732,15 +3725,16 @@
      </select>
     </div>
     <div>
+     <label class="text-binanceMuted block mb-1">Network</label>
+     <select id="withdrawNetwork" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono"></select>
+    </div>
+    <div>
      <label class="text-binanceMuted block mb-1">Recipient Address</label>
      <input id="withdrawAddress" placeholder="Recipient address" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
     </div>
     <div>
      <label class="text-binanceMuted block mb-1">Amount</label>
      <input id="withdrawAmount" type="number" min="0" step="any" placeholder="0.00" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
-    </div>
-    <div class="bg-binanceBg border border-binanceBorder rounded p-3 text-binanceMuted">
-     Withdrawal only. No transaction will be sent to a blockchain.
     </div>
    </div>
    <button onclick="withdrawDemoFunds()" class="w-full py-2.5 rounded font-bold bg-binanceYellow text-binanceBg hover:bg-binanceYellowHover">Submit Withdrawal</button>
@@ -6128,7 +6122,6 @@
     ...balances.filter((balance) => !supportedSpotAssets.includes(balance.asset)).map((balance) => ({...balance, wallet: 'Spot' }))
    ];
    const priceFor = (asset) => asset === 'USDT'? 1: demoMarketPrice(asset);
-   const depositNetworksLabel = () => DEPOSIT_NETWORK_OPTIONS.join(' · ');
    const section = state.assetsSection;
    const fundingBalances = state.fundingAssets;
    const positionMargin = state.futuresPositions.reduce((sum, position) => sum + Number(position.initialMargin || 0), 0);
@@ -6365,7 +6358,6 @@
         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${balance.asset === 'BTC'? 'bg-[#f7931a]': balance.asset === 'USDT'? 'bg-[#26a17b]': 'bg-binanceHover'} text-xs font-bold text-white">${escapeHTML(balance.asset.slice(0, 1))}</span>
         <div class="min-w-0">
          <div class="flex items-center gap-1"><span class="text-xs font-semibold text-white">${escapeHTML(balance.asset)}</span><span class="truncate text-[10px] text-binanceMuted">${escapeHTML(balance.name || (balance.asset === 'USDT'? 'Tether': balance.asset))}</span></div>
-         <div class="mt-1 break-words text-[9px] leading-relaxed text-binanceMuted">Network options: ${escapeHTML(depositNetworksLabel())}</div>
          <div class="mt-1 font-mono text-[10px] text-binanceMuted">${visible? Number(balance.total || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(balance.asset)}</div>
          <div class="mt-0.5 text-[9px] text-binanceMuted">${visible? `Available ${Number(balance.available || 0).toLocaleString('en-US', { maximumFractionDigits: 8 })} · In orders ${Number(balance.inOrders || 0).toLocaleString('en-US', { maximumFractionDigits: 8 })}`: '••••••'}</div>
         </div>
@@ -6401,7 +6393,6 @@
      <article class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4">
       <div class="min-w-0">
        <div class="flex items-center gap-2"><span class="text-xs font-bold text-white">${escapeHTML(balance.asset)}</span><span class="rounded bg-binanceHover px-1.5 py-0.5 text-[9px] text-binanceMuted">${escapeHTML(balance.wallet)}</span></div>
-       <div class="mt-1 break-words text-[9px] leading-relaxed text-binanceMuted">Network options: ${escapeHTML(depositNetworksLabel())}</div>
        <div class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[9px] text-binanceMuted sm:flex sm:gap-4"><span>Total <b class="font-mono text-binanceText">${visible? Number(balance.total || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask}</b></span><span>Available <b class="font-mono text-binanceText">${visible? Number(balance.available || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask}</b></span><span>In orders <b class="font-mono text-binanceText">${visible? Number(balance.inOrders || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask}</b></span></div>
       </div>
       <div class="text-right"><div class="font-mono text-xs font-semibold text-white">${visible? formatMoney(estimate): mask}</div><div class="mt-1 text-[9px] text-binanceMuted">${formatMoney(assetPrice)} / ${escapeHTML(balance.asset)}</div>${balance.wallet !== 'Futures' && balance.asset !== 'USDT'? `<button type="button" onclick="openMarketPair('${escapeHTML(balance.asset)}USDT', ${assetPrice}, '${escapeHTML(balance.asset)}')" class="mt-2 rounded border border-binanceBorder px-2.5 py-1 text-[9px] font-semibold text-binanceYellow">Trade</button>`: ''}</div>
@@ -6431,7 +6422,6 @@
         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${balance.asset === 'BTC'? 'bg-[#f7931a]': balance.asset === 'USDT'? 'bg-[#26a17b]': 'bg-binanceHover'} text-xs font-bold text-white">${escapeHTML(balance.asset.slice(0, 1))}</span>
         <div class="min-w-0 flex-1">
          <div class="flex flex-wrap items-center gap-1.5"><span class="text-xs font-bold text-white">${escapeHTML(balance.asset)}</span><span class="truncate text-[10px] text-binanceMuted">${escapeHTML(balance.name || (balance.asset === 'BTC'? 'Bitcoin': balance.asset === 'USDT'? 'Tether': balance.asset))}</span>${section !== 'spot'? `<span class="rounded bg-binanceHover px-1.5 py-0.5 text-[8px] text-binanceMuted">${escapeHTML(balance.wallet)}</span>`: ''}</div>
-         <div class="mt-1 break-words text-[9px] leading-relaxed text-binanceMuted">Network options: ${escapeHTML(depositNetworksLabel())}</div>
          <div class="mt-1 font-mono text-[10px] text-binanceMuted">${visible? Number(balance.total || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(balance.asset)}</div>
         </div>
         <div class="text-right">
@@ -10121,6 +10111,7 @@
    const modal = document.getElementById(id);
    if (modal) modal.classList.remove('hidden');
    if (id === 'depositModal') updateDepositNetworkOptions();
+   if (id === 'withdrawModal') updateWithdrawalNetworkOptions();
    if (id === 'p2pModal') {
     document.getElementById('p2pTradePanel')?.classList.add('hidden');
     showP2PView('market');
@@ -12294,33 +12285,6 @@
    notify('Account reset');
   }
 
-  function depositDemoFunds() {
-   const asset = document.getElementById('depositAsset').value;
-   const amount = Number(document.getElementById('depositAmount').value);
-   if (!Number.isFinite(amount) || amount <= 0) {
-    notify('Enter a deposit amount greater than zero');
-    return;
-   }
-   const balance = getBalance(asset);
-   balance.total += amount;
-   balance.available += amount;
-   state.transactions.unshift({
-    id: Date.now(),
-    time: new Date().toLocaleTimeString('en-GB').slice(0, 8),
-    type: 'Deposit',
-    asset,
-    amount,
-    status: 'Credited ( )'
-   });
-   renderAssets();
-   renderTransactions();
-   saveDemoState();
-   document.getElementById('depositAmount').value = '';
-   closeModal('depositModal');
-   switchBottomTab('transactions');
-   notify(`${amount} ${asset} credited to wallet`);
-  }
-
   function depositAddressForSelection(asset, network) {
    return state.cryptoDepositAddresses.find((entry) => entry.asset === asset && entry.network === network) || null;
   }
@@ -12354,6 +12318,15 @@
    if (DEPOSIT_NETWORK_OPTIONS.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
    networkSelect.disabled = !DEPOSIT_NETWORK_OPTIONS.length;
    updateDepositAddressDisplay();
+  }
+
+  function updateWithdrawalNetworkOptions() {
+   const networkSelect = document.getElementById('withdrawNetwork');
+   if (!networkSelect) return;
+   const selectedNetwork = networkSelect.value;
+   networkSelect.innerHTML = DEPOSIT_NETWORK_OPTIONS.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
+   if (DEPOSIT_NETWORK_OPTIONS.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
+   networkSelect.disabled = !DEPOSIT_NETWORK_OPTIONS.length;
   }
 
   function updateDepositAddressDisplay() {
@@ -12480,8 +12453,13 @@
 
   function withdrawDemoFunds() {
    const asset = document.getElementById('withdrawAsset').value;
+   const network = document.getElementById('withdrawNetwork').value;
    const amount = Number(document.getElementById('withdrawAmount').value);
    const address = document.getElementById('withdrawAddress').value.trim();
+   if (!network || !DEPOSIT_NETWORK_OPTIONS.includes(network)) {
+    notify('Choose a withdrawal network');
+    return;
+   }
    if (!address) {
     notify('Enter a recipient address');
     return;
@@ -12502,8 +12480,9 @@
     time: new Date().toLocaleTimeString('en-GB').slice(0, 8),
     type: 'Withdrawal',
     asset,
+    network,
     amount,
-    status: 'Submitted ( )'
+    status: 'Submitted'
    });
    renderAssets();
    renderTransactions();
