@@ -4714,6 +4714,7 @@
    volume: '—'
   }));
   const LIVE_MARKET_ASSETS = new Set(CRYPTO_MARKET_CATALOG.map(({ asset }) => asset));
+  const SPOT_MARKET_BY_SYMBOL = new Map();
   const TRADFI_BINANCE_SYMBOLS = {
    SPY: 'SPYUSDT',
    QQQ: 'QQQUSDT',
@@ -4763,7 +4764,7 @@
   const DEMO_STORAGE_KEY = 'exchange-account-v1';
   const PAGE_SESSION_STORAGE_KEY = 'exchange-page-v1';
   const USERS_STORAGE_KEY = 'exchange-users-v1';
-  const MARKET_CATALOG_STORAGE_KEY = 'exchange-market-catalog-v1';
+  const MARKET_CATALOG_STORAGE_KEY = 'exchange-market-catalog-v2';
   const BALANCE_PROCESSING_DELAY_MS = 60_000;
   const P2P_PAYMENT_METHODS = ['Bank Transfer', 'Cash in Person', 'Wise', 'PayPal', 'Revolut', 'Zelle', 'Skrill', 'Apple Pay'];
 
@@ -5892,13 +5893,15 @@
    state.marketPageQuery = input.value.trim().toLowerCase();
    const cryptoCatalog = CRYPTO_MARKET_CATALOG.map((coin) => ({
     ...coin,
-    pair: `${coin.asset}USDT`,
-    price: demoMarketPrice(coin.asset),
-    change: state.marketQuoteChanges[coin.asset],
-    volume: state.marketTickerStats[coin.asset]? formatMarketVolume(state.marketTickerStats[coin.asset].quoteVolume): coin.volume,
+    pair: coin.symbol,
+    price: spotMarketPrice(coin.symbol, coin.price),
+    change: state.marketQuoteChanges[coin.symbol] ?? coin.change,
+    volume: Number.isFinite(state.marketTickerStats[coin.symbol]?.quoteVolume)
+     ? formatMarketVolume(state.marketTickerStats[coin.symbol].quoteVolume)
+     : coin.volume,
     category: 'crypto',
-    display: `${coin.asset} / USDT`,
-    subtitle: 'Binance spot · USDT market'
+    display: `${coin.asset} / ${coin.quoteAsset}`,
+    subtitle: `Binance spot · ${coin.quoteAsset} market`
    }));
    const tradfiCatalog = [
     { asset: 'SPY', name: 'S&P 500 ETF', price: 0, volume: '—', tradfiClass: 'bstocks' },
@@ -5934,13 +5937,14 @@
     subtitle: 'USDⓈ-M · perpetual contract'
    }));
    const allRows = [...cryptoCatalog,...tradfiCatalog];
+   const curatedRows = [...cryptoCatalog.filter((market) => market.quoteAsset === 'USDT'),...tradfiCatalog];
    const tradfiRows = state.marketTradfiView === 'futures'? futuresCatalog
     : state.marketTradfiView === 'stocks'? tradfiCatalog.filter((instrument) => instrument.tradfiClass === 'bstocks')
      : tradfiCatalog.filter((instrument) => instrument.tradfiClass === state.marketTradfiClass);
    const rows = state.marketSection === 'crypto'? cryptoCatalog
     : state.marketSection === 'tradfi'? tradfiRows
      : state.marketSection === 'favorites'? allRows.filter((instrument) => state.favoritePairs.includes(instrument.pair))
-      : allRows.filter((instrument) => instrument.change > 0)
+      : curatedRows.filter((instrument) => instrument.change > 0)
        .sort((left, right) => right.change - left.change)
        .slice(0, 8);
    document.getElementById('marketFavoritesCount').textContent = String(allRows.filter((instrument) => state.favoritePairs.includes(instrument.pair)).length);
@@ -5948,14 +5952,17 @@
    document.getElementById('marketLeaderValue').textContent = state.marketSection === 'tradfi'? 'Binance TradFi': state.marketSection === 'favorites' && rows.length? rows[0].display: 'BTC / USDT';
    const query = state.marketPageQuery;
    const filtered = rows.filter((coin) => {
-    return !query || coin.asset.toLowerCase().includes(query) || coin.display.toLowerCase().includes(query) || (coin.name || '').toLowerCase().includes(query);
+    return !query || coin.asset.toLowerCase().includes(query)
+     || coin.pair.toLowerCase().includes(query)
+     || coin.display.toLowerCase().includes(query)
+     || (coin.name || '').toLowerCase().includes(query);
    });
    document.getElementById('marketTrackedCount').textContent = String(filtered.length);
    document.getElementById('marketTrackedLabel').textContent = state.marketSection === 'crypto'? 'Pairs in view': 'Markets in view';
    const sectionTitles = {
     'for-you': ['Market', 'Binance spot prices and live TradFi references'],
     favorites: ['Market', 'Your saved crypto and TradFi markets'],
-    crypto: ['Pair', 'Live Binance spot prices · USDT pairs'],
+    crypto: ['Pair', 'Live Binance spot prices · all quote assets'],
     tradfi: ['Instrument', 'Binance USDⓈ-M TradFi perpetual quotes · reference prices']
    };
    const [columnName, description] = sectionTitles[state.marketSection];
@@ -6002,21 +6009,24 @@
    list.innerHTML = filtered.length? filtered.map((coin) => {
     const favorite = state.favoritePairs.includes(coin.pair);
     const tradfi = coin.category === 'tradfi';
+    const tradeableSpot = coin.category === 'crypto' && coin.quoteAsset === 'USDT';
     const action = tradfi? `notify('TradFi watchlist quotes are for reference only; trading is not enabled.')`
      : coin.category === 'futures'? `openFuturesPair('${coin.pair}', demoMarketPrice('${coin.asset}'), '${coin.asset}')`
-      : `openMarketPair('${coin.pair}', demoMarketPrice('${coin.asset}'), '${coin.asset}')`;
+      : tradeableSpot
+       ? `openMarketPair('${coin.pair}', spotMarketPrice('${coin.pair}', ${coin.price}), '${coin.asset}')`
+       : `notify('This ${coin.quoteAsset}-quoted Spot pair is listed for reference. Simulated Spot trading is available for USDT pairs only.')`;
     return `
      <div class="grid grid-cols-[minmax(0,1.2fr)_minmax(5.5rem,0.8fr)_minmax(4.5rem,0.7fr)_auto] items-center gap-2 px-3 py-3 sm:grid-cols-[minmax(0,1.4fr)_minmax(7rem,0.8fr)_minmax(5rem,0.6fr)_minmax(6rem,0.7fr)_auto] sm:px-4">
       <button type="button" onclick="${action}" class="min-w-0 text-left">
        <span class="block truncate text-xs font-bold text-white">${escapeHTML(coin.display)}</span>
        <span class="mt-1 block truncate text-[9px] text-binanceMuted">${escapeHTML(coin.subtitle)}</span>
       </button>
-      <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.asset)}`}" class="text-right font-mono text-[11px] text-white">${formatMarketPrice(coin.price)}</span>
-      <span data-market-quote-change="${escapeHTML(coin.asset)}" class="text-right font-mono text-[10px] ${Number.isFinite(coin.change)? coin.change >= 0? 'text-binanceGreen': 'text-binanceRed': 'text-binanceMuted'}">${Number.isFinite(coin.change)? `${coin.change >= 0? '+': ''}${coin.change.toFixed(2)}%`: '—'}</span>
-      <span data-market-quote-volume="${escapeHTML(coin.asset)}" class="hidden text-right font-mono text-[10px] text-binanceMuted sm:block">$${coin.volume}</span>
+      <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.pair)}`}" class="text-right font-mono text-[11px] text-white">${coin.category === 'crypto'? formatSpotPairPrice(coin.pair, coin.price): formatMarketPrice(coin.price)}</span>
+      <span data-market-quote-change="${escapeHTML(coin.category === 'crypto'? coin.pair: coin.asset)}" class="text-right font-mono text-[10px] ${Number.isFinite(coin.change)? coin.change >= 0? 'text-binanceGreen': 'text-binanceRed': 'text-binanceMuted'}">${Number.isFinite(coin.change)? `${coin.change >= 0? '+': ''}${coin.change.toFixed(2)}%`: '—'}</span>
+      <span data-market-quote-volume="${escapeHTML(coin.category === 'crypto'? coin.pair: coin.asset)}" data-market-quote-unit="${escapeHTML(coin.category === 'crypto'? coin.quoteAsset: '$')}" class="hidden text-right font-mono text-[10px] text-binanceMuted sm:block">${coin.category === 'crypto'? escapeHTML(coin.quoteAsset): '$'} ${coin.volume}</span>
       <div class="flex items-center gap-1">
        <button type="button" onclick="toggleMarketFavorite('${coin.pair}')" aria-label="${favorite? 'Remove from': 'Add to'} favorites" aria-pressed="${favorite}" class="rounded p-1.5 ${favorite? 'text-binanceYellow': 'text-binanceMuted'}"><i data-lucide="star" class="h-4 w-4" ${favorite? 'fill="currentColor"': ''}></i></button>
-       <button type="button" onclick="${action}" class="rounded ${tradfi? 'border border-binanceBorder text-binanceMuted': 'bg-binanceYellow text-binanceBg'} px-2.5 py-1.5 text-[9px] font-bold">${tradfi? 'Details': 'Trade'}</button>
+       <button type="button" onclick="${action}" class="rounded ${tradfi || !tradeableSpot && coin.category === 'crypto'? 'border border-binanceBorder text-binanceMuted': 'bg-binanceYellow text-binanceBg'} px-2.5 py-1.5 text-[9px] font-bold">${tradfi? 'Details': tradeableSpot || coin.category === 'futures'? 'Trade': 'View only'}</button>
       </div>
      </div>
     `;
@@ -6024,26 +6034,29 @@
    const mobileList = document.getElementById('marketsMobileList');
    mobileList.innerHTML = filtered.length? filtered.map((coin) => {
     const favorite = state.favoritePairs.includes(coin.pair);
+    const tradeableSpot = coin.category === 'crypto' && coin.quoteAsset === 'USDT';
     const action = coin.category === 'tradfi'? `notify('TradFi watchlist quotes are for reference only; trading is not enabled.')`
      : coin.category === 'futures'? `openFuturesPair('${coin.pair}', demoMarketPrice('${coin.asset}'), '${coin.asset}')`
-      : `openMarketPair('${coin.pair}', demoMarketPrice('${coin.asset}'), '${coin.asset}')`;
+      : tradeableSpot
+       ? `openMarketPair('${coin.pair}', spotMarketPrice('${coin.pair}', ${coin.price}), '${coin.asset}')`
+       : `notify('This ${coin.quoteAsset}-quoted Spot pair is listed for reference. Simulated Spot trading is available for USDT pairs only.')`;
     const symbol = escapeHTML(coin.asset.slice(0, 1));
     return `
      <div class="flex items-center gap-2 border-b border-[#161a1f] py-3">
       <button type="button" onclick="${action}" class="flex min-w-0 flex-[1.1] items-center gap-2.5 text-left">
        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-binanceHover text-[11px] font-bold text-white">${symbol}</span>
        <span class="min-w-0">
-        <span class="flex items-center gap-1 text-sm font-bold text-white">${escapeHTML(coin.asset)}${coin.category === 'futures'? '<span class="rounded bg-binanceHover px-1 text-[8px] text-binanceMuted">PERP</span>': ''}</span>
-        <span class="mt-0.5 block truncate text-[10px] text-binanceMuted">${escapeHTML(coin.name || coin.subtitle)} · <span data-market-quote-volume="${escapeHTML(coin.asset)}">$${escapeHTML(coin.volume)}</span></span>
+        <span class="flex items-center gap-1 text-sm font-bold text-white">${escapeHTML(coin.category === 'crypto'? coin.display: coin.asset)}${coin.category === 'futures'? '<span class="rounded bg-binanceHover px-1 text-[8px] text-binanceMuted">PERP</span>': ''}</span>
+        <span class="mt-0.5 block truncate text-[10px] text-binanceMuted">${escapeHTML(coin.name || coin.subtitle)} · <span data-market-quote-volume="${escapeHTML(coin.category === 'crypto'? coin.pair: coin.asset)}" data-market-quote-unit="${escapeHTML(coin.category === 'crypto'? coin.quoteAsset: '$')}">${coin.category === 'crypto'? escapeHTML(coin.quoteAsset): '$'} ${escapeHTML(coin.volume)}</span></span>
        </span>
       </button>
       <button type="button" onclick="${action}" class="min-w-0 flex-1 text-right">
-       <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.asset)}`}" class="block truncate font-mono text-[13px] font-semibold text-white">${formatMarketPrice(coin.price)}</span>
-       <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.asset)}`}" class="block text-[10px] text-binanceMuted">${formatMarketPrice(coin.price)}</span>
+       <span data-market-quote-price="${coin.category === 'futures'? `futures:${escapeHTML(coin.pair)}`: `spot:${escapeHTML(coin.pair)}`}" class="block truncate font-mono text-[13px] font-semibold text-white">${coin.category === 'crypto'? formatSpotPairPrice(coin.pair, coin.price): formatMarketPrice(coin.price)}</span>
+       <span class="block text-[10px] text-binanceMuted">${escapeHTML(coin.quoteAsset || 'USDT')}</span>
       </button>
       <div class="flex shrink-0 items-center gap-1">
        <button type="button" onclick="toggleMarketFavorite('${coin.pair}')" aria-label="${favorite? 'Remove from': 'Add to'} favorites" aria-pressed="${favorite}" class="rounded p-1 ${favorite? 'text-binanceYellow': 'text-binanceMuted'}"><i data-lucide="star" class="h-3.5 w-3.5" ${favorite? 'fill="currentColor"': ''}></i></button>
-       <button type="button" data-market-quote-change="${escapeHTML(coin.asset)}" onclick="${action}" class="min-w-[4.25rem] rounded px-1.5 py-2 text-[11px] font-bold text-white ${Number.isFinite(coin.change)? coin.change >= 0? 'bg-binanceGreen': 'bg-binanceRed': 'bg-binanceHover'}">${Number.isFinite(coin.change)? `${coin.change >= 0? '+': ''}${coin.change.toFixed(2)}%`: '—'}</button>
+       <button type="button" data-market-quote-change="${escapeHTML(coin.category === 'crypto'? coin.pair: coin.asset)}" onclick="${action}" class="min-w-[4.25rem] rounded px-1.5 py-2 text-[11px] font-bold text-white ${Number.isFinite(coin.change)? coin.change >= 0? 'bg-binanceGreen': 'bg-binanceRed': 'bg-binanceHover'}">${Number.isFinite(coin.change)? `${coin.change >= 0? '+': ''}${coin.change.toFixed(2)}%`: '—'}</button>
       </div>
      </div>
     `;
@@ -6691,7 +6704,7 @@
   }
 
   function getHomeMarketRows() {
-   const cryptoMarkets = CRYPTO_MARKET_CATALOG.map((market) => ({
+   const cryptoMarkets = CRYPTO_MARKET_CATALOG.filter((market) => market.quoteAsset === 'USDT').map((market) => ({
     ...market,
     price: demoMarketPrice(market.asset),
     change: state.marketQuoteChanges[market.asset],
@@ -8103,6 +8116,19 @@
    return adjustedMarketPrice('spot', `${asset}USDT`, referencePrice);
   }
 
+  function spotMarketPrice(symbol, fallbackPrice = 0) {
+   const referencePrice = Number(state.marketQuotes[symbol]) || Number(fallbackPrice) || 0;
+   return adjustedMarketPrice('spot', symbol, referencePrice);
+  }
+
+  function formatSpotPairPrice(symbol, price) {
+   const market = SPOT_MARKET_BY_SYMBOL.get(symbol);
+   if (!market || market.quoteAsset === 'USDT') return formatMarketPrice(price);
+   if (!Number.isFinite(price) || price <= 0) return '—';
+   const precision = Math.abs(price) >= 1? 2: Math.abs(price) >= 0.01? 5: 8;
+   return new Intl.NumberFormat('en-US', { maximumFractionDigits: precision }).format(price);
+  }
+
   function updateTradfiQuoteStatus() {
    const labels = {
     connecting: 'Binance USDⓈ-M · connecting to live TradFi references',
@@ -8351,8 +8377,9 @@
 
   function applyBinanceTicker(ticker, source = 'websocket') {
    const symbol = ticker.s || ticker.symbol;
-   if (typeof symbol !== 'string' || !symbol.endsWith('USDT')) return;
-   const asset = symbol.slice(0, -4);
+   const market = typeof symbol === 'string'? SPOT_MARKET_BY_SYMBOL.get(symbol): null;
+   if (!market) return;
+   const { asset, quoteAsset } = market;
    const referencePrice = Number(ticker.c === undefined? ticker.lastPrice: ticker.c);
    const change = Number(ticker.P === undefined? ticker.priceChangePercent: ticker.P);
    const factor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey('spot', symbol)] || 0) / 100;
@@ -8360,16 +8387,21 @@
    const high = Number(ticker.h === undefined? ticker.highPrice: ticker.h) * factor;
    const low = Number(ticker.l === undefined? ticker.lowPrice: ticker.l) * factor;
    const quoteVolume = Number(ticker.q === undefined? ticker.quoteVolume: ticker.q);
-   if (!LIVE_MARKET_ASSETS.has(asset) || !Number.isFinite(price) || price <= 0 || !Number.isFinite(change)) return;
+   if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(change)) return;
 
-   state.marketQuotes[asset] = referencePrice;
-   state.marketQuoteChanges[asset] = change;
-   state.marketTickerStats[asset] = {
+   state.marketQuotes[symbol] = referencePrice;
+   state.marketQuoteChanges[symbol] = change;
+   state.marketTickerStats[symbol] = {
     high,
     low,
     quoteVolume,
     updatedAt: Number(ticker.E === undefined? ticker.closeTime: ticker.E) || Date.now()
    };
+   if (quoteAsset === 'USDT') {
+    state.marketQuotes[asset] = referencePrice;
+    state.marketQuoteChanges[asset] = change;
+    state.marketTickerStats[asset] = state.marketTickerStats[symbol];
+   }
    if (source === 'websocket') {
     marketDataLastMessageAt = Date.now();
     marketDataReconnectDelay = 1000;
@@ -8377,12 +8409,12 @@
    }
    updatePairSelectorPrices();
    document.querySelectorAll('[data-market-quote-volume]').forEach((element) => {
-    if (element.dataset.marketQuoteVolume === asset) element.textContent = `$${formatMarketVolume(quoteVolume)}`;
+    if (element.dataset.marketQuoteVolume === symbol) element.textContent = `${quoteAsset} ${formatMarketVolume(quoteVolume)}`;
    });
+   updateMarketQuoteDisplays();
    if (state.tradingMode !== 'futures') setMarketFeedStatus(source === 'websocket'? 'live': 'fallback');
 
-   if (state.asset !== asset || state.selectedPair !== `${asset}USDT` || state.tradingMode === 'futures') {
-    updateMarketQuoteDisplays();
+   if (quoteAsset !== 'USDT' || state.asset !== asset || state.selectedPair !== symbol || state.tradingMode === 'futures') {
     updateHomeQuoteDisplays();
     return;
    }
@@ -8470,15 +8502,16 @@
   function loadCachedMarketCatalogs() {
    try {
     const cached = JSON.parse(localStorage.getItem(MARKET_CATALOG_STORAGE_KEY) || 'null');
-    if (!cached || cached.version !== 1
+    if (!cached || cached.version !== 2
      || !Array.isArray(cached.spot) || !cached.spot.length
      || !Array.isArray(cached.futures) || !cached.futures.length) return;
     const validAsset = (asset) => typeof asset === 'string' && /^[\p{L}\p{N}]{1,20}$/u.test(asset);
     const spotMarkets = cached.spot.filter((market) => market
      && validAsset(market.asset)
-     && market.symbol === `${market.asset}USDT`
+     && validAsset(market.quoteAsset)
+     && market.symbol === `${market.asset}${market.quoteAsset}`
      && [market.price, market.change, market.quoteVolume, market.high, market.low].every(Number.isFinite)
-     && market.price > 0 && market.quoteVolume > 0 && market.high > 0 && market.low > 0);
+     && market.price >= 0 && market.quoteVolume >= 0 && market.high >= 0 && market.low >= 0);
     const futuresMarkets = cached.futures.filter((market) => market
      && validAsset(market.asset)
      && market.symbol === `${market.asset}USDT`
@@ -8490,21 +8523,30 @@
     }
     CRYPTO_MARKET_CATALOG.splice(0, CRYPTO_MARKET_CATALOG.length,...spotMarkets.map((market) => ({
      asset: market.asset,
+     quoteAsset: market.quoteAsset,
      symbol: market.symbol,
      price: market.price,
+     change: market.change,
      volume: formatMarketVolume(market.quoteVolume)
     })));
     LIVE_MARKET_ASSETS.clear();
+    SPOT_MARKET_BY_SYMBOL.clear();
     spotMarkets.forEach((market) => {
-     LIVE_MARKET_ASSETS.add(market.asset);
-     state.marketQuotes[market.asset] = market.price;
-     state.marketQuoteChanges[market.asset] = market.change;
-     state.marketTickerStats[market.asset] = {
+     if (market.quoteAsset === 'USDT') LIVE_MARKET_ASSETS.add(market.asset);
+     SPOT_MARKET_BY_SYMBOL.set(market.symbol, market);
+     state.marketQuotes[market.symbol] = market.price;
+     state.marketQuoteChanges[market.symbol] = market.change;
+     state.marketTickerStats[market.symbol] = {
       high: market.high,
       low: market.low,
       quoteVolume: market.quoteVolume,
       updatedAt: Number(cached.savedAt) || 0
      };
+     if (market.quoteAsset === 'USDT') {
+      state.marketQuotes[market.asset] = market.price;
+      state.marketQuoteChanges[market.asset] = market.change;
+      state.marketTickerStats[market.asset] = state.marketTickerStats[market.symbol];
+     }
     });
     FUTURES_MARKET_CATALOG.splice(0, FUTURES_MARKET_CATALOG.length,...futuresMarkets.map((market) => ({
      asset: market.asset,
@@ -8531,10 +8573,11 @@
   function saveCachedMarketCatalogs(spotMarkets, futuresMarkets) {
    try {
     localStorage.setItem(MARKET_CATALOG_STORAGE_KEY, JSON.stringify({
-     version: 1,
+     version: 2,
      savedAt: Date.now(),
-     spot: spotMarkets.map(({ asset, symbol, ticker }) => ({
+     spot: spotMarkets.map(({ asset, quoteAsset, symbol, ticker }) => ({
       asset,
+      quoteAsset,
       symbol,
       price: Number(ticker.lastPrice),
       change: Number(ticker.priceChangePercent),
@@ -8630,7 +8673,7 @@
     const observedAt = Date.now();
     const spotBySymbol = new Map(Array.isArray(spotTickers)? spotTickers.map((ticker) => [ticker.symbol, ticker]): []);
     const futuresBySymbol = new Map(Array.isArray(futuresTickers)? futuresTickers.map((ticker) => [ticker.symbol, ticker]): []);
-    CRYPTO_MARKET_CATALOG.forEach(({ asset, symbol }) => {
+    CRYPTO_MARKET_CATALOG.forEach(({ asset, quoteAsset, symbol }) => {
      const ticker = spotBySymbol.get(symbol);
      if (!ticker) return;
      const price = Number(ticker.lastPrice);
@@ -8639,15 +8682,20 @@
      const high = Number(ticker.highPrice);
      const low = Number(ticker.lowPrice);
      if (![price, change, quoteVolume, high, low].every(Number.isFinite) || price <= 0) return;
-     state.marketQuotes[asset] = price;
-     state.marketQuoteChanges[asset] = change;
      const adjustmentFactor = 1 + Number(state.marketPriceAdjustments[marketAdjustmentKey('spot', symbol)] || 0) / 100;
-     state.marketTickerStats[asset] = {
+     state.marketQuotes[symbol] = price;
+     state.marketQuoteChanges[symbol] = change;
+     state.marketTickerStats[symbol] = {
       high: high * adjustmentFactor,
       low: low * adjustmentFactor,
       quoteVolume,
       updatedAt: observedAt
      };
+     if (quoteAsset === 'USDT') {
+      state.marketQuotes[asset] = price;
+      state.marketQuoteChanges[asset] = change;
+      state.marketTickerStats[asset] = state.marketTickerStats[symbol];
+     }
     });
     FUTURES_MARKET_CATALOG.forEach(({ symbol }) => {
      const ticker = futuresBySymbol.get(symbol);
@@ -8668,7 +8716,7 @@
     updateHomeQuoteDisplays();
     document.querySelectorAll('[data-market-quote-volume]').forEach((element) => {
      const volume = state.marketTickerStats[element.dataset.marketQuoteVolume]?.quoteVolume;
-     if (Number.isFinite(volume)) element.textContent = `$${formatMarketVolume(volume)}`;
+     if (Number.isFinite(volume)) element.textContent = `${element.dataset.marketQuoteUnit || '$'} ${formatMarketVolume(volume)}`;
     });
     document.querySelectorAll('[data-futures-quote-volume]').forEach((element) => {
      const volume = state.futuresTickerStats[element.dataset.futuresQuoteVolume]?.quoteVolume;
@@ -8719,14 +8767,19 @@
 
     const spotTickerBySymbol = new Map(spotTickers.map((ticker) => [ticker.symbol, ticker]));
     const spotMarkets = spotExchange.symbols
-     .filter((symbol) => symbol.status === 'TRADING' && symbol.quoteAsset === 'USDT' && symbol.isSpotTradingAllowed)
+     .filter((symbol) => symbol.status === 'TRADING' && symbol.isSpotTradingAllowed
+      && typeof symbol.baseAsset === 'string' && typeof symbol.quoteAsset === 'string')
      .map((symbol) => {
       const ticker = spotTickerBySymbol.get(symbol.symbol);
-      return ticker? { symbol: symbol.symbol, asset: symbol.baseAsset, ticker }: null;
+      return {
+       symbol: symbol.symbol,
+       asset: symbol.baseAsset,
+       quoteAsset: symbol.quoteAsset,
+       ticker: ticker || { lastPrice: '0', priceChangePercent: '0', quoteVolume: '0', highPrice: '0', lowPrice: '0' }
+      };
      })
-     .filter((market) => market && Number(market.ticker.lastPrice) > 0 && Number(market.ticker.quoteVolume) > 0)
      .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume));
-    if (!spotMarkets.length) throw new Error('Binance returned no eligible spot USDT pairs');
+    if (!spotMarkets.length) throw new Error('Binance returned no eligible Spot pairs');
 
     const futuresTickerBySymbol = new Map(futuresTickers.map((ticker) => [ticker.symbol, ticker]));
     const premiumBySymbol = new Map(futuresPremiums.map((premium) => [premium.symbol, premium]));
@@ -8744,25 +8797,36 @@
      .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume));
     if (!futuresMarkets.length) throw new Error('Binance returned no eligible USDⓈ-M perpetuals');
 
-     saveCachedMarketCatalogs(spotMarkets, futuresMarkets);
-     CRYPTO_MARKET_CATALOG.splice(0, CRYPTO_MARKET_CATALOG.length,...spotMarkets.map(({ symbol, asset, ticker }) => ({
+    saveCachedMarketCatalogs(spotMarkets, futuresMarkets);
+    CRYPTO_MARKET_CATALOG.splice(0, CRYPTO_MARKET_CATALOG.length,...spotMarkets.map(({ symbol, asset, quoteAsset, ticker }) => ({
      asset,
+     quoteAsset,
      symbol,
      price: Number(ticker.lastPrice),
      change: Number(ticker.priceChangePercent),
      volume: formatMarketVolume(Number(ticker.quoteVolume))
     })));
     LIVE_MARKET_ASSETS.clear();
-    spotMarkets.forEach(({ asset, symbol, ticker }) => {
-     LIVE_MARKET_ASSETS.add(asset);
-     state.marketQuotes[asset] = Number(ticker.lastPrice);
-     state.marketQuoteChanges[asset] = Number(ticker.priceChangePercent);
-     state.marketTickerStats[asset] = {
+    SPOT_MARKET_BY_SYMBOL.clear();
+    spotMarkets.forEach(({ asset, quoteAsset, symbol, ticker }) => {
+     if (quoteAsset === 'USDT') LIVE_MARKET_ASSETS.add(asset);
+     SPOT_MARKET_BY_SYMBOL.set(symbol, { asset, quoteAsset, symbol });
+     const price = Number(ticker.lastPrice);
+     const change = Number(ticker.priceChangePercent);
+     const marketStats = {
       high: Number(ticker.highPrice),
       low: Number(ticker.lowPrice),
       quoteVolume: Number(ticker.quoteVolume),
       updatedAt: Number(ticker.closeTime) || Date.now()
      };
+     state.marketQuotes[symbol] = price;
+     state.marketQuoteChanges[symbol] = change;
+     state.marketTickerStats[symbol] = marketStats;
+     if (quoteAsset === 'USDT') {
+      state.marketQuotes[asset] = price;
+      state.marketQuoteChanges[asset] = change;
+      state.marketTickerStats[asset] = marketStats;
+     }
     });
 
     FUTURES_MARKET_CATALOG.splice(0, FUTURES_MARKET_CATALOG.length,...futuresMarkets.map(({ symbol, asset, ticker, premium }) => ({
@@ -8819,6 +8883,7 @@
     setMarketFeedStatus('unavailable');
     return;
    }
+   if (!SPOT_MARKET_BY_SYMBOL.size) return;
    if (marketDataSocket && [WebSocket.CONNECTING, WebSocket.OPEN].includes(marketDataSocket.readyState)) return;
    if (marketDataReconnectTimer) {
     window.clearTimeout(marketDataReconnectTimer);
@@ -8832,7 +8897,10 @@
     socket.addEventListener('open', () => {
      if (marketDataSocket !== socket) return;
      try {
-      const streams = [...LIVE_MARKET_ASSETS].map((asset) => `${asset.toLowerCase()}usdt@ticker`);
+      const streams = CRYPTO_MARKET_CATALOG
+       .filter((market) => market.quoteAsset === 'USDT')
+       .slice(0, 1000)
+       .map((market) => `${market.symbol.toLowerCase()}@ticker`);
       socket.send(JSON.stringify({ method: 'SUBSCRIBE', params: streams, id: 1 }));
      } catch (error) {
       console.error('Unable to subscribe to Binance spot market data.', error);
@@ -9027,8 +9095,14 @@
     const [marketType, identifier] = element.dataset.marketQuotePrice.split(':');
     const price = marketType === 'futures'
      ? futuresMarketPrice(identifier)
-     : demoMarketPrice(identifier);
-    if (price > 0) element.textContent = formatMoney(price);
+     : SPOT_MARKET_BY_SYMBOL.has(identifier)
+      ? spotMarketPrice(identifier)
+      : demoMarketPrice(identifier);
+    if (price > 0) {
+     element.textContent = marketType !== 'futures' && SPOT_MARKET_BY_SYMBOL.has(identifier)
+      ? formatSpotPairPrice(identifier, price)
+      : formatMoney(price);
+    }
    });
    document.querySelectorAll('[data-market-quote-change]').forEach((element) => {
     const change = state.marketQuoteChanges[element.dataset.marketQuoteChange];
@@ -9475,8 +9549,8 @@
   function renderPairOptions() {
    const list = document.getElementById('marketPairOptions');
    if (!list) return;
-   list.innerHTML = CRYPTO_MARKET_CATALOG.map(({ asset }) => `
-    <button type="button" data-market-pair onclick="selectPair('${asset}USDT', demoMarketPrice('${asset}'), '${asset}')" class="w-full px-3 py-2 text-xs flex justify-between cursor-pointer hover:bg-binanceHover">
+   list.innerHTML = CRYPTO_MARKET_CATALOG.filter(({ quoteAsset }) => quoteAsset === 'USDT').map(({ asset, symbol }) => `
+    <button type="button" data-market-pair onclick="selectPair('${symbol}', demoMarketPrice('${asset}'), '${asset}')" class="w-full px-3 py-2 text-xs flex justify-between cursor-pointer hover:bg-binanceHover">
      <span class="font-bold text-white font-mono">${asset}/USDT</span>
      <span data-pair-price="${asset}" class="text-binanceMuted font-mono">${formatMarketPrice(demoMarketPrice(asset))}</span>
     </button>
