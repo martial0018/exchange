@@ -7364,6 +7364,124 @@
     return { users: state.users.map((user) => ({...user, password: undefined })) };
    }
 
+   const adminUserMatch = pathname.match(/^\/api\/admin\/users\/([^/]+)$/);
+   if (adminUserMatch && method === 'POST') {
+    if (!sessionUser || sessionUser.role !== 'admin') throw new Error('Administrator access is required');
+    const userId = decodeURIComponent(adminUserMatch[1]);
+    const userIndex = state.users.findIndex((user) => String(user.id) === userId && user.role === 'user');
+    if (userIndex < 0) throw new Error('Account not found');
+
+    const payload = JSON.parse(options.body || '{}');
+    const targetUser = state.users[userIndex];
+    ensureUserActivity(targetUser);
+    const wallet = cloneWallet(targetUser.wallet);
+    const now = new Date();
+    const id = crypto.randomUUID();
+    let transaction;
+    let notificationMessage;
+    let asset;
+    let amount = 0;
+    let operation;
+
+    if (payload.action === 'balance_credit'
+     && typeof payload.asset === 'string' && /^[A-Z0-9]{2,20}$/.test(payload.asset)
+     && Number.isFinite(payload.amount) && payload.amount > 0 && payload.amount <= 1e15
+     && typeof payload.network === 'string' && payload.network.trim().length > 0 && payload.network.length <= 80
+     && typeof payload.fromAddress === 'string' && payload.fromAddress.trim().length > 0 && payload.fromAddress.length <= 200) {
+     asset = payload.asset;
+     amount = payload.amount;
+     operation = 'credit';
+     let balance = wallet.find((entry) => entry.asset === asset);
+     if (!balance) {
+      balance = { asset, total: 0, available: 0, inOrders: 0 };
+      wallet.push(balance);
+     }
+     balance.total += amount;
+     balance.available += amount;
+     transaction = {
+      id,
+      time: now.toLocaleString('en-GB'),
+      status: 'Completed (practice)',
+      adminUsername: sessionUser.username,
+      type: 'Practice Deposit',
+      asset,
+      amount,
+      side: 'buy',
+      network: payload.network.trim(),
+      fromAddress: payload.fromAddress.trim()
+     };
+     notificationMessage = `${amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${asset} has been credited to your practice account.`;
+    } else if (payload.action === 'balance_adjustment'
+     && typeof payload.asset === 'string' && /^[A-Z0-9]{2,20}$/.test(payload.asset)
+     && ['total', 'available', 'inOrders'].every((field) => Number.isFinite(payload[field]) && payload[field] >= 0 && payload[field] <= 1e15)
+     && payload.total >= payload.available + payload.inOrders) {
+     asset = payload.asset;
+     operation = 'set';
+     const balance = wallet.find((entry) => entry.asset === asset);
+     if (!balance) throw new Error(`Balance for ${asset} is unavailable`);
+     const change = payload.total - balance.total;
+     Object.assign(balance, { total: payload.total, available: payload.available, inOrders: payload.inOrders });
+     transaction = {
+      id,
+      time: now.toLocaleString('en-GB'),
+      status: 'Completed (practice)',
+      adminUsername: sessionUser.username,
+      type: change === 0 ? 'Admin Balance Allocation Update' : 'Admin Balance Adjustment',
+      asset,
+      amount: Math.abs(change),
+      side: change >= 0 ? 'buy' : 'sell',
+      details: `Total balance updated by an administrator`
+     };
+     notificationMessage = `Your ${asset} practice balance was updated by an administrator.`;
+    } else if (payload.action === 'wallet_reset') {
+     wallet.splice(0, wallet.length, ...createDefaultWallet());
+     operation = 'setWallet';
+     asset = 'WALLET';
+     transaction = {
+      id,
+      time: now.toLocaleString('en-GB'),
+      status: 'Completed (practice)',
+      adminUsername: sessionUser.username,
+      type: 'Admin Wallet Reset',
+      asset,
+      amount: 0,
+      details: 'Reset to the zero-balance practice wallet'
+     };
+     notificationMessage = 'Your practice wallet reset has completed.';
+    } else {
+     throw new Error('Invalid administrator action');
+    }
+
+    const updatedUser = {
+     ...targetUser,
+     wallet,
+     transactions: [transaction, ...targetUser.transactions].slice(0, 1000),
+     notifications: [{
+      id: `${id}-completed`,
+      title: 'Balance transaction completed',
+      message: notificationMessage,
+      createdAt: now.toLocaleString('en-GB'),
+      read: false
+     }, ...targetUser.notifications].slice(0, 1000),
+     balanceJobs: [{
+      id,
+      asset,
+      operation,
+      amount,
+      transactionId: id,
+      status: 'Completed',
+      completedAt: now.getTime()
+     }, ...targetUser.balanceJobs].slice(0, 1000),
+     updatedAt: now.toISOString()
+    };
+    state.users[userIndex] = updatedUser;
+    if (!saveUsers()) {
+     state.users[userIndex] = targetUser;
+     throw new Error('Could not save the account in this browser');
+    }
+    return { user: {...updatedUser, password: undefined }, duplicate: false };
+   }
+
    if (pathname === '/api/market-price-adjustments' && resource === 'deposit-addresses' && method === 'GET') {
     return { addresses: [] };
    }
