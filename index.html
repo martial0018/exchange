@@ -4293,8 +4293,14 @@
      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <div class="text-xs text-binanceMuted sm:col-span-2">
        <div>Assets sharing this address</div>
+       <div class="mt-1 flex flex-wrap items-center gap-2">
+        <input id="adminDepositAssetSearch" type="search" oninput="filterAdminDepositAssets()" autocomplete="off" placeholder="Search assets (e.g. BTC)" aria-label="Search deposit address assets" class="min-w-0 flex-1 rounded border border-binanceBorder bg-binanceCard px-3 py-2 text-xs text-white outline-none placeholder:text-binanceMuted focus:border-binanceYellow">
+        <button type="button" onclick="selectVisibleAdminDepositAssets(true)" class="rounded border border-binanceBorder px-2 py-2 text-[10px] text-binanceYellow hover:border-binanceYellow">Select shown</button>
+        <button type="button" onclick="selectVisibleAdminDepositAssets(false)" class="rounded border border-binanceBorder px-2 py-2 text-[10px] text-binanceMuted hover:text-white">Clear shown</button>
+       </div>
+       <p id="adminDepositAssetSearchCount" aria-live="polite" class="mt-1 text-[10px]"></p>
        <div id="adminDepositAssets" class="mt-1 grid max-h-36 grid-cols-2 gap-1 overflow-y-auto rounded border border-binanceBorder bg-binanceCard p-2 sm:grid-cols-3 xl:grid-cols-4"></div>
-       <p class="mt-1 text-[10px]">Saving applies this address to every checked asset on the selected network.</p>
+       <p class="mt-1 text-[10px]">Search the full asset list and select every asset that should share this network address.</p>
       </div>
       <label class="text-xs text-binanceMuted">Network
        <select id="adminDepositNetwork" onchange="updateAdminDepositAddressInput()" class="mt-1 w-full rounded border border-binanceBorder bg-binanceCard px-3 py-2 text-white outline-none focus:border-binanceYellow"></select>
@@ -4564,6 +4570,7 @@
    marketTickerStats: {},
    marketPriceAdjustments: {},
    cryptoDepositAddresses: [],
+   depositAssetCatalog: [],
    futuresQuotes: {},
    futuresQuoteChanges: {},
    futuresTickerStats: {},
@@ -8535,6 +8542,11 @@
      .filter((market) => market && Number(market.ticker.lastPrice) > 0 && Number(market.ticker.quoteVolume) > 0)
      .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume))
      .slice(0, 150);
+    state.depositAssetCatalog = [...new Set(spotExchange.symbols
+     .filter((symbol) => symbol.status === 'TRADING' && symbol.quoteAsset === 'USDT' && symbol.isSpotTradingAllowed)
+     .map((symbol) => symbol.baseAsset)
+     .filter((asset) => typeof asset === 'string' && /^[A-Z0-9]{2,20}$/.test(asset)))];
+    updateAdminDepositNetworkOptions(true);
     if (spotMarkets.length < 150) throw new Error(`Binance returned only ${spotMarkets.length} eligible spot USDT pairs`);
 
     const futuresTickerBySymbol = new Map(futuresTickers.map((ticker) => [ticker.symbol, ticker]));
@@ -8593,6 +8605,7 @@
     });
 
     updateMarketCatalogs();
+    updateAdminDepositNetworkOptions(true);
     if (state.admin.loggedIn) updateAdminPricePairOptions();
     connectMarketData();
     connectFuturesMarketData();
@@ -12950,6 +12963,7 @@
    return [...new Set([
     'USDT',
     ...CRYPTO_MARKET_CATALOG.map(({ asset }) => asset),
+    ...state.depositAssetCatalog,
     ...state.assets.map(({ asset }) => asset),
     ...state.fundingAssets.map(({ asset }) => asset),
     ...state.cryptoDepositAddresses.map(({ asset }) => asset)
@@ -13034,7 +13048,7 @@
    }
   }
 
-  function updateAdminDepositNetworkOptions() {
+  function updateAdminDepositNetworkOptions(preserveEnteredValue = false) {
    const assetList = document.getElementById('adminDepositAssets');
    const networkSelect = document.getElementById('adminDepositNetwork');
    if (!assetList || !networkSelect) return;
@@ -13046,10 +13060,31 @@
      <span>${escapeHTML(asset)}</span>
     </label>
    `).join('');
+   filterAdminDepositAssets();
    const selectedNetwork = networkSelect.value;
    networkSelect.innerHTML = DEPOSIT_NETWORK_OPTIONS.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
    if (DEPOSIT_NETWORK_OPTIONS.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
-   updateAdminDepositAddressInput();
+   updateAdminDepositAddressInput(preserveEnteredValue);
+  }
+
+  function filterAdminDepositAssets() {
+   const query = document.getElementById('adminDepositAssetSearch')?.value.trim().toLowerCase() || '';
+   const labels = [...document.querySelectorAll('#adminDepositAssets label')];
+   let visibleCount = 0;
+   labels.forEach((label) => {
+    const matches = label.textContent.trim().toLowerCase().includes(query);
+    label.classList.toggle('hidden', !matches);
+    if (matches) visibleCount += 1;
+   });
+   const count = document.getElementById('adminDepositAssetSearchCount');
+   if (count) count.textContent = query? `${visibleCount} matching asset${visibleCount === 1? '': 's'} · ${labels.length} available`: `${labels.length} assets available`;
+  }
+
+  function selectVisibleAdminDepositAssets(selected) {
+   document.querySelectorAll('#adminDepositAssets label:not(.hidden) input[type="checkbox"]').forEach((input) => {
+    input.checked = selected;
+   });
+   updateAdminDepositAddressInput(true);
   }
 
   function selectedAdminDepositAssets() {
