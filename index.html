@@ -10760,30 +10760,41 @@
    let actionAccepted = false;
    try {
     actionRequestStarted = true;
-    await requestAuthApi(`/api/admin/users/${encodeURIComponent(user.id)}`, {
+    const { user: updatedUser } = await requestAuthApi(`/api/admin/users/${encodeURIComponent(user.id)}`, {
      method: 'POST',
      body: JSON.stringify({...payload, requestId: crypto.randomUUID() })
     });
     actionAccepted = true;
     actionRequestStarted = false;
-    const { users } = await requestAuthApi('/api/admin/users', { method: 'GET', headers: {} });
-    const updatedUser = users.find((entry) => String(entry.id) === String(user.id));
-    if (!updatedUser) {
-     throw new Error('The server accepted the action, but the account could not be reloaded. Refresh before retrying.');
+    if (!updatedUser || String(updatedUser.id) !== String(user.id) || updatedUser.role !== 'user') {
+     throw new Error('The server accepted the action but did not return the updated user account. Check action history before retrying.');
     }
     if (payload.action === 'balance_credit') {
-     const previousBalance = Array.isArray(user.wallet)
-      ? user.wallet.find((entry) => entry.asset === payload.asset)
-      : null;
      const updatedBalance = Array.isArray(updatedUser.wallet)
       ? updatedUser.wallet.find((entry) => entry.asset === payload.asset)
       : null;
-     const expectedTotal = Number(previousBalance?.total || 0) + payload.amount;
-     const expectedAvailable = Number(previousBalance?.available || 0) + payload.amount;
+     const creditJob = Array.isArray(updatedUser.balanceJobs)
+      ? updatedUser.balanceJobs.find((job) =>
+       job.operation === 'credit'
+       && job.asset === payload.asset
+       && job.amount === payload.amount
+       && job.status === 'Completed'
+       && typeof job.transactionId === 'string'
+      )
+      : null;
+     const hasRecordedCredit = creditJob && Array.isArray(updatedUser.transactions)
+      && updatedUser.transactions.some((transaction) =>
+       transaction.id === creditJob.transactionId
+       && transaction.type === 'Practice Deposit'
+       && transaction.asset === payload.asset
+       && transaction.amount === payload.amount
+       && transaction.status === 'Completed (practice)'
+      );
      if (!updatedBalance
-      || !Number.isFinite(updatedBalance.total) || updatedBalance.total < expectedTotal
-      || !Number.isFinite(updatedBalance.available) || updatedBalance.available < expectedAvailable) {
-      throw new Error("The server did not confirm the credit in the user's Spot wallet. Do not submit it again; refresh the account and check the action history.");
+      || !Number.isFinite(updatedBalance.total) || updatedBalance.total < payload.amount
+      || !Number.isFinite(updatedBalance.available) || updatedBalance.available < payload.amount
+      || !hasRecordedCredit) {
+      throw new Error("The server accepted the request but its returned account record does not contain the credit. Check action history before retrying.");
      }
     }
     const userIndex = state.users.findIndex((entry) => String(entry.id) === String(updatedUser.id));
