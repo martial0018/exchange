@@ -53,10 +53,11 @@ module.exports = async function handler(req, res) {
         const [loggedInUser] = await db`
             UPDATE users SET last_login_at = NOW()
             WHERE id = ${user.id}
-            RETURNING xmin::text AS version
+            RETURNING id, username, email, full_name, role, wallet, funding_wallet, futures_wallet,
+                      transactions, notifications, balance_jobs, open_orders, order_history,
+                      futures_positions, created_at, updated_at, xmin::text AS version
         `;
-        user.version = loggedInUser.version;
-        sendJson(res, 200, { user: publicUser(user) });
+        sendJson(res, 200, { user: publicUser(loggedInUser) });
     } catch (error) {
         handleError(res, error, 'Unable to sign in');
     }
