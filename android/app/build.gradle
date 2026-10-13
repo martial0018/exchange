@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.martial0018.exchange'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.martial0018.exchange'
+        minSdk 23
+        targetSdk 35
+        versionCode (System.getenv('ANDROID_VERSION_CODE') ?: '1').toInteger()
+        versionName System.getenv('ANDROID_VERSION_NAME') ?: '1.0.0'
+        buildConfigField 'String', 'EXCHANGE_URL', '"https://exchange-seven-jade.vercel.app/"'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    signingConfigs {
+        release {
+            def keystorePath = System.getenv('ANDROID_KEYSTORE_PATH')
+            if (keystorePath) {
+                storeFile file(keystorePath)
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (System.getenv('ANDROID_KEYSTORE_PATH')) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+}
