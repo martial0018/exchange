@@ -5034,9 +5034,15 @@
   }
 
   async function refreshSignedInAccount() {
-   if (!state.currentUser || state.admin.loggedIn || isLocalPreviewMode()
-    || document.visibilityState === 'hidden' || accountRefreshRequestActive
-    || accountSaveInFlight || accountSaveQueued || accountSaveTimer) return;
+   if (!state.currentUser || state.admin.loggedIn || isLocalPreviewMode()) {
+    accountRefreshQueued = false;
+    return;
+   }
+   if (document.visibilityState === 'hidden' || accountRefreshRequestActive) return;
+   if (accountSaveInFlight || accountSaveQueued || accountSaveTimer) {
+    accountRefreshQueued = true;
+    return;
+   }
    accountRefreshRequestActive = true;
    const username = state.currentUser.username;
    try {
@@ -8141,6 +8147,7 @@
   let accountSaveTimer = null;
   let accountSaveInFlight = false;
   let accountSaveQueued = false;
+  let accountRefreshQueued = false;
 
   function queueAuthenticatedAccountSave() {
    if (!state.currentUser || isLocalPreviewMode()) return;
@@ -8191,6 +8198,9 @@
      if (accountSaveQueued && !accountConflict) {
       accountSaveQueued = false;
       queueAuthenticatedAccountSave();
+     } else if (accountRefreshQueued) {
+      accountRefreshQueued = false;
+      window.setTimeout(refreshSignedInAccount, 0);
      }
     }
    }, 500);
@@ -14164,6 +14174,7 @@
     refreshSignedInAccount();
    };
    window.addEventListener('online', resumeMarketFeeds);
+   window.addEventListener('focus', refreshSignedInAccount);
    document.addEventListener('visibilitychange', resumeMarketFeeds);
    window.setInterval(refreshSignedInAccount, 5_000);
    loadTradfiQuotes();
