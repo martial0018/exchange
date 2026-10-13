@@ -3,6 +3,16 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <script>
+  try {
+   const savedPage = JSON.parse(sessionStorage.getItem('exchange-page-v1') || 'null')?.activePage;
+   const initialPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'p2p'];
+   if (initialPages.includes(savedPage)) document.documentElement.dataset.initialAppPage = savedPage;
+   else if (savedPage === 'profile') document.documentElement.dataset.initialAppPage = 'home';
+  } catch (error) {
+   console.error('Could not restore the page before the app starts.', error);
+  }
+ </script>
  <meta name="theme-color" content="#12161a">
  <meta name="description" content="A mobile-friendly exchange market dashboard.">
  <meta name="mobile-web-app-capable" content="yes">
@@ -49,6 +59,19 @@
  </script>
 
  <style>
+  html[data-initial-app-page]:not([data-initial-app-page="trade"]):not([data-initial-app-page="futuresTrade"]) body > main {
+   display: none !important;
+  }
+  html[data-initial-app-page="home"] #userHomePage,
+  html[data-initial-app-page="markets"] #marketsPage,
+  html[data-initial-app-page="futures"] #futuresPage,
+  html[data-initial-app-page="assets"] #assetsPage,
+  html[data-initial-app-page="convert"] #convertPage {
+   display: flex !important;
+  }
+  html[data-initial-app-page="p2p"] #p2pModal {
+   display: flex !important;
+  }
   .mobile-bottom-nav {
    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
@@ -5278,6 +5301,7 @@
    if (isTradingWorkspace) setTab('trade');
    else setTab(page);
    setMobileBottomNavActive(page === 'markets' || page === 'futures' || page === 'assets'? page: page === 'home'? 'home': page === 'futuresTrade'? 'futures': 'trade');
+   document.documentElement.removeAttribute('data-initial-app-page');
    if (page === 'home') renderUserHomeDashboard();
    else if (page === 'markets') renderMarketsPage();
    else if (page === 'futures') {
@@ -13584,6 +13608,16 @@
    setupInstallableApp();
    loadDemoState();
    loadUsers();
+   const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'p2p'].includes(state.activePage)
+    ? state.activePage
+    : 'home';
+   if (!state.currentUser) {
+    if (preferredPage === 'p2p') {
+     openAppPage(['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.returnPage)? state.returnPage: 'trade');
+     openP2PPage();
+    }
+    else openAppPage(preferredPage === 'profile'? 'home': preferredPage);
+   }
    updateDepositNetworkOptions();
    updateAdminDepositNetworkOptions();
    loadDepositAddresses();
@@ -13650,16 +13684,6 @@
    saveDemoState();
    tickFundingCountdown();
    if (window.lucide) window.lucide.createIcons();
-   const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'p2p'].includes(state.activePage)
-    ? state.activePage
-    : 'home';
-   if (!state.currentUser) {
-    if (preferredPage === 'p2p') {
-     openAppPage(['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.returnPage)? state.returnPage: 'trade');
-     openP2PPage();
-    }
-    else openAppPage(preferredPage === 'profile'? 'home': preferredPage);
-   }
    window.addEventListener('resize', () => {
     drawChart();
     if (!document.getElementById('depthView').classList.contains('hidden')) drawDepth();
