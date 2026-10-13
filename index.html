@@ -4291,9 +4291,11 @@
       <p class="mt-1 text-[10px] leading-relaxed text-binanceMuted">These addresses are visible to every account in the deposit form. Leave the address blank and save to remove it. This demo does not monitor blockchain deposits or credit them automatically; do not use real funds.</p>
      </div>
      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <label class="text-xs text-binanceMuted">Asset
-       <select id="adminDepositAsset" onchange="updateAdminDepositNetworkOptions()" class="mt-1 w-full rounded border border-binanceBorder bg-binanceCard px-3 py-2 text-white outline-none focus:border-binanceYellow"></select>
-      </label>
+      <div class="text-xs text-binanceMuted sm:col-span-2">
+       <div>Assets sharing this address</div>
+       <div id="adminDepositAssets" class="mt-1 grid max-h-36 grid-cols-2 gap-1 overflow-y-auto rounded border border-binanceBorder bg-binanceCard p-2 sm:grid-cols-3 xl:grid-cols-4"></div>
+       <p class="mt-1 text-[10px]">Saving applies this address to every checked asset on the selected network.</p>
+      </div>
       <label class="text-xs text-binanceMuted">Network
        <select id="adminDepositNetwork" onchange="updateAdminDepositAddressInput()" class="mt-1 w-full rounded border border-binanceBorder bg-binanceCard px-3 py-2 text-white outline-none focus:border-binanceYellow"></select>
       </label>
@@ -7336,6 +7338,7 @@
    state.admin.userId = user.id;
    state.admin.lastLogin = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
    renderAuthUI();
+   setMarketFeedStatus(state.marketFeedStatus);
   }
 
   async function loadAdminUsers() {
@@ -7647,10 +7650,14 @@
     notify(`Signed in as ${user.username}`);
    } catch (error) {
     console.error('Account sign in failed', error);
-    setAuthFeedback(error.message);
+    const isPreviewPasswordMismatch = isLocalPreviewMode() && error.message === 'Invalid username/email or password';
+    setAuthFeedback(isPreviewPasswordMismatch
+     ? "That password does not match this browser's local preview account. Live-site accounts use a separate sign-in."
+     : error.message);
     const liveSignInLink = document.getElementById('authLiveSignInLink');
     if (liveSignInLink) {
-     liveSignInLink.classList.toggle('hidden', !isLocalPreviewMode() || !error.message.startsWith('No preview account was found'));
+     liveSignInLink.classList.toggle('hidden', !isLocalPreviewMode()
+      || (!isPreviewPasswordMismatch && !error.message.startsWith('No preview account was found')));
     }
    } finally {
     if (button) button.disabled = false;
@@ -8213,19 +8220,21 @@
 
   function setMarketFeedStatus(status) {
    state.marketFeedStatus = status;
+   const isAdmin = state.admin.loggedIn;
    const marketLabel = state.tradingMode === 'futures'? 'Binance futures': 'Binance spot';
    const labels = {
     connecting: 'Connecting',
     waiting: 'Waiting for data',
-    live: `Live · ${new Date().toLocaleTimeString()}`,
-    fallback: `REST backup · Live · ${new Date().toLocaleTimeString()}`,
+    live: isAdmin? `Live · ${new Date().toLocaleTimeString()}`: 'Live',
+    fallback: isAdmin? `REST backup · Live · ${new Date().toLocaleTimeString()}`: 'Live',
     reconnecting: 'Reconnecting · quotes may be stale',
     stale: 'No recent data · quotes may be stale',
     unavailable: 'Feed unavailable · quotes may be stale'
    };
    const label = labels[status] || labels.unavailable;
    document.querySelectorAll('[data-market-feed-status]').forEach((element) => {
-    element.textContent = element.closest('#tradeMarketSummary')? `${marketLabel} · ${label}`: label;
+    element.textContent = element.closest('#tradeMarketSummary') && isAdmin? `${marketLabel} · ${label}`: label;
+    element.classList.toggle('hidden', !isAdmin);
     element.classList.toggle('text-binanceGreen', status === 'live' || status === 'fallback');
     element.classList.toggle('text-binanceRed', status === 'unavailable' || status === 'reconnecting' || status === 'stale');
     element.classList.toggle('text-binanceMuted', status !== 'live' && status !== 'fallback' && status !== 'unavailable' && status !== 'reconnecting' && status !== 'stale');
@@ -10271,6 +10280,7 @@
     state.admin.selectedUser = '';
     state.admin.loadError = '';
     renderAdminPanel();
+    setMarketFeedStatus(state.marketFeedStatus);
     notify('Administrator signed out');
    } catch (error) {
     console.error('Administrator sign out failed', error);
@@ -13025,28 +13035,49 @@
   }
 
   function updateAdminDepositNetworkOptions() {
-   const assetSelect = document.getElementById('adminDepositAsset');
+   const assetList = document.getElementById('adminDepositAssets');
    const networkSelect = document.getElementById('adminDepositNetwork');
-   if (!assetSelect || !networkSelect) return;
+   if (!assetList || !networkSelect) return;
    const assets = supportedDepositAssets();
-   const selectedAsset = assetSelect.value;
-   assetSelect.innerHTML = assets.map((asset) => `<option value="${escapeHTML(asset)}">${escapeHTML(asset)}</option>`).join('');
-   if (assets.includes(selectedAsset)) assetSelect.value = selectedAsset;
-   else assetSelect.value = assets.includes('USDT')? 'USDT': assets[0] || '';
+   const selectedAssets = new Set(selectedAdminDepositAssets());
+   assetList.innerHTML = assets.map((asset) => `
+    <label class="flex items-center gap-2 rounded px-1.5 py-1 text-[11px] text-white hover:bg-binanceHover">
+     <input type="checkbox" value="${escapeHTML(asset)}" ${selectedAssets.has(asset) || (!selectedAssets.size && asset === 'USDT')? 'checked': ''} onchange="updateAdminDepositAddressInput(true)" class="accent-binanceYellow">
+     <span>${escapeHTML(asset)}</span>
+    </label>
+   `).join('');
    const selectedNetwork = networkSelect.value;
    networkSelect.innerHTML = DEPOSIT_NETWORK_OPTIONS.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
    if (DEPOSIT_NETWORK_OPTIONS.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
    updateAdminDepositAddressInput();
   }
 
-  function updateAdminDepositAddressInput() {
-   const asset = document.getElementById('adminDepositAsset')?.value || '';
+  function selectedAdminDepositAssets() {
+   return [...(document.querySelectorAll('#adminDepositAssets input[type="checkbox"]:checked'))].map((input) => input.value);
+  }
+
+  function updateAdminDepositAddressInput(preserveEnteredValue = false) {
+   let assets = selectedAdminDepositAssets();
    const network = document.getElementById('adminDepositNetwork')?.value || '';
-   const saved = depositAddressForSelection(asset, network);
    const address = document.getElementById('adminDepositAddress');
    const memo = document.getElementById('adminDepositMemo');
-   if (address) address.value = saved?.address || '';
-   if (memo) memo.value = saved?.memo || '';
+   if (!address || !memo || (preserveEnteredValue && (address.value || memo.value))) return;
+   const selectedAssetSavedEntry = assets.length? depositAddressForSelection(assets[0], network): null;
+   if (selectedAssetSavedEntry) {
+    const sharedAssets = new Set(state.cryptoDepositAddresses
+     .filter((entry) => entry.network === network && entry.address === selectedAssetSavedEntry.address && entry.memo === selectedAssetSavedEntry.memo)
+     .map((entry) => entry.asset));
+    document.querySelectorAll('#adminDepositAssets input[type="checkbox"]').forEach((input) => {
+     input.checked = sharedAssets.has(input.value);
+    });
+    assets = selectedAdminDepositAssets();
+   }
+   const savedEntries = assets.map((asset) => depositAddressForSelection(asset, network));
+   const firstSharedEntry = savedEntries[0];
+   const sharedSaved = firstSharedEntry
+    && savedEntries.every((entry) => entry && entry.address === firstSharedEntry.address && entry.memo === firstSharedEntry.memo);
+   address.value = sharedSaved? firstSharedEntry.address: '';
+   memo.value = sharedSaved? firstSharedEntry.memo: '';
   }
 
   async function loadAdminDepositAddresses() {
@@ -13066,10 +13097,14 @@
 
   async function saveAdminDepositAddress() {
    if (state.admin.saving) return;
-   const asset = document.getElementById('adminDepositAsset').value;
+   const assets = selectedAdminDepositAssets();
    const network = document.getElementById('adminDepositNetwork').value;
    const address = document.getElementById('adminDepositAddress').value.trim();
    const memo = document.getElementById('adminDepositMemo').value.trim();
+   if (!assets.length) {
+    setAdminFeedback('adminDepositAddressFeedback', 'Select at least one asset for this deposit address.', 'error');
+    return;
+   }
    if (address.length > 200 || memo.length > 120) {
     setAdminFeedback('adminDepositAddressFeedback', 'Address must be 200 characters or fewer and memo/tag 120 characters or fewer.', 'error');
     return;
@@ -13080,14 +13115,14 @@
    try {
     await requestAuthApi('/api/admin/deposit-addresses', {
      method: 'PUT',
-     body: JSON.stringify({ asset, network, address, memo })
+     body: JSON.stringify({ assets, network, address, memo })
     });
     if (!await loadAdminDepositAddresses()) {
      throw new Error('The address was saved, but the latest settings could not be reloaded. Refresh the page to confirm it.');
     }
     setAdminFeedback('adminDepositAddressFeedback', address
-     ? `Saved the shared ${asset} address for ${network}.`
-     : `Removed the shared ${asset} address for ${network}.`, 'success');
+     ? `Saved the shared ${assets.join(', ')} address for ${network}.`
+     : `Removed the shared address for ${assets.join(', ')} on ${network}.`, 'success');
     await loadAdminAudit();
    } catch (error) {
     console.error('Could not save administrator deposit address', error);
