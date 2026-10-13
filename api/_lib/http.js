@@ -75,7 +75,7 @@ function parseJsonArray(value, field, allowMissing = false) {
         throw new Error(`Missing stored ${field} data`);
     }
     let parsed = value;
-    if (typeof parsed === 'string') {
+    while (typeof parsed === 'string') {
         try {
             parsed = JSON.parse(parsed);
         } catch (error) {
