@@ -4739,6 +4739,8 @@
   let quoteFallbackRequestActive = false;
   let quoteCatalogFallbackRequestActive = false;
   let quoteFallbackLastErrorAt = 0;
+  let accountRefreshRequestActive = false;
+  let accountRefreshLastErrorAt = 0;
   let chartDataSocket = null;
   let chartDataReconnectTimer = null;
   let chartDataStaleTimer = null;
@@ -4761,6 +4763,7 @@
   const DEMO_STORAGE_KEY = 'exchange-account-v1';
   const PAGE_SESSION_STORAGE_KEY = 'exchange-page-v1';
   const USERS_STORAGE_KEY = 'exchange-users-v1';
+  const MARKET_CATALOG_STORAGE_KEY = 'exchange-market-catalog-v1';
   const BALANCE_PROCESSING_DELAY_MS = 60_000;
   const P2P_PAYMENT_METHODS = ['Bank Transfer', 'Cash in Person', 'Wise', 'PayPal', 'Revolut', 'Zelle', 'Skrill', 'Apple Pay'];
 
@@ -5005,6 +5008,7 @@
    if (wallet !== user.wallet) user.wallet = wallet;
    state.assets = cloneWallet(wallet);
    state.fundingAssets = hasFundingWallet? cloneWallet(user.fundingWallet): [];
+   state.futuresAssets = Array.isArray(user.futuresWallet)? cloneWallet(user.futuresWallet): [];
    if (!hasFundingWallet) {
     migrateP2PPurchasesToFunding([], user.transactions);
     user.fundingWallet = cloneWallet(state.fundingAssets);
@@ -5022,6 +5026,39 @@
    user.notifications.forEach((item) => {
     if (oldNotifications.get(item.id) !== `${item.title}|${item.message}`) notify(item.message || item.title);
    });
+  }
+
+  async function refreshSignedInAccount() {
+   if (!state.currentUser || state.admin.loggedIn || isLocalPreviewMode()
+    || document.visibilityState === 'hidden' || accountRefreshRequestActive
+    || accountSaveInFlight || accountSaveQueued || accountSaveTimer) return;
+   accountRefreshRequestActive = true;
+   const username = state.currentUser.username;
+   try {
+    const { user } = await requestAuthApi('/api/auth/me', { method: 'GET', headers: {} });
+    accountRefreshLastErrorAt = 0;
+    if (!user || user.role !== 'user' || user.username !== username
+     || state.currentUser?.username !== username) return;
+    const synchronizedFields = [
+     'wallet', 'fundingWallet', 'futuresWallet', 'transactions',
+     'notifications', 'openOrders', 'orderHistory', 'futuresPositions'
+    ];
+    const hasChangedData = synchronizedFields.some((field) =>
+     JSON.stringify(user[field] ?? null) !== JSON.stringify(state.currentUser[field] ?? null)
+    );
+    if (!hasChangedData) return;
+    const userIndex = state.users.findIndex((entry) => entry.username === username);
+    if (userIndex < 0) state.users.push(user);
+    else state.users[userIndex] = user;
+    refreshCurrentUserFromRecord(user, state.currentUser);
+   } catch (error) {
+    if (Date.now() - accountRefreshLastErrorAt >= 30_000) {
+     console.error('Could not refresh the signed-in account.', error);
+     accountRefreshLastErrorAt = Date.now();
+    }
+   } finally {
+    accountRefreshRequestActive = false;
+   }
   }
 
   function handleUserStorageChange(event) {
@@ -7557,9 +7594,22 @@
   }
 
   function syncCurrentUserWallet() {
-   if (!state.currentUser) return;
+   if (!state.currentUser) return false;
    const user = state.users.find((entry) => entry.username === state.currentUser.username);
-   if (!user) return;
+   if (!user) return false;
+   const accountData = {
+    wallet: state.assets,
+    fundingWallet: state.fundingAssets,
+    futuresWallet: state.futuresAssets,
+    transactions: state.transactions,
+    openOrders: state.openOrders,
+    orderHistory: state.orderHistory,
+    futuresPositions: state.futuresPositions
+   };
+   const hasChanges = Object.entries(accountData).some(([field, value]) =>
+    JSON.stringify(user[field] ?? null) !== JSON.stringify(value ?? null)
+   );
+   if (!hasChanges) return false;
    user.wallet = cloneWallet(state.assets);
    user.fundingWallet = cloneWallet(state.fundingAssets);
    user.futuresWallet = cloneWallet(state.futuresAssets);
@@ -7570,6 +7620,7 @@
    user.updatedAt = new Date().toISOString();
    saveUsers();
    if (isLocalPreviewMode()) setLocalPreviewSession(user);
+   return true;
   }
 
   function setCurrentUser(user) {
@@ -7942,8 +7993,7 @@
      formState
     }));
     if (syncAccount && state.currentUser) {
-     syncCurrentUserWallet();
-     queueAuthenticatedAccountSave();
+     if (syncCurrentUserWallet()) queueAuthenticatedAccountSave();
     }
    } catch (error) {
     console.error('Unable to save the local account state.', error);
@@ -7994,7 +8044,7 @@
   }
 
   function saveAccountBeforePageExit() {
-   if (!state.currentUser || isLocalPreviewMode()) return;
+   if (!state.currentUser || isLocalPreviewMode() || !accountSaveTimer || accountSaveInFlight) return;
    window.clearTimeout(accountSaveTimer);
    const body = JSON.stringify({
     wallet: state.assets,
@@ -8417,6 +8467,95 @@
    throw new Error(`Binance spot data is unavailable from all configured endpoints. ${errors.join(' | ')}`);
   }
 
+  function loadCachedMarketCatalogs() {
+   try {
+    const cached = JSON.parse(localStorage.getItem(MARKET_CATALOG_STORAGE_KEY) || 'null');
+    if (!cached || cached.version !== 1
+     || !Array.isArray(cached.spot) || !cached.spot.length
+     || !Array.isArray(cached.futures) || !cached.futures.length) return;
+    const validAsset = (asset) => typeof asset === 'string' && /^[\p{L}\p{N}]{1,20}$/u.test(asset);
+    const spotMarkets = cached.spot.filter((market) => market
+     && validAsset(market.asset)
+     && market.symbol === `${market.asset}USDT`
+     && [market.price, market.change, market.quoteVolume, market.high, market.low].every(Number.isFinite)
+     && market.price > 0 && market.quoteVolume > 0 && market.high > 0 && market.low > 0);
+    const futuresMarkets = cached.futures.filter((market) => market
+     && validAsset(market.asset)
+     && market.symbol === `${market.asset}USDT`
+     && [market.price, market.change, market.quoteVolume, market.funding].every(Number.isFinite)
+     && market.price > 0 && market.quoteVolume > 0);
+    if (spotMarkets.length !== cached.spot.length || futuresMarkets.length !== cached.futures.length) {
+     console.warn('Saved Binance market catalog was invalid and will be refreshed.');
+     return;
+    }
+    CRYPTO_MARKET_CATALOG.splice(0, CRYPTO_MARKET_CATALOG.length,...spotMarkets.map((market) => ({
+     asset: market.asset,
+     symbol: market.symbol,
+     price: market.price,
+     volume: formatMarketVolume(market.quoteVolume)
+    })));
+    LIVE_MARKET_ASSETS.clear();
+    spotMarkets.forEach((market) => {
+     LIVE_MARKET_ASSETS.add(market.asset);
+     state.marketQuotes[market.asset] = market.price;
+     state.marketQuoteChanges[market.asset] = market.change;
+     state.marketTickerStats[market.asset] = {
+      high: market.high,
+      low: market.low,
+      quoteVolume: market.quoteVolume,
+      updatedAt: Number(cached.savedAt) || 0
+     };
+    });
+    FUTURES_MARKET_CATALOG.splice(0, FUTURES_MARKET_CATALOG.length,...futuresMarkets.map((market) => ({
+     asset: market.asset,
+     symbol: market.symbol,
+     pair: market.symbol,
+     price: market.price,
+     change: market.change,
+     funding: market.funding,
+     volume: market.quoteVolume
+    })));
+    futuresMarkets.forEach((market) => {
+     state.futuresQuotes[market.symbol] = market.price;
+     state.futuresQuoteChanges[market.symbol] = market.change;
+     state.futuresTickerStats[market.symbol] = {
+      quoteVolume: market.quoteVolume,
+      updatedAt: Number(cached.savedAt) || 0
+     };
+    });
+   } catch (error) {
+    console.error('Could not restore saved Binance markets.', error);
+   }
+  }
+
+  function saveCachedMarketCatalogs(spotMarkets, futuresMarkets) {
+   try {
+    localStorage.setItem(MARKET_CATALOG_STORAGE_KEY, JSON.stringify({
+     version: 1,
+     savedAt: Date.now(),
+     spot: spotMarkets.map(({ asset, symbol, ticker }) => ({
+      asset,
+      symbol,
+      price: Number(ticker.lastPrice),
+      change: Number(ticker.priceChangePercent),
+      quoteVolume: Number(ticker.quoteVolume),
+      high: Number(ticker.highPrice),
+      low: Number(ticker.lowPrice)
+     })),
+     futures: futuresMarkets.map(({ asset, symbol, ticker, premium }) => ({
+      asset,
+      symbol,
+      price: Number(ticker.lastPrice),
+      change: Number(ticker.priceChangePercent),
+      quoteVolume: Number(ticker.quoteVolume),
+      funding: Number(premium?.lastFundingRate || 0) * 100
+     }))
+    }));
+   } catch (error) {
+    console.warn('Could not save Binance markets for the next reload.', error);
+   }
+  }
+
   async function refreshActiveQuoteFallback() {
    if (quoteFallbackRequestActive) return;
    const isFutures = state.tradingMode === 'futures';
@@ -8586,9 +8725,8 @@
       return ticker? { symbol: symbol.symbol, asset: symbol.baseAsset, ticker }: null;
      })
      .filter((market) => market && Number(market.ticker.lastPrice) > 0 && Number(market.ticker.quoteVolume) > 0)
-     .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume))
-     .slice(0, 150);
-    if (spotMarkets.length < 150) throw new Error(`Binance returned only ${spotMarkets.length} eligible spot USDT pairs`);
+     .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume));
+    if (!spotMarkets.length) throw new Error('Binance returned no eligible spot USDT pairs');
 
     const futuresTickerBySymbol = new Map(futuresTickers.map((ticker) => [ticker.symbol, ticker]));
     const premiumBySymbol = new Map(futuresPremiums.map((premium) => [premium.symbol, premium]));
@@ -8603,11 +8741,11 @@
       return ticker? { symbol: symbol.symbol, asset: symbol.baseAsset, ticker, premium }: null;
      })
      .filter((market) => market && Number(market.ticker.lastPrice) > 0 && Number(market.ticker.quoteVolume) > 0)
-     .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume))
-     .slice(0, 150);
-    if (futuresMarkets.length < 150) throw new Error(`Binance returned only ${futuresMarkets.length} eligible USDⓈ-M perpetuals`);
+     .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume));
+    if (!futuresMarkets.length) throw new Error('Binance returned no eligible USDⓈ-M perpetuals');
 
-    CRYPTO_MARKET_CATALOG.splice(0, CRYPTO_MARKET_CATALOG.length,...spotMarkets.map(({ symbol, asset, ticker }) => ({
+     saveCachedMarketCatalogs(spotMarkets, futuresMarkets);
+     CRYPTO_MARKET_CATALOG.splice(0, CRYPTO_MARKET_CATALOG.length,...spotMarkets.map(({ symbol, asset, ticker }) => ({
      asset,
      symbol,
      price: Number(ticker.lastPrice),
@@ -13606,6 +13744,7 @@
   function init() {
    setupInstallableApp();
    loadDemoState();
+   loadCachedMarketCatalogs();
    loadUsers();
    const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'p2p'].includes(state.activePage)
     ? state.activePage
@@ -13725,9 +13864,11 @@
     connectFuturesMarketData();
     refreshActiveQuoteFallback();
     refreshMarketCatalogFallback();
+    refreshSignedInAccount();
    };
    window.addEventListener('online', resumeMarketFeeds);
    document.addEventListener('visibilitychange', resumeMarketFeeds);
+   window.setInterval(refreshSignedInAccount, 5_000);
    loadTradfiQuotes();
    window.setInterval(loadTradfiQuotes, 15_000);
    loadMarketPriceAdjustments();
