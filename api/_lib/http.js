@@ -66,7 +66,14 @@ function hashToken(token) {
     return crypto.createHash('sha256').update(token).digest('hex');
 }
 
-function parseJsonArray(value, field) {
+function parseJsonArray(value, field, allowMissing = false) {
+    if (value === null || value === undefined) {
+        if (allowMissing) {
+            console.warn(`Missing stored ${field} data; initializing it as an empty array.`);
+            return [];
+        }
+        throw new Error(`Missing stored ${field} data`);
+    }
     let parsed = value;
     if (typeof parsed === 'string') {
         try {
@@ -83,14 +90,14 @@ function normalizeUserJsonFields(user) {
     return {
         ...user,
         wallet: parseJsonArray(user.wallet, 'Spot wallet'),
-        funding_wallet: parseJsonArray(user.funding_wallet, 'Funding wallet'),
-        futures_wallet: parseJsonArray(user.futures_wallet, 'Futures wallet'),
-        transactions: parseJsonArray(user.transactions, 'transactions'),
-        notifications: parseJsonArray(user.notifications, 'notifications'),
-        balance_jobs: parseJsonArray(user.balance_jobs, 'balance jobs'),
-        open_orders: parseJsonArray(user.open_orders, 'open orders'),
-        order_history: parseJsonArray(user.order_history, 'order history'),
-        futures_positions: parseJsonArray(user.futures_positions, 'futures positions')
+        funding_wallet: parseJsonArray(user.funding_wallet, 'Funding wallet', true),
+        futures_wallet: parseJsonArray(user.futures_wallet, 'Futures wallet', true),
+        transactions: parseJsonArray(user.transactions, 'transactions', true),
+        notifications: parseJsonArray(user.notifications, 'notifications', true),
+        balance_jobs: parseJsonArray(user.balance_jobs, 'balance jobs', true),
+        open_orders: parseJsonArray(user.open_orders, 'open orders', true),
+        order_history: parseJsonArray(user.order_history, 'order history', true),
+        futures_positions: parseJsonArray(user.futures_positions, 'futures positions', true)
     };
 }
 
