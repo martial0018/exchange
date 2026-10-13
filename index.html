@@ -6,7 +6,7 @@
  <script>
   try {
    const savedPage = JSON.parse(sessionStorage.getItem('exchange-page-v1') || 'null')?.activePage;
-   const initialPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'p2p'];
+   const initialPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'];
    if (initialPages.includes(savedPage)) document.documentElement.dataset.initialAppPage = savedPage;
    else if (savedPage === 'profile') document.documentElement.dataset.initialAppPage = 'home';
   } catch (error) {
@@ -69,8 +69,11 @@
   html[data-initial-app-page="convert"] #convertPage {
    display: flex !important;
   }
-  html[data-initial-app-page="p2p"] #p2pModal {
-   display: flex !important;
+  html:not([data-p2p-enabled]) [onclick="openP2PPage()"] {
+   display: none !important;
+  }
+  html:not([data-p2p-enabled])[data-initial-app-page="p2p"] #p2pModal {
+   display: none !important;
   }
   .mobile-bottom-nav {
    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
@@ -4903,6 +4906,7 @@
    const notifications = document.getElementById('accountNotifications');
    const homeButton = document.getElementById('homeNavButton');
    const isLoggedIn = !!state.currentUser;
+   document.documentElement.toggleAttribute('data-p2p-enabled', state.admin.loggedIn);
    document.getElementById('appBody')?.classList.toggle('guest-mode', !isLoggedIn);
    const guestHomeContent = document.getElementById('guestHomeContent');
    if (guestHomeContent) {
@@ -5042,7 +5046,7 @@
      || state.currentUser?.username !== username) return;
     const synchronizedFields = [
      'wallet', 'fundingWallet', 'futuresWallet', 'transactions',
-     'notifications', 'openOrders', 'orderHistory', 'futuresPositions'
+     'notifications', 'openOrders', 'orderHistory', 'futuresPositions', 'version'
     ];
     const hasChangedData = synchronizedFields.some((field) =>
      JSON.stringify(user[field] ?? null) !== JSON.stringify(state.currentUser[field] ?? null)
@@ -7411,7 +7415,10 @@
     throw new Error('The account service returned an invalid response. Please try again later.');
    }
    if (!response.ok) {
-    throw new Error(result.error || 'The account request could not be completed.');
+    const requestError = new Error(result.error || 'The account request could not be completed.');
+    requestError.status = response.status;
+    requestError.user = result.user;
+    throw requestError;
    }
    return result;
   }
@@ -7661,15 +7668,12 @@
    if (user) {
     const intendedPage = state.restorePage || state.activePage;
     state.restorePage = null;
-    const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'p2p'].includes(intendedPage)
+    const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile'].includes(intendedPage)
      ? intendedPage
      : 'home';
     if (preferredPage === 'profile') {
      openAppPage(['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.returnPage)? state.returnPage: 'trade');
      openProfilePage();
-    } else if (preferredPage === 'p2p') {
-     openAppPage(['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.returnPage)? state.returnPage: 'trade');
-     openP2PPage();
     } else {
      openAppPage(preferredPage);
     }
@@ -7868,7 +7872,7 @@
     }
     if (typeof saved.asset === 'string' && /^[A-Z0-9]{2,10}$/.test(saved.asset)) state.asset = saved.asset;
     if (typeof saved.selectedPair === 'string' && /^[A-Z0-9]{2,20}$/.test(saved.selectedPair)) state.selectedPair = saved.selectedPair;
-    const validPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'p2p'];
+    const validPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile'];
     if (typeof saved.activePage === 'string' && validPages.includes(saved.activePage)) state.activePage = saved.activePage;
     if (typeof saved.returnPage === 'string' && validPages.includes(saved.returnPage)) state.returnPage = saved.returnPage;
     try {
@@ -8030,10 +8034,12 @@
     const user = state.currentUser;
     if (!user) return;
     accountSaveInFlight = true;
+    let accountConflict = false;
     try {
-     await requestAuthApi('/api/auth/me', {
+     const { user: savedUser } = await requestAuthApi('/api/auth/me', {
       method: 'PUT',
       body: JSON.stringify({
+       version: user.version,
        wallet: state.assets,
        fundingWallet: state.fundingAssets,
        futuresWallet: state.futuresAssets,
@@ -8043,12 +8049,26 @@
        futuresPositions: state.futuresPositions
       })
      });
+     if (state.currentUser?.username === user.username && savedUser?.version) {
+      state.currentUser.version = savedUser.version;
+      state.currentUser.updatedAt = savedUser.updatedAt;
+     }
     } catch (error) {
-     console.error('Could not sync account changes to the server', error);
-     notify(`Could not sync account changes: ${error.message}`);
+     if (error.status === 409 && error.user?.username === user.username) {
+      accountSaveQueued = false;
+      accountConflict = true;
+      const userIndex = state.users.findIndex((entry) => entry.username === user.username);
+      if (userIndex < 0) state.users.push(error.user);
+      else state.users[userIndex] = error.user;
+      refreshCurrentUserFromRecord(error.user, user);
+      notify('Your account was updated elsewhere. The latest balance has been loaded; please retry your last action.');
+     } else {
+      console.error('Could not sync account changes to the server', error);
+      notify(`Could not sync account changes: ${error.message}`);
+     }
     } finally {
      accountSaveInFlight = false;
-     if (accountSaveQueued) {
+     if (accountSaveQueued && !accountConflict) {
       accountSaveQueued = false;
       queueAuthenticatedAccountSave();
      }
@@ -8060,6 +8080,7 @@
    if (!state.currentUser || isLocalPreviewMode() || !accountSaveTimer || accountSaveInFlight) return;
    window.clearTimeout(accountSaveTimer);
    const body = JSON.stringify({
+    version: state.currentUser.version,
     wallet: state.assets,
     fundingWallet: state.fundingAssets,
     futuresWallet: state.futuresAssets,
@@ -8479,10 +8500,40 @@
    updateHomeQuoteDisplays();
   }
 
-  async function fetchBinanceJson(url, options) {
-   const response = await fetch(url, options);
+  function getBinanceProxyUrl(url) {
+   const upstreamUrl = new URL(url, window.location.href);
+   const market = upstreamUrl.hostname === 'fapi.binance.com'
+    ? 'futures'
+    : ['api.binance.com', 'data-api.binance.vision'].includes(upstreamUrl.hostname)
+     ? 'spot'
+     : null;
+   if (!market) return null;
+   const proxyUrl = new URL('/api/market-price-adjustments', window.location.origin);
+   proxyUrl.searchParams.set('resource', 'market-data');
+   proxyUrl.searchParams.set('market', market);
+   proxyUrl.searchParams.set('endpoint', upstreamUrl.pathname);
+   upstreamUrl.searchParams.forEach((value, key) => proxyUrl.searchParams.append(key, value));
+   return proxyUrl.toString();
+  }
+
+  async function readBinanceJson(response) {
    if (!response.ok) throw new Error(`Binance request failed with HTTP ${response.status}`);
    return response.json();
+  }
+
+  async function fetchBinanceJson(url, options) {
+   const proxyUrl = getBinanceProxyUrl(url);
+   if (!proxyUrl) return readBinanceJson(await fetch(url, options));
+   try {
+    return await readBinanceJson(await fetch(proxyUrl, options));
+   } catch (proxyError) {
+    if (proxyError.name === 'AbortError') throw proxyError;
+    try {
+     return await readBinanceJson(await fetch(url, options));
+    } catch (directError) {
+     throw new Error(`Market data is unavailable through the regional proxy and direct Binance access: ${proxyError.message}; ${directError.message}`);
+    }
+   }
   }
 
   async function fetchBinanceSpotJson(path, options = {}) {
@@ -8758,11 +8809,21 @@
      .filter((asset) => typeof asset === 'string' && /^[A-Z0-9]{2,20}$/.test(asset)))];
     updateAdminDepositNetworkOptions(true);
 
-    const [spotTickers, futuresExchange, futuresTickers, futuresPremiums] = await Promise.all([
+    const [spotTickers, futuresData] = await Promise.all([
      fetchBinanceSpotJson('/api/v3/ticker/24hr'),
-     fetchBinanceJson('https://fapi.binance.com/fapi/v1/exchangeInfo'),
-     fetchBinanceJson('https://fapi.binance.com/fapi/v1/ticker/24hr'),
-     fetchBinanceJson('https://fapi.binance.com/fapi/v1/premiumIndex')
+     (async () => {
+      try {
+       const [exchange, tickers, premiums] = await Promise.all([
+        fetchBinanceJson('https://fapi.binance.com/fapi/v1/exchangeInfo'),
+        fetchBinanceJson('https://fapi.binance.com/fapi/v1/ticker/24hr'),
+        fetchBinanceJson('https://fapi.binance.com/fapi/v1/premiumIndex')
+       ]);
+       return { exchange, tickers, premiums };
+      } catch (error) {
+       console.error('Unable to refresh Binance Futures markets; continuing with Spot markets.', error);
+       return null;
+      }
+     })()
     ]);
 
     const spotTickerBySymbol = new Map(spotTickers.map((ticker) => [ticker.symbol, ticker]));
@@ -8781,23 +8842,29 @@
      .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume));
     if (!spotMarkets.length) throw new Error('Binance returned no eligible Spot pairs');
 
-    const futuresTickerBySymbol = new Map(futuresTickers.map((ticker) => [ticker.symbol, ticker]));
-    const premiumBySymbol = new Map(futuresPremiums.map((premium) => [premium.symbol, premium]));
-    const futuresMarkets = futuresExchange.symbols
-     .filter((symbol) => symbol.status === 'TRADING'
-      && symbol.contractType === 'PERPETUAL'
-      && symbol.quoteAsset === 'USDT'
-      && symbol.marginAsset === 'USDT')
-     .map((symbol) => {
-      const ticker = futuresTickerBySymbol.get(symbol.symbol);
-      const premium = premiumBySymbol.get(symbol.symbol);
-      return ticker? { symbol: symbol.symbol, asset: symbol.baseAsset, ticker, premium }: null;
-     })
-     .filter((market) => market && Number(market.ticker.lastPrice) > 0 && Number(market.ticker.quoteVolume) > 0)
-     .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume));
-    if (!futuresMarkets.length) throw new Error('Binance returned no eligible USDⓈ-M perpetuals');
+    const futuresMarkets = futuresData
+     && Array.isArray(futuresData.exchange.symbols)
+     && Array.isArray(futuresData.tickers)
+     && Array.isArray(futuresData.premiums)
+     ? (() => {
+      const futuresTickerBySymbol = new Map(futuresData.tickers.map((ticker) => [ticker.symbol, ticker]));
+      const premiumBySymbol = new Map(futuresData.premiums.map((premium) => [premium.symbol, premium]));
+      return futuresData.exchange.symbols
+       .filter((symbol) => symbol.status === 'TRADING'
+        && symbol.contractType === 'PERPETUAL'
+        && symbol.quoteAsset === 'USDT'
+        && symbol.marginAsset === 'USDT')
+       .map((symbol) => {
+        const ticker = futuresTickerBySymbol.get(symbol.symbol);
+        const premium = premiumBySymbol.get(symbol.symbol);
+        return ticker? { symbol: symbol.symbol, asset: symbol.baseAsset, ticker, premium }: null;
+       })
+       .filter((market) => market && Number(market.ticker.lastPrice) > 0 && Number(market.ticker.quoteVolume) > 0)
+       .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume));
+     })()
+     : [];
 
-    saveCachedMarketCatalogs(spotMarkets, futuresMarkets);
+    if (futuresMarkets.length) saveCachedMarketCatalogs(spotMarkets, futuresMarkets);
     CRYPTO_MARKET_CATALOG.splice(0, CRYPTO_MARKET_CATALOG.length,...spotMarkets.map(({ symbol, asset, quoteAsset, ticker }) => ({
      asset,
      quoteAsset,
@@ -8829,23 +8896,25 @@
      }
     });
 
-    FUTURES_MARKET_CATALOG.splice(0, FUTURES_MARKET_CATALOG.length,...futuresMarkets.map(({ symbol, asset, ticker, premium }) => ({
-     asset,
-     symbol,
-     pair: symbol,
-     price: Number(ticker.lastPrice),
-     change: Number(ticker.priceChangePercent),
-     funding: Number(premium?.lastFundingRate || 0) * 100,
-     volume: Number(ticker.quoteVolume)
-    })));
-    futuresMarkets.forEach(({ symbol, asset, ticker }) => {
-     state.futuresQuotes[symbol] = Number(ticker.lastPrice);
-     state.futuresQuoteChanges[symbol] = Number(ticker.priceChangePercent);
-     state.futuresTickerStats[symbol] = {
-      quoteVolume: Number(ticker.quoteVolume),
-      updatedAt: Number(ticker.closeTime) || Date.now()
-     };
-    });
+    if (futuresMarkets.length) {
+     FUTURES_MARKET_CATALOG.splice(0, FUTURES_MARKET_CATALOG.length,...futuresMarkets.map(({ symbol, asset, ticker, premium }) => ({
+      asset,
+      symbol,
+      pair: symbol,
+      price: Number(ticker.lastPrice),
+      change: Number(ticker.priceChangePercent),
+      funding: Number(premium?.lastFundingRate || 0) * 100,
+      volume: Number(ticker.quoteVolume)
+     })));
+     futuresMarkets.forEach(({ symbol, asset, ticker }) => {
+      state.futuresQuotes[symbol] = Number(ticker.lastPrice);
+      state.futuresQuoteChanges[symbol] = Number(ticker.priceChangePercent);
+      state.futuresTickerStats[symbol] = {
+       quoteVolume: Number(ticker.quoteVolume),
+       updatedAt: Number(ticker.closeTime) || Date.now()
+      };
+     });
+    }
 
     updateMarketCatalogs();
     updateAdminDepositNetworkOptions(true);
@@ -10701,6 +10770,11 @@
   }
 
   function openP2PPage() {
+   if (!state.admin.loggedIn) {
+    notify('P2P is available to administrators only');
+    openAppPage(state.currentUser? 'trade': 'home');
+    return;
+   }
    const mainApp = document.querySelector('main');
    const p2pModal = document.getElementById('p2pModal');
    state.returnPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.activePage)? state.activePage: 'trade';
@@ -10740,6 +10814,10 @@
   }
 
   function openModal(id) {
+   if (id === 'p2pModal' && !state.admin.loggedIn) {
+    notify('P2P is available to administrators only');
+    return;
+   }
    const modal = document.getElementById(id);
    if (modal) modal.classList.remove('hidden');
    if (id === 'depositModal') updateDepositNetworkOptions();
@@ -13820,16 +13898,10 @@
    loadDemoState();
    loadCachedMarketCatalogs();
    loadUsers();
-   const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'p2p'].includes(state.activePage)
+   const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile'].includes(state.activePage)
     ? state.activePage
     : 'home';
-   if (!state.currentUser) {
-    if (preferredPage === 'p2p') {
-     openAppPage(['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'].includes(state.returnPage)? state.returnPage: 'trade');
-     openP2PPage();
-    }
-    else openAppPage(preferredPage === 'profile'? 'home': preferredPage);
-   }
+   if (!state.currentUser) openAppPage(preferredPage === 'profile'? 'home': preferredPage);
    updateDepositNetworkOptions();
    updateAdminDepositNetworkOptions();
    loadDepositAddresses();

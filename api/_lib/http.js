@@ -82,7 +82,7 @@ async function getSessionUser(req) {
     const [user] = await getDb()`
         SELECT u.id, u.username, u.email, u.full_name, u.role, u.wallet, u.funding_wallet, u.futures_wallet,
                u.transactions, u.notifications, u.balance_jobs, u.open_orders,
-               u.order_history, u.futures_positions, u.created_at, u.updated_at
+               u.order_history, u.futures_positions, u.created_at, u.updated_at, u.xmin::text AS version
         FROM sessions s
         JOIN users u ON u.id = s.user_id
         WHERE s.token_hash = ${hashToken(token)} AND s.expires_at > NOW()
@@ -107,6 +107,7 @@ function publicUser(user) {
         openOrders: user.open_orders,
         orderHistory: user.order_history,
         futuresPositions: user.futures_positions,
+        version: user.version,
         createdAt: user.created_at,
         updatedAt: user.updated_at
     };

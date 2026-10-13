@@ -105,7 +105,7 @@ module.exports = async function handler(req, res) {
                 const [existingUser] = await sql`
                     SELECT id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                            notifications, balance_jobs, open_orders, order_history, futures_positions,
-                           created_at, updated_at
+                           created_at, updated_at, xmin::text AS version
                     FROM users WHERE id = ${existingAction.target_user_id}
                 `;
                 return existingUser ? [{ user: existingUser, duplicate: true }] : [];
@@ -114,7 +114,7 @@ module.exports = async function handler(req, res) {
             const [user] = await sql`
                 SELECT id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                        notifications, balance_jobs, open_orders, order_history, futures_positions,
-                       created_at, updated_at
+                       created_at, updated_at, xmin::text AS version
                 FROM users
                 WHERE id = ${userId} AND role = 'user'
                 FOR UPDATE
@@ -207,7 +207,7 @@ module.exports = async function handler(req, res) {
                 WHERE id = ${userId}
                 RETURNING id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                           notifications, balance_jobs, open_orders, order_history, futures_positions,
-                          created_at, updated_at
+                          created_at, updated_at, xmin::text AS version
             `;
             await sql`
                 INSERT INTO admin_audit_log (actor_id, target_user_id, action, before_wallet, after_wallet, details, request_id)

@@ -39,9 +39,12 @@ module.exports = async function handler(req, res) {
             if (Buffer.byteLength(JSON.stringify(body), 'utf8') > 200_000) {
                 return sendJson(res, 413, { error: 'Account update is too large' });
             }
-            const allowed = ['wallet', 'fundingWallet', 'futuresWallet', 'transactions', 'notifications', 'openOrders', 'orderHistory', 'futuresPositions'];
+            const allowed = ['version', 'wallet', 'fundingWallet', 'futuresWallet', 'transactions', 'notifications', 'openOrders', 'orderHistory', 'futuresPositions'];
             if (Object.keys(body).some((key) => !allowed.includes(key))) {
                 return sendJson(res, 400, { error: 'Unsupported account data field' });
+            }
+            if (typeof body.version !== 'string' || !/^\d+$/.test(body.version)) {
+                return sendJson(res, 428, { error: 'Your account data is out of date. Refresh before saving.' });
             }
             for (const field of ['wallet', 'fundingWallet', 'futuresWallet']) {
                 if (body[field] !== undefined && !validWallet(body[field])) {
@@ -72,12 +75,24 @@ module.exports = async function handler(req, res) {
                     order_history = COALESCE(${body.orderHistory === undefined ? null : JSON.stringify(body.orderHistory)}::jsonb, order_history),
                     futures_positions = COALESCE(${body.futuresPositions === undefined ? null : JSON.stringify(body.futuresPositions)}::jsonb, futures_positions),
                     updated_at = NOW()
-                WHERE id = ${user.id}
+                WHERE id = ${user.id} AND xmin::text = ${body.version}
                 RETURNING id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                        notifications, balance_jobs, open_orders, order_history, futures_positions,
-                       created_at, updated_at
+                       created_at, updated_at, xmin::text AS version
             `;
-            if (!freshUser) return sendJson(res, 404, { error: 'Account not found' });
+            if (!freshUser) {
+                const [latestUser] = await getDb()`
+                    SELECT id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
+                           notifications, balance_jobs, open_orders, order_history, futures_positions,
+                           created_at, updated_at, xmin::text AS version
+                    FROM users WHERE id = ${user.id}
+                `;
+                if (!latestUser) return sendJson(res, 404, { error: 'Account not found' });
+                return sendJson(res, 409, {
+                    error: 'Your account changed elsewhere. The latest balance and account data have been refreshed.',
+                    user: publicUser(latestUser)
+                });
+            }
             return sendJson(res, 200, { user: publicUser(freshUser) });
         }
         return methodNotAllowed(res, ['GET', 'PUT', 'DELETE']);

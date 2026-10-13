@@ -8,7 +8,7 @@ module.exports = async function handler(req, res) {
         const users = await getDb()`
             SELECT id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                    notifications, balance_jobs, open_orders, order_history, futures_positions,
-                   created_at, updated_at
+                   created_at, updated_at, xmin::text AS version
             FROM users
             WHERE role = 'user'
             ORDER BY created_at DESC

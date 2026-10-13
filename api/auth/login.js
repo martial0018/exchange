@@ -29,7 +29,7 @@ module.exports = async function handler(req, res) {
         const [user] = await db`
             SELECT id, username, email, full_name, role, password_hash, wallet, funding_wallet, futures_wallet,
                    transactions, notifications, balance_jobs, open_orders, order_history,
-                   futures_positions, created_at, updated_at
+                   futures_positions, created_at, updated_at, xmin::text AS version
             FROM users
             WHERE LOWER(username) = ${normalized} OR LOWER(email) = ${normalized}
             LIMIT 1
@@ -50,7 +50,12 @@ module.exports = async function handler(req, res) {
         }
         await db`DELETE FROM login_attempts WHERE identifier = ${normalized}`;
         await createSession(user.id, res);
-        await db`UPDATE users SET last_login_at = NOW() WHERE id = ${user.id}`;
+        const [loggedInUser] = await db`
+            UPDATE users SET last_login_at = NOW()
+            WHERE id = ${user.id}
+            RETURNING xmin::text AS version
+        `;
+        user.version = loggedInUser.version;
         sendJson(res, 200, { user: publicUser(user) });
     } catch (error) {
         handleError(res, error, 'Unable to sign in');
