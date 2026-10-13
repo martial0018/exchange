@@ -3,6 +3,8 @@
 This Android app is a signed native package that opens the live Exchange site in
 an Android WebView. An internet connection is required. Android customers can
 download the APK directly from the website without using Google Play.
+The attached Binance image is also displayed as the native splash screen while
+the WebView loads the site.
 
 ## Release signing setup
 
