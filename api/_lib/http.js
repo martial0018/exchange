@@ -66,6 +66,34 @@ function hashToken(token) {
     return crypto.createHash('sha256').update(token).digest('hex');
 }
 
+function parseJsonArray(value, field) {
+    let parsed = value;
+    if (typeof parsed === 'string') {
+        try {
+            parsed = JSON.parse(parsed);
+        } catch (error) {
+            throw new Error(`Invalid stored ${field} data`, { cause: error });
+        }
+    }
+    if (!Array.isArray(parsed)) throw new Error(`Invalid stored ${field} data`);
+    return parsed;
+}
+
+function normalizeUserJsonFields(user) {
+    return {
+        ...user,
+        wallet: parseJsonArray(user.wallet, 'Spot wallet'),
+        funding_wallet: parseJsonArray(user.funding_wallet, 'Funding wallet'),
+        futures_wallet: parseJsonArray(user.futures_wallet, 'Futures wallet'),
+        transactions: parseJsonArray(user.transactions, 'transactions'),
+        notifications: parseJsonArray(user.notifications, 'notifications'),
+        balance_jobs: parseJsonArray(user.balance_jobs, 'balance jobs'),
+        open_orders: parseJsonArray(user.open_orders, 'open orders'),
+        order_history: parseJsonArray(user.order_history, 'order history'),
+        futures_positions: parseJsonArray(user.futures_positions, 'futures positions')
+    };
+}
+
 async function createSession(userId, res) {
     const token = crypto.randomBytes(32).toString('base64url');
     const expiresAt = new Date(Date.now() + SESSION_DURATION_SECONDS * 1000);
@@ -88,28 +116,29 @@ async function getSessionUser(req) {
         WHERE s.token_hash = ${hashToken(token)} AND s.expires_at > NOW()
         LIMIT 1
     `;
-    return user || null;
+    return user ? normalizeUserJsonFields(user) : null;
 }
 
 function publicUser(user) {
+    const normalizedUser = normalizeUserJsonFields(user);
     return {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        fullName: user.full_name,
-        role: user.role,
-        wallet: user.wallet,
-        fundingWallet: user.funding_wallet,
-        futuresWallet: user.futures_wallet,
-        transactions: user.transactions,
-        notifications: user.notifications,
-        balanceJobs: user.balance_jobs,
-        openOrders: user.open_orders,
-        orderHistory: user.order_history,
-        futuresPositions: user.futures_positions,
-        version: user.version,
-        createdAt: user.created_at,
-        updatedAt: user.updated_at
+        id: normalizedUser.id,
+        username: normalizedUser.username,
+        email: normalizedUser.email,
+        fullName: normalizedUser.full_name,
+        role: normalizedUser.role,
+        wallet: normalizedUser.wallet,
+        fundingWallet: normalizedUser.funding_wallet,
+        futuresWallet: normalizedUser.futures_wallet,
+        transactions: normalizedUser.transactions,
+        notifications: normalizedUser.notifications,
+        balanceJobs: normalizedUser.balance_jobs,
+        openOrders: normalizedUser.open_orders,
+        orderHistory: normalizedUser.order_history,
+        futuresPositions: normalizedUser.futures_positions,
+        version: normalizedUser.version,
+        createdAt: normalizedUser.created_at,
+        updatedAt: normalizedUser.updated_at
     };
 }
 
@@ -180,7 +209,9 @@ module.exports = {
     handleError,
     hashPassword,
     methodNotAllowed,
+    normalizeUserJsonFields,
     parseBody,
+    parseJsonArray,
     publicUser,
     requireSameOrigin,
     requireUser,

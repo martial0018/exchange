@@ -1,5 +1,5 @@
 const crypto = require('node:crypto');
-const { getDb, handleError, methodNotAllowed, parseBody, publicUser, requireSameOrigin, requireUser, sendJson, validWallet } = require('../../_lib/http');
+const { getDb, handleError, methodNotAllowed, normalizeUserJsonFields, parseBody, publicUser, requireSameOrigin, requireUser, sendJson, validWallet } = require('../../_lib/http');
 
 const DEFAULT_WALLET = [
     { asset: 'BTC', total: 0, available: 0, inOrders: 0 },
@@ -102,16 +102,17 @@ module.exports = async function handler(req, res) {
                 WHERE actor_id = ${admin.id} AND request_id = ${body.requestId}
             `;
             if (existingAction) {
-                const [existingUser] = await sql`
+                const [existingUserRow] = await sql`
                     SELECT id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                            notifications, balance_jobs, open_orders, order_history, futures_positions,
                            created_at, updated_at, xmin::text AS version
                     FROM users WHERE id = ${existingAction.target_user_id}
                 `;
+                const existingUser = existingUserRow ? normalizeUserJsonFields(existingUserRow) : null;
                 return existingUser ? [{ user: existingUser, duplicate: true }] : [];
             }
 
-            const [user] = await sql`
+            const [userRow] = await sql`
                 SELECT id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
                        notifications, balance_jobs, open_orders, order_history, futures_positions,
                        created_at, updated_at, xmin::text AS version
@@ -119,6 +120,7 @@ module.exports = async function handler(req, res) {
                 WHERE id = ${userId} AND role = 'user'
                 FOR UPDATE
             `;
+            const user = userRow ? normalizeUserJsonFields(userRow) : null;
             if (!user) return [];
 
             const beforeWallet = Array.isArray(user.wallet) ? user.wallet : [];

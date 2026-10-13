@@ -1,4 +1,4 @@
-const { getDb, handleError, methodNotAllowed, requireUser, sendJson } = require('../_lib/http');
+const { getDb, handleError, methodNotAllowed, parseJsonArray, requireUser, sendJson } = require('../_lib/http');
 
 function balanceFor(wallet, asset) {
     return Array.isArray(wallet) ? wallet.find((balance) => balance && balance.asset === asset) : null;
@@ -12,16 +12,18 @@ function normalizeAuditDetails(entry) {
         : {};
     if (entry.action !== 'balance_credit') return details;
 
+    const beforeWallet = parseJsonArray(entry.before_wallet, 'audit before wallet');
+    const afterWallet = parseJsonArray(entry.after_wallet, 'audit after wallet');
     let asset = typeof details.asset === 'string' ? details.asset : '';
     if (!asset) {
-        asset = (Array.isArray(entry.after_wallet) ? entry.after_wallet : [])
+        asset = afterWallet
             .find((afterBalance) => {
-                const beforeBalance = balanceFor(entry.before_wallet, afterBalance?.asset);
+                const beforeBalance = balanceFor(beforeWallet, afterBalance?.asset);
                 return afterBalance && Number(afterBalance.total) > Number(beforeBalance?.total || 0);
             })?.asset || '';
     }
-    const beforeBalance = balanceFor(entry.before_wallet, asset);
-    const afterBalance = balanceFor(entry.after_wallet, asset);
+    const beforeBalance = balanceFor(beforeWallet, asset);
+    const afterBalance = balanceFor(afterWallet, asset);
     const amount = Number(details.amount);
     const recordedChange = Number(afterBalance?.total) - Number(beforeBalance?.total || 0);
     if (asset) details.asset = asset;
