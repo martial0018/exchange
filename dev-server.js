@@ -15,12 +15,14 @@ const publicFiles = new Map([
     ['/service-worker.js', 'service-worker.js'],
     ['/app-icon-192.png', 'app-icon-192.png'],
     ['/app-icon-512.png', 'app-icon-512.png'],
-    ['/apple-touch-icon.png', 'apple-touch-icon.png']
+    ['/apple-touch-icon.png', 'apple-touch-icon.png'],
+    ['/exchange-android.apk', 'exchange-android.apk']
 ]);
 const contentTypes = {
     '.html': 'text/html; charset=utf-8',
     '.js': 'text/javascript; charset=utf-8',
     '.png': 'image/png',
+    '.apk': 'application/vnd.android.package-archive',
     '.webmanifest': 'application/manifest+json; charset=utf-8'
 };
 

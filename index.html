@@ -4457,7 +4457,7 @@
    </div>
    <div class="flex flex-col gap-2">
     <button id="installPromptButton" type="button" onclick="installExchangeApp()" class="hidden w-full rounded-lg bg-binanceYellow px-4 py-3 text-xs font-bold text-binanceBg hover:bg-binanceYellowHover">Install app</button>
-     <a id="androidApkDownloadButton" href="https://github.com/martial0018/exchange/releases/latest/download/exchange-android.apk" class="hidden w-full rounded-lg bg-binanceYellow px-4 py-3 text-center text-xs font-bold text-binanceBg hover:bg-binanceYellowHover">Download Android app</a>
+     <a id="androidApkDownloadButton" href="/exchange-android.apk" download="Exchange.apk" class="hidden w-full rounded-lg bg-binanceYellow px-4 py-3 text-center text-xs font-bold text-binanceBg hover:bg-binanceYellowHover">Download Android app</a>
      <p id="androidApkStatus" class="hidden text-center text-[10px] leading-relaxed text-binanceMuted" role="status" aria-live="polite"></p>
      <button id="copyLinkForSafariButton" type="button" onclick="copyLinkForSafari()" class="hidden w-full rounded-lg border border-binanceBorder px-4 py-3 text-xs font-semibold text-white hover:bg-binanceHover">Copy link to open in Safari</button>
      <button type="button" onclick="closeModal('installHelpModal')" class="w-full rounded-lg border border-binanceBorder px-4 py-3 text-xs font-semibold text-white hover:bg-binanceHover">Done</button>
@@ -6402,7 +6402,7 @@
    futuresPositionsTab.className = `border-b-2 pb-1 text-xs font-semibold ${futuresView === 'positions'? 'border-binanceYellow text-white': 'border-transparent text-binanceMuted'}`;
    document.getElementById('mobileAssetsFuturesAssetsList').classList.toggle('hidden', futuresView !== 'assets');
    document.getElementById('mobileAssetsFuturesPositionsList').classList.toggle('hidden', futuresView !== 'positions');
-   document.getElementById('mobileAssetsFuturesAssetsList').innerHTML = futuresSupported? `
+   document.getElementById('mobileAssetsFuturesAssetsList').innerHTML = futuresSupported && futuresWalletBalance > 0? `
     <article class="p-4">
      <div class="flex items-center justify-between">
       <div class="flex items-center gap-2"><span class="flex h-9 w-9 items-center justify-center rounded-full bg-[#26a17b] text-xs font-bold text-white">U</span><span class="text-xs font-bold text-white">USDT</span></div>
@@ -6415,7 +6415,9 @@
       <div><div class="text-[9px] text-binanceMuted">Available for Transfer</div><div class="mt-1 font-mono text-[10px] text-white">${visible? Number(futuresUsdtBalance.available || 0).toFixed(2): mask}</div></div>
      </div>
     </article>
-   `: '<div class="p-6 text-center text-[10px] text-binanceMuted">No COIN-M wallet balances. COIN-M trading is not enabled in this view.</div>';
+   `: futuresSupported
+    ? '<div class="p-6 text-center text-[10px] text-binanceMuted">No USDⓈ-M wallet balance.</div>'
+    : '<div class="p-6 text-center text-[10px] text-binanceMuted">No COIN-M wallet balances. COIN-M trading is not enabled in this view.</div>';
    const futuresPositions = futuresSupported? state.futuresPositions: [];
    document.getElementById('mobileAssetsFuturesPositionsList').innerHTML = futuresPositions.length? futuresPositions.map((position) => {
     const mark = position.pair.replace('/', '') === state.selectedPair? state.currentPrice: position.markPrice;
@@ -6455,9 +6457,8 @@
    const search = (document.getElementById('assetsPageSearch')?.value || '').trim().toLowerCase();
    const mobileSearch = document.getElementById('mobileAssetsSearch');
    if (mobileSearch && document.activeElement !== mobileSearch) mobileSearch.value = document.getElementById('assetsPageSearch').value;
-   const visibleBalances = balances.filter((balance) => String(balance.asset).toLowerCase().includes(search));
-   const visibleFundingBalances = fundingBalances.filter((balance) => String(balance.asset).toLowerCase().includes(search));
-   const visibleDisplayBalances = displayBalances.filter((balance) => String(balance.asset).toLowerCase().includes(search));
+   const visibleFundingBalances = fundingBalances.filter((balance) => Number(balance.total || 0) > 0 && String(balance.asset).toLowerCase().includes(search));
+   const visibleDisplayBalances = displayBalances.filter((balance) => Number(balance.total || 0) > 0 && String(balance.asset).toLowerCase().includes(search));
    const assetsList = document.getElementById('assetsPageList');
    if (section === 'funding') {
     assetsList.innerHTML = visibleFundingBalances.length? visibleFundingBalances.map((balance) => {
@@ -6477,7 +6478,7 @@
        <div class="shrink-0 text-right"><div class="font-mono text-xs font-semibold text-white">${visible? formatMoney(estimate): mask}</div><div class="mt-1 font-mono text-[9px] text-binanceMuted">${visible? `≈ ${btcValue.toFixed(8)} BTC`: '≈ •••••• BTC'}</div></div>
       </article>
      `;
-    }).join(''): '<div class="p-8 text-center text-xs text-binanceMuted">Completed P2P purchases will appear in your Funding wallet.</div>';
+    }).join(''): '<div class="p-8 text-center text-xs text-binanceMuted">No assets with a balance in your Funding wallet.</div>';
    } else if (section === 'futures') {
     const positions = state.futuresPositions;
     assetsList.innerHTML = positions.length? positions.map((position) => {
@@ -6510,7 +6511,7 @@
       <div class="text-right"><div class="font-mono text-xs font-semibold text-white">${visible? formatMoney(estimate): mask}</div><div class="mt-1 text-[9px] text-binanceMuted">${formatMoney(assetPrice)} / ${escapeHTML(balance.asset)}</div>${balance.wallet !== 'Futures' && balance.asset !== 'USDT'? `<button type="button" onclick="openMarketPair('${escapeHTML(balance.asset)}USDT', ${assetPrice}, '${escapeHTML(balance.asset)}')" class="mt-2 rounded border border-binanceBorder px-2.5 py-1 text-[9px] font-semibold text-binanceYellow">Trade</button>`: ''}</div>
      </article>
     `;
-    }).join(''): '<div class="p-8 text-center text-xs text-binanceMuted">No matching assets. Try a different search.</div>';
+    }).join(''): `<div class="p-8 text-center text-xs text-binanceMuted">${search? 'No matching assets. Try a different search.': 'No assets with a balance.'}</div>`;
    }
    document.getElementById('mobileAssetsBalanceCaption').textContent = section === 'spot'
     ? 'Supported Spot assets · balances and values estimated in USDT'
@@ -10534,21 +10535,10 @@
     || /ExchangeAndroidApp/i.test(navigator.userAgent);
   }
 
-  function setAndroidApkStatus(message, showReleasesLink = false) {
+  function setAndroidApkStatus(message) {
    const status = document.getElementById('androidApkStatus');
    if (!status) return;
    status.replaceChildren(document.createTextNode(message));
-   if (showReleasesLink) {
-    status.append(
-     document.createTextNode(' '),
-     Object.assign(document.createElement('a'), {
-      href: 'https://github.com/martial0018/exchange/releases',
-      target: '_blank',
-      rel: 'noopener noreferrer',
-      textContent: 'View releases'
-     })
-    );
-   }
    status.classList.remove('hidden');
   }
 
@@ -10560,27 +10550,17 @@
     if (!status || !download) return;
     setAndroidApkStatus('Checking for the signed Android app…');
     try {
-     const response = await fetch('https://api.github.com/repos/martial0018/exchange/releases/latest', {
-      headers: { Accept: 'application/vnd.github+json' },
+     const response = await fetch(download.href, {
+      method: 'HEAD',
       cache: 'no-store'
      });
      if (response.status === 404) {
       androidApkIsAvailable = false;
-      setAndroidApkStatus('The signed Android APK is not published yet. Please check back soon.', true);
+      setAndroidApkStatus('The signed Android APK is not published yet. Please check back soon.');
       return;
      }
-     if (!response.ok) throw new Error(`GitHub release check failed with HTTP ${response.status}`);
-     const release = await response.json();
-     const apk = Array.isArray(release.assets)
-      ? release.assets.find((asset) => asset.name === 'exchange-android.apk' && typeof asset.browser_download_url === 'string')
-      : null;
-     if (!apk) {
-      androidApkIsAvailable = false;
-      setAndroidApkStatus('The latest release does not include the Android APK yet.', true);
-      return;
-     }
+     if (!response.ok) throw new Error(`Android APK check failed with HTTP ${response.status}`);
      androidApkIsAvailable = true;
-     download.href = apk.browser_download_url;
      status.classList.add('hidden');
      if (/Android/i.test(navigator.userAgent) && !/ExchangeAndroidApp/i.test(navigator.userAgent)) {
       download.classList.remove('hidden');
@@ -10588,7 +10568,7 @@
     } catch (error) {
      androidApkIsAvailable = false;
      console.error('Unable to check Android APK release availability.', error);
-     setAndroidApkStatus('Could not check for the signed APK. Try again later.', true);
+     setAndroidApkStatus('Could not check for the signed APK. Try again later.');
     }
    })();
    return androidApkAvailabilityPromise;
@@ -13087,7 +13067,7 @@
     walletButton.title = `Estimated wallet value: ${formatMoney(walletTotal + fundingTotal)}. USDT: ${totalUSDT.toLocaleString('en-US', { maximumFractionDigits: 8 })} total, ${availableUSDT.toLocaleString('en-US', { maximumFractionDigits: 8 })} Spot available, ${inOrdersUSDT.toLocaleString('en-US', { maximumFractionDigits: 8 })} in orders.`;
     walletButton.setAttribute('aria-label', `Open wallet overview. Estimated value ${formatMoney(walletTotal + fundingTotal)}. ${availableUSDT.toLocaleString('en-US', { maximumFractionDigits: 8 })} USDT available.`);
    }
-   tbody.innerHTML = state.assets.map((asset) => `
+   tbody.innerHTML = state.assets.filter((asset) => Number(asset.total || 0) > 0).map((asset) => `
     <tr class="border-b border-binanceBorder">
      <td class="p-2.5">${asset.asset}</td>
      <td class="p-2.5">${Number(asset.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</td>
