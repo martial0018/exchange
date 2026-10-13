@@ -7605,8 +7605,8 @@
       ? 'Wallet reset'
       : entry.action === 'balance_credit'
        ? Number.isFinite(Number(entry.details?.amount)) && Number(entry.details.amount) > 0 && typeof entry.details?.asset === 'string'
-        ? `Credited ${escapeHTML(Number(entry.details.amount).toLocaleString('en-US', { maximumFractionDigits: 8 }))} ${escapeHTML(entry.details.asset)}`
-        : 'Credit recorded · details unavailable'
+        ? `${entry.details.walletChangeRecorded === false ? 'Credit logged · no wallet change found' : 'Credited'} ${escapeHTML(Number(entry.details.amount).toLocaleString('en-US', { maximumFractionDigits: 8 }))} ${escapeHTML(entry.details.asset)}`
+        : 'Credit logged · wallet change not found'
        : `Adjusted ${escapeHTML(entry.details.asset)} balance`;
      return `<tr class="border-t border-binanceBorder"><td data-label="Time" class="py-2 pr-4 text-binanceMuted">${escapeHTML(time)}</td><td data-label="Administrator" class="py-2 pr-4">${escapeHTML(entry.actorUsername)}</td><td data-label="Account" class="py-2 pr-4">${escapeHTML(entry.targetUsername)}</td><td data-label="Action" class="py-2">${details}</td></tr>`;
     }).join(''): '<tr><td colspan="4" class="py-5 text-center text-binanceMuted">No administrator actions have been recorded.</td></tr>';
@@ -10746,11 +10746,36 @@
    if (state.admin.saving) return false;
    state.admin.saving = true;
    renderAdminPanel();
+   let actionRequestStarted = false;
+   let actionAccepted = false;
    try {
-    const { user: updatedUser } = await requestAuthApi(`/api/admin/users/${encodeURIComponent(user.id)}`, {
+    actionRequestStarted = true;
+    await requestAuthApi(`/api/admin/users/${encodeURIComponent(user.id)}`, {
      method: 'POST',
      body: JSON.stringify({...payload, requestId: crypto.randomUUID() })
     });
+    actionAccepted = true;
+    actionRequestStarted = false;
+    const { users } = await requestAuthApi('/api/admin/users', { method: 'GET', headers: {} });
+    const updatedUser = users.find((entry) => String(entry.id) === String(user.id));
+    if (!updatedUser) {
+     throw new Error('The server accepted the action, but the account could not be reloaded. Refresh before retrying.');
+    }
+    if (payload.action === 'balance_credit') {
+     const previousBalance = Array.isArray(user.wallet)
+      ? user.wallet.find((entry) => entry.asset === payload.asset)
+      : null;
+     const updatedBalance = Array.isArray(updatedUser.wallet)
+      ? updatedUser.wallet.find((entry) => entry.asset === payload.asset)
+      : null;
+     const expectedTotal = Number(previousBalance?.total || 0) + payload.amount;
+     const expectedAvailable = Number(previousBalance?.available || 0) + payload.amount;
+     if (!updatedBalance
+      || !Number.isFinite(updatedBalance.total) || updatedBalance.total < expectedTotal
+      || !Number.isFinite(updatedBalance.available) || updatedBalance.available < expectedAvailable) {
+      throw new Error("The server did not confirm the credit in the user's Spot wallet. Do not submit it again; refresh the account and check the action history.");
+     }
+    }
     const userIndex = state.users.findIndex((entry) => String(entry.id) === String(updatedUser.id));
     if (userIndex < 0) {
      throw new Error('The updated account is not in the administrator account list.');
@@ -10763,7 +10788,13 @@
     return true;
    } catch (error) {
     console.error('Could not save administrator action', error);
-    notify(`Could not save administrator action: ${error.message}`);
+    if (actionAccepted) {
+     notify(`Action may have been saved, but the account could not be verified. Check action history before retrying: ${error.message}`);
+    } else if (actionRequestStarted && !error.status) {
+     notify(`Could not confirm whether the action was saved. Check action history before retrying: ${error.message}`);
+    } else {
+     notify(`Could not save administrator action: ${error.message}`);
+    }
     return false;
    } finally {
     state.admin.saving = false;
