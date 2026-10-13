@@ -8524,8 +8524,15 @@
 
   async function loadLiveMarketCatalogs() {
    try {
-    const [spotExchange, spotTickers, futuresExchange, futuresTickers, futuresPremiums] = await Promise.all([
-     fetchBinanceSpotJson('/api/v3/exchangeInfo'),
+    const spotExchange = await fetchBinanceSpotJson('/api/v3/exchangeInfo');
+    if (!Array.isArray(spotExchange.symbols)) throw new Error('Binance returned invalid spot exchange metadata');
+    state.depositAssetCatalog = [...new Set(spotExchange.symbols
+     .filter((symbol) => symbol.status === 'TRADING' && symbol.quoteAsset === 'USDT' && symbol.isSpotTradingAllowed)
+     .map((symbol) => symbol.baseAsset)
+     .filter((asset) => typeof asset === 'string' && /^[A-Z0-9]{2,20}$/.test(asset)))];
+    updateAdminDepositNetworkOptions(true);
+
+    const [spotTickers, futuresExchange, futuresTickers, futuresPremiums] = await Promise.all([
      fetchBinanceSpotJson('/api/v3/ticker/24hr'),
      fetchBinanceJson('https://fapi.binance.com/fapi/v1/exchangeInfo'),
      fetchBinanceJson('https://fapi.binance.com/fapi/v1/ticker/24hr'),
@@ -8542,11 +8549,6 @@
      .filter((market) => market && Number(market.ticker.lastPrice) > 0 && Number(market.ticker.quoteVolume) > 0)
      .sort((left, right) => Number(right.ticker.quoteVolume) - Number(left.ticker.quoteVolume))
      .slice(0, 150);
-    state.depositAssetCatalog = [...new Set(spotExchange.symbols
-     .filter((symbol) => symbol.status === 'TRADING' && symbol.quoteAsset === 'USDT' && symbol.isSpotTradingAllowed)
-     .map((symbol) => symbol.baseAsset)
-     .filter((asset) => typeof asset === 'string' && /^[A-Z0-9]{2,20}$/.test(asset)))];
-    updateAdminDepositNetworkOptions(true);
     if (spotMarkets.length < 150) throw new Error(`Binance returned only ${spotMarkets.length} eligible spot USDT pairs`);
 
     const futuresTickerBySymbol = new Map(futuresTickers.map((ticker) => [ticker.symbol, ticker]));
