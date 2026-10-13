@@ -2130,7 +2130,7 @@
   <!-- Wallet Balance & Actions -->
   <div id="headerAccountActions" class="flex items-center space-x-3">
    <button id="installAppButton" type="button" onclick="installExchangeApp()" aria-label="Install Exchange app" class="flex h-8 items-center gap-1.5 rounded border border-binanceBorder bg-binanceHover px-2 text-[10px] font-semibold text-white transition hover:border-binanceYellow hover:text-binanceYellow">
-    <i data-lucide="download" class="h-3.5 w-3.5"></i><span>Install</span>
+    <i data-lucide="download" class="h-3.5 w-3.5"></i><span id="installAppButtonLabel">Install</span>
    </button>
    <div id="mobileHeaderActions" class="flex items-center gap-2 md:hidden">
     <button id="mobileHomeQuickAction" type="button" onclick="openBuyCryptoModal()" aria-label="Buy crypto" title="Buy crypto" class="flex h-8 w-8 items-center justify-center rounded-full text-binanceMuted transition hover:bg-binanceHover hover:text-white">
@@ -4439,14 +4439,30 @@
  </div>
 
  <div id="installHelpModal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-labelledby="installHelpTitle" onclick="if (event.target === this) closeModal('installHelpModal')">
-  <div class="w-full max-w-sm space-y-4 rounded-xl border border-binanceBorder bg-binanceCard p-5 shadow-2xl">
-   <div class="flex items-start justify-between gap-3 border-b border-binanceBorder pb-3">
-    <div><h2 id="installHelpTitle" class="text-base font-bold text-white">Install Exchange</h2><p class="mt-1 text-[10px] text-binanceMuted">Add the app to your device for quick access.</p></div>
+  <div class="w-full max-w-md space-y-5 rounded-2xl border border-binanceBorder bg-binanceCard p-5 shadow-2xl sm:p-6">
+   <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+     <img src="/app-icon-192.png" alt="" class="h-12 w-12 rounded-xl border border-binanceBorder bg-binanceBg">
+     <div><h2 id="installHelpTitle" class="text-base font-bold text-white">Get the Exchange app</h2><p id="installHelpSubtitle" class="mt-1 text-[11px] text-binanceMuted">Add a shortcut to your device.</p></div>
+    </div>
     <button type="button" onclick="closeModal('installHelpModal')" aria-label="Close install help" class="text-xl leading-none text-binanceMuted hover:text-white">&times;</button>
    </div>
-   <div id="installHelpInstructions" class="space-y-2 text-xs leading-relaxed text-binanceMuted"></div>
-   <div class="flex justify-end">
-    <button type="button" onclick="closeModal('installHelpModal')" class="rounded-lg bg-binanceYellow px-3 py-2 text-[10px] font-bold text-binanceBg">Done</button>
+   <div class="grid grid-cols-3 gap-2">
+    <div class="rounded-xl border border-binanceBorder bg-binanceBg p-3"><i data-lucide="zap" class="h-4 w-4 text-binanceYellow"></i><p class="mt-2 text-[10px] font-semibold text-white">Quick access</p><p class="mt-1 text-[9px] leading-relaxed text-binanceMuted">Launch from your Home Screen.</p></div>
+    <div class="rounded-xl border border-binanceBorder bg-binanceBg p-3"><i data-lucide="panels-top-left" class="h-4 w-4 text-binanceYellow"></i><p class="mt-2 text-[10px] font-semibold text-white">App-style view</p><p class="mt-1 text-[9px] leading-relaxed text-binanceMuted">Open separately from browser tabs.</p></div>
+    <div class="rounded-xl border border-binanceBorder bg-binanceBg p-3"><i data-lucide="shield-check" class="h-4 w-4 text-binanceYellow"></i><p class="mt-2 text-[10px] font-semibold text-white">Secure connection</p><p class="mt-1 text-[9px] leading-relaxed text-binanceMuted">Uses the same secure website.</p></div>
+   </div>
+   <div class="rounded-xl border border-binanceBorder bg-binanceBg p-4">
+    <div class="flex items-center justify-between gap-3">
+     <h3 id="installInstructionsTitle" class="text-xs font-semibold text-white">Add to your device</h3>
+     <span id="installAvailabilityBadge" class="rounded-full border border-binanceGreen/30 bg-binanceGreen/10 px-2 py-1 text-[9px] font-semibold text-binanceGreen">Ready to add</span>
+    </div>
+    <ol id="installHelpInstructions" class="mt-3 space-y-3"></ol>
+    <p id="installHelpNote" class="mt-3 hidden rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 p-2.5 text-[10px] leading-relaxed text-binanceMuted"></p>
+   </div>
+   <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+    <button type="button" onclick="closeModal('installHelpModal')" class="rounded-lg border border-binanceBorder px-4 py-2.5 text-xs font-semibold text-white hover:bg-binanceHover">Not now</button>
+    <button id="installPromptButton" type="button" onclick="installExchangeApp()" class="hidden rounded-lg bg-binanceYellow px-4 py-2.5 text-xs font-bold text-binanceBg hover:bg-binanceYellowHover">Install app</button>
    </div>
   </div>
  </div>
@@ -10507,20 +10523,101 @@
 
   let deferredInstallPrompt = null;
 
-  function showInstallHelp() {
-   const instructions = document.getElementById('installHelpInstructions');
-   if (!instructions) return;
-   const userAgent = navigator.userAgent;
-   const isIOS = /iPhone|iPad|iPod/i.test(userAgent)
+  function isAppleMobileDevice() {
+   return /iPhone|iPad|iPod/i.test(navigator.userAgent)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-   const steps = isIOS
-    ? ['1. Open this page in Safari.', '2. Tap the Share button.', '3. Choose “Add to Home Screen”, then tap Add.']
-    : ['1. Open the browser menu (⋮ or Share).', '2. Choose “Install app” or “Add to Home screen”.', '3. Confirm the installation.'];
-   instructions.replaceChildren(...steps.map((step) => {
-    const paragraph = document.createElement('p');
-    paragraph.textContent = step;
-    return paragraph;
-   }));
+  }
+
+  function isExchangeInstalled() {
+   return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  }
+
+  function setInstallInstructions(steps, note = '') {
+   const instructions = document.getElementById('installHelpInstructions');
+   const noteElement = document.getElementById('installHelpNote');
+   if (instructions) {
+    instructions.replaceChildren(...steps.map((step, index) => {
+     const item = document.createElement('li');
+     item.className = 'flex items-start gap-2.5 text-[11px] leading-relaxed text-binanceMuted';
+     const number = document.createElement('span');
+     number.className = 'flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-binanceHover text-[9px] font-bold text-binanceYellow';
+     number.textContent = String(index + 1);
+     const text = document.createElement('span');
+     text.textContent = step;
+     item.append(number, text);
+     return item;
+    }));
+   }
+   if (noteElement) {
+    noteElement.textContent = note;
+    noteElement.classList.toggle('hidden', !note);
+   }
+  }
+
+  function showInstallHelp() {
+   const subtitle = document.getElementById('installHelpSubtitle');
+   const instructionsTitle = document.getElementById('installInstructionsTitle');
+   const availability = document.getElementById('installAvailabilityBadge');
+   const promptButton = document.getElementById('installPromptButton');
+   const installButton = document.getElementById('installAppButton');
+   const installed = isExchangeInstalled();
+   const appleMobile = isAppleMobileDevice();
+   const android = /Android/i.test(navigator.userAgent);
+   const hasPrompt = Boolean(deferredInstallPrompt);
+   const openedInIOSBrowser = appleMobile
+    && (/CriOS|FxiOS|EdgiOS|OPiOS/i.test(navigator.userAgent) || !/Safari/i.test(navigator.userAgent));
+
+   if (subtitle) subtitle.textContent = installed
+    ? 'Exchange is already installed on this device.'
+    : 'A faster, app-style way to open Exchange.';
+   if (availability) {
+    availability.textContent = installed? 'Already installed': hasPrompt? 'Install available': 'Ready to add';
+    availability.classList.toggle('text-binanceGreen', installed || hasPrompt);
+    availability.classList.toggle('text-binanceYellow', !installed && !hasPrompt);
+   }
+   if (instructionsTitle) instructionsTitle.textContent = installed? 'You’re all set': hasPrompt? 'Install in one tap': 'Add to your device';
+   if (promptButton) promptButton.classList.toggle('hidden', !hasPrompt || installed);
+   if (installButton && appleMobile && !isExchangeInstalled()) {
+    const label = document.getElementById('installAppButtonLabel');
+    if (label) label.textContent = 'Add app';
+    installButton.setAttribute('aria-label', 'Add Exchange to your Home Screen');
+   }
+
+   if (installed) {
+    setInstallInstructions(['Open Exchange from its Home Screen icon whenever you want to use the app.']);
+   } else if (appleMobile) {
+    setInstallInstructions([
+     'Open this page in Safari. If you are in another browser or an in-app browser, open the page in Safari first.',
+     'Tap Share (the square with the up arrow).',
+     'Scroll down and tap “Add to Home Screen”.',
+     'Keep the name “Exchange” or choose your own, then tap “Add” in the top-right corner.'
+    ], 'iPhone and iPad install web apps from Safari’s Share menu. The browser does not allow websites to trigger this step automatically.');
+   } else if (hasPrompt) {
+    setInstallInstructions([
+     'Tap “Install app” below.',
+     'Confirm the installation in your browser.'
+    ]);
+   } else if (android) {
+    setInstallInstructions([
+     'Open the browser menu (⋮) in Chrome.',
+     'Tap “Install app” or “Add to Home screen”.',
+     'Confirm to add Exchange to your Home Screen.'
+    ], 'If the install option is missing, open this secure site in Chrome and try again.');
+   } else {
+    setInstallInstructions([
+     'Open the browser menu or Share menu.',
+     'Choose “Install app” or “Add to Home screen”.',
+     'Confirm the installation.'
+    ], 'Install options vary by browser. If no install option appears, open Exchange in Safari on iPhone/iPad or Chrome on Android.');
+   }
+   if (openedInIOSBrowser) {
+    setInstallInstructions([
+     'Open this page in Safari. In the browser menu, choose “Open in Safari” if available.',
+     'In Safari, tap Share (the square with the up arrow).',
+     'Scroll down and tap “Add to Home Screen”, then tap “Add”.'
+    ], 'iPhone and iPad only allow web app installation through Safari.');
+   }
+   if (window.lucide) window.lucide.createIcons();
    openModal('installHelpModal');
    document.getElementById('installHelpModal')?.classList.add('flex');
   }
@@ -10537,10 +10634,14 @@
     const choice = await installPrompt.userChoice;
     if (choice.outcome === 'accepted') {
      document.getElementById('installAppButton')?.classList.add('hidden');
+     closeModal('installHelpModal');
+    } else {
+     showInstallHelp();
     }
    } catch (error) {
     console.error('Unable to open the Exchange app installation prompt.', error);
     notify('Could not open the installation prompt. Use your browser menu to install the app.');
+    showInstallHelp();
    }
   }
 
@@ -10641,16 +10742,27 @@
   function setupInstallableApp() {
    setupPullToRefresh();
    const installButton = document.getElementById('installAppButton');
-   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+   const isStandalone = isExchangeInstalled();
+   if (installButton && !isStandalone) {
+    const label = document.getElementById('installAppButtonLabel');
+    if (isAppleMobileDevice()) {
+     if (label) label.textContent = 'Add app';
+     installButton.setAttribute('aria-label', 'Add Exchange to your Home Screen');
+    } else if (label) {
+     label.textContent = 'Install';
+    }
+   }
    if (isStandalone && installButton) installButton.classList.add('hidden');
    window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
     deferredInstallPrompt = event;
     if (installButton && !isStandalone) installButton.classList.remove('hidden');
+    if (document.getElementById('installHelpModal')?.classList.contains('flex')) showInstallHelp();
    });
    window.addEventListener('appinstalled', () => {
     deferredInstallPrompt = null;
     installButton?.classList.add('hidden');
+    closeModal('installHelpModal');
     notify('Exchange app installed');
    });
    if ('serviceWorker' in navigator) {
