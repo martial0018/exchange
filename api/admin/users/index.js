@@ -19,7 +19,7 @@ module.exports = async function handler(req, res) {
         const normalizedUsers = users.map(normalizeUserJsonFields);
         const dueUserIds = normalizedUsers
             .filter((user) => user.balance_jobs.some((job) =>
-                job.operation === 'credit'
+                ['credit', 'withdrawal'].includes(job.operation)
                 && job.status === 'Processing'
                 && Number.isFinite(job.dueAt)
                 && job.dueAt <= Date.now()

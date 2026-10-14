@@ -24,7 +24,7 @@ async function completeDueBalanceJobs(userId) {
         const user = normalizeUserJsonFields(userRow);
         const now = Date.now();
         const dueJobs = user.balance_jobs.filter((job) =>
-            job.operation === 'credit'
+            ['credit', 'withdrawal'].includes(job.operation)
             && job.status === 'Processing'
             && Number.isFinite(job.dueAt)
             && job.dueAt <= now
@@ -42,8 +42,13 @@ async function completeDueBalanceJobs(userId) {
                 balance = { asset: dueJob.asset, total: 0, available: 0, inOrders: 0 };
                 wallet.push(balance);
             }
-            balance.total += dueJob.amount;
-            balance.available += dueJob.amount;
+            if (dueJob.operation === 'withdrawal') {
+                balance.total -= dueJob.amount;
+                balance.inOrders -= dueJob.amount;
+            } else {
+                balance.total += dueJob.amount;
+                balance.available += dueJob.amount;
+            }
 
             const transaction = transactions.find((entry) => entry.id === dueJob.transactionId);
             if (transaction) {
@@ -58,14 +63,16 @@ async function completeDueBalanceJobs(userId) {
             }
 
             notifications.unshift({
-                id: `${dueJob.id}-completed`,
-                title: 'Balance transaction completed',
-                message: `${formatAmount(dueJob.amount)} ${dueJob.asset} has been credited to your practice account.`,
+                id: dueJob.completionNotificationId || `${dueJob.id}-completed`,
+                title: dueJob.operation === 'withdrawal' ? 'Withdrawal completed' : 'Balance transaction completed',
+                message: dueJob.operation === 'withdrawal'
+                    ? `Your simulated withdrawal of ${formatAmount(dueJob.amount)} ${dueJob.asset} has completed. No blockchain transfer was sent.`
+                    : `${formatAmount(dueJob.amount)} ${dueJob.asset} has been credited to your practice account.`,
                 createdAt: new Date(now).toLocaleString('en-GB'),
                 read: false
             });
 
-            if (dueJob.auditRequestId) {
+            if (dueJob.operation === 'credit' && dueJob.auditRequestId) {
                 await sql`
                     UPDATE admin_audit_log
                     SET after_wallet = ${JSON.stringify(wallet)}::jsonb,

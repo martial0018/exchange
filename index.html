@@ -3456,6 +3456,28 @@
   </div>
  </section>
 
+ <section id="withdrawalProcessingPage" class="hidden min-h-0 flex-1 overflow-y-auto bg-binanceBg px-4 py-8 pb-24 md:px-6" aria-labelledby="withdrawalProcessingTitle">
+  <div class="mx-auto max-w-xl">
+   <button type="button" onclick="openAppPage('assets')" class="mb-6 inline-flex items-center gap-2 text-xs font-semibold text-binanceMuted hover:text-white"><i data-lucide="arrow-left" class="h-4 w-4"></i>Back to assets</button>
+   <article class="rounded-xl border border-binanceBorder bg-binanceCard p-6 text-center sm:p-8">
+    <div id="withdrawalProcessingIcon" class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-binanceYellow/10 text-binanceYellow"><i data-lucide="loader-circle" class="h-7 w-7 animate-spin"></i></div>
+    <p id="withdrawalProcessingStatus" class="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] text-binanceYellow">Withdrawal processing</p>
+    <h1 id="withdrawalProcessingTitle" class="mt-2 text-2xl font-bold text-white">Your withdrawal is processing</h1>
+    <p id="withdrawalProcessingDescription" class="mx-auto mt-3 max-w-md text-xs leading-relaxed text-binanceMuted">Your withdrawal request is being processed. The requested amount is reserved from your available balance.</p>
+    <div class="mt-6 rounded-lg border border-binanceBorder bg-binanceBg p-4 text-left">
+     <dl class="space-y-3 text-xs">
+      <div class="flex justify-between gap-4"><dt class="text-binanceMuted">Amount</dt><dd id="withdrawalProcessingAmount" class="font-mono font-semibold text-white">—</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-binanceMuted">Network</dt><dd id="withdrawalProcessingNetwork" class="text-right text-white">—</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-binanceMuted">Recipient address</dt><dd id="withdrawalProcessingAddress" class="max-w-[70%] break-all text-right font-mono text-white">—</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-binanceMuted">Status</dt><dd id="withdrawalProcessingRemaining" class="font-mono text-binanceYellow">Processing</dd></div>
+     </dl>
+    </div>
+    <p class="mt-4 rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-left text-[10px] leading-relaxed text-binanceMuted">This is a simulated withdrawal request for the practice exchange. No funds are sent to the network or recipient address.</p>
+    <button type="button" onclick="openAppPage('assets')" class="mt-5 w-full rounded-lg border border-binanceBorder py-3 text-xs font-semibold text-white hover:bg-binanceHover">Return to assets</button>
+   </article>
+  </div>
+ </section>
+
  <section id="profilePage" data-pull-to-refresh class="profile-design-page hidden flex-1 min-h-0 overflow-y-auto" aria-labelledby="profilePageTitle">
   <div class="profile-phone-wrapper">
    <div class="profile-top-navbar">
@@ -3825,8 +3847,9 @@
      <label class="text-binanceMuted block mb-1">Amount</label>
      <input id="withdrawAmount" type="number" min="0" step="any" placeholder="0.00" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
     </div>
+    <p class="rounded border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-[10px] leading-relaxed text-binanceMuted">Simulated withdrawal only: the amount is reserved now and the request completes after 90 seconds. No blockchain transfer is sent.</p>
    </div>
-   <button onclick="withdrawDemoFunds()" class="w-full py-2.5 rounded font-bold bg-binanceYellow text-binanceBg hover:bg-binanceYellowHover">Submit Withdrawal</button>
+   <button type="button" onclick="withdrawDemoFunds()" class="w-full py-2.5 rounded font-bold bg-binanceYellow text-binanceBg hover:bg-binanceYellowHover">Submit Withdrawal</button>
   </div>
  </div>
 
@@ -4631,6 +4654,8 @@
    cryptoPurchaseSide: 'buy',
    authMode: 'login',
    currentUser: null,
+   withdrawalProcessingTransactionId: '',
+   pendingWithdrawalRequest: null,
    users: [],
    admin: {
     loggedIn: false,
@@ -4746,6 +4771,8 @@
   let accountRefreshRequestActive = false;
   let adminCreditRefreshActive = false;
   let adminCreditRefreshTimer = null;
+  let withdrawalProcessingTimer = null;
+  let withdrawalSubmitting = false;
   let accountRefreshLastErrorAt = 0;
   let chartDataSocket = null;
   let chartDataReconnectTimer = null;
@@ -5030,6 +5057,7 @@
    calculateTotal();
    if (state.activePage === 'profile') renderProfilePage();
    if (state.activePage === 'home') renderUserHomeDashboard();
+   if (state.activePage === 'withdrawalProcessing') renderWithdrawalProcessingPage();
    user.notifications.forEach((item) => {
     if (oldNotifications.get(item.id) !== `${item.title}|${item.message}`) notify(item.message || item.title);
    });
@@ -5098,26 +5126,35 @@
    const id = `${now}-${Math.random().toString(36).slice(2, 9)}`;
    const time = new Date(now).toLocaleString('en-GB');
    const previous = {
+    wallet: cloneWallet(user.wallet),
     transactions: [...user.transactions],
     notifications: [...user.notifications],
     balanceJobs: [...user.balanceJobs],
     updatedAt: user.updatedAt
    };
    const crediting = jobDetails.amount >= 0;
+   if (jobDetails.operation === 'withdrawal') {
+    const balance = user.wallet.find((entry) => entry.asset === jobDetails.asset);
+    if (!balance || balance.available < jobDetails.amount) return false;
+    balance.available -= jobDetails.amount;
+    balance.inOrders += jobDetails.amount;
+   }
    const transaction = {
     id,
     time,
     type: jobDetails.type,
     asset: jobDetails.asset,
     amount: Math.abs(jobDetails.amount),
-    side: crediting? 'buy': 'sell',
+    side: jobDetails.operation === 'withdrawal' || !crediting? 'sell': 'buy',
     details: jobDetails.details || '',
     network: jobDetails.network || '',
     fromAddress: jobDetails.fromAddress || '',
+    address: jobDetails.address || '',
     status: 'Processing'
    };
    const job = {
     id,
+    requestId: jobDetails.requestId || undefined,
     asset: jobDetails.asset,
     operation: jobDetails.operation,
     amount: jobDetails.amount,
@@ -5128,6 +5165,7 @@
     completionNotificationId: `${id}-completed`,
     network: jobDetails.network || '',
     fromAddress: jobDetails.fromAddress || '',
+    address: jobDetails.address || '',
     createdAt: now,
     dueAt: now + BALANCE_PROCESSING_DELAY_MS,
     status: 'Processing'
@@ -5136,15 +5174,18 @@
    user.balanceJobs.push(job);
    user.notifications.unshift({
     id: job.processingNotificationId,
-    title: 'Balance transaction processing',
+    title: jobDetails.operation === 'withdrawal' ? 'Withdrawal processing' : 'Balance transaction processing',
     message: jobDetails.operation === 'setWallet'
      ? 'Your wallet reset is processing.'
-     : `${Math.abs(jobDetails.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${jobDetails.asset} ${jobDetails.amount < 0? 'balance adjustment': 'credit'} is processing for your account.`,
+     : jobDetails.operation === 'withdrawal'
+      ? `${Math.abs(jobDetails.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${jobDetails.asset} withdrawal is processing. The amount is reserved from your available balance. No blockchain transfer will be sent.`
+      : `${Math.abs(jobDetails.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${jobDetails.asset} ${jobDetails.amount < 0? 'balance adjustment': 'credit'} is processing for your account.`,
     createdAt: time,
     read: false
    });
    user.updatedAt = new Date(now).toISOString();
    if (!saveUsers()) {
+    user.wallet = previous.wallet;
     user.transactions = previous.transactions;
     user.notifications = previous.notifications;
     user.balanceJobs = previous.balanceJobs;
@@ -5190,6 +5231,9 @@
       user.wallet = cloneWallet(job.targetWallet);
      } else if (job.operation === 'set' && job.targetBalance) {
       Object.assign(balance, job.targetBalance);
+     } else if (job.operation === 'withdrawal') {
+      balance.total -= job.amount;
+      balance.inOrders -= job.amount;
      } else {
       balance.total += job.amount;
       balance.available += job.amount;
@@ -5203,10 +5247,12 @@
      job.completedAt = now;
      user.notifications.unshift({
       id: job.completionNotificationId || `${job.id}-completed`,
-      title: 'Balance transaction completed',
+      title: job.operation === 'withdrawal' ? 'Withdrawal completed' : 'Balance transaction completed',
       message: job.operation === 'setWallet'
        ? 'Your wallet reset has completed.'
-       : `${Math.abs(job.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${job.asset} ${job.amount < 0? 'balance adjustment': 'credit'} has completed in your account.`,
+       : job.operation === 'withdrawal'
+        ? `Your simulated withdrawal of ${Math.abs(job.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${job.asset} has completed. No blockchain transfer was sent.`
+        : `${Math.abs(job.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${job.asset} ${job.amount < 0? 'balance adjustment': 'credit'} has completed in your account.`,
       createdAt: new Date(now).toLocaleString('en-GB'),
       read: false
      });
@@ -5329,7 +5375,10 @@
   }
 
   function openAppPage(page) {
-   const pages = ['home', 'markets', 'futures', 'assets', 'convert'];
+   if (page === 'withdrawalProcessing' && (!state.currentUser || !state.withdrawalProcessingTransactionId)) {
+    page = 'assets';
+   }
+   const pages = ['home', 'markets', 'futures', 'assets', 'convert', 'withdrawalProcessing'];
    const previousPage = state.activePage;
    const isTradingWorkspace = page === 'trade' || page === 'futuresTrade';
    const isLoggedInAssetsView = page === 'assets' && !!state.currentUser;
@@ -5355,6 +5404,7 @@
    setMobileBottomNavActive(page === 'markets' || page === 'futures' || page === 'assets'? page: page === 'home'? 'home': page === 'futuresTrade'? 'futures': 'trade');
    document.documentElement.removeAttribute('data-initial-app-page');
    if (page === 'home') renderUserHomeDashboard();
+   else if (page === 'withdrawalProcessing') renderWithdrawalProcessingPage();
    else if (page === 'markets') renderMarketsPage();
    else if (page === 'futures') {
     setTradingMode('futures');
@@ -7369,6 +7419,44 @@
     }
    }
 
+   if (pathname === '/api/auth/withdraw' && method === 'POST') {
+    if (!sessionUser || sessionUser.role !== 'user') throw new Error('Sign in to continue');
+    const payload = JSON.parse(options.body || '{}');
+    if (typeof payload.requestId !== 'string' || !/^[0-9a-f-]{36}$/i.test(payload.requestId)
+     || typeof payload.asset !== 'string' || !/^[A-Z0-9]{2,20}$/.test(payload.asset)
+     || !Number.isFinite(payload.amount) || payload.amount <= 0
+     || typeof payload.network !== 'string' || !DEPOSIT_NETWORK_OPTIONS.includes(payload.network)
+     || typeof payload.address !== 'string' || !payload.address.trim() || payload.address.length > 200) {
+     throw new Error('Enter a valid withdrawal asset, amount, network, and address');
+    }
+    const user = state.users.find((entry) => String(entry.id) === String(sessionUser.id) && entry.role === 'user');
+    if (!user) throw new Error('Account not found');
+    ensureUserActivity(user);
+    const existingJob = user.balanceJobs.find((job) => job.requestId === payload.requestId);
+    if (existingJob) {
+     const isSameWithdrawal = existingJob.operation === 'withdrawal'
+      && existingJob.asset === payload.asset
+      && existingJob.amount === payload.amount
+      && existingJob.network === payload.network
+      && existingJob.address === payload.address.trim();
+     if (!isSameWithdrawal) throw new Error('This request ID is already associated with a different account action');
+     return { user: { ...user, password: undefined }, duplicate: true };
+    }
+    const balance = user.wallet.find((entry) => entry.asset === payload.asset);
+    if (!balance || balance.available < payload.amount) throw new Error(`Insufficient ${payload.asset} available balance`);
+    const queued = enqueueAdminBalanceJob(user, {
+     type: 'Withdrawal',
+     asset: payload.asset,
+     amount: payload.amount,
+     operation: 'withdrawal',
+     network: payload.network,
+     address: payload.address.trim(),
+     requestId: payload.requestId
+    });
+    if (!queued) throw new Error('Could not save the simulated withdrawal in this browser');
+    return { user: { ...user, password: undefined }, duplicate: false };
+   }
+
    if (pathname === '/api/admin/users' && method === 'GET') {
     if (!sessionUser || sessionUser.role !== 'admin') throw new Error('Administrator access is required');
     return { users: state.users.map((user) => ({...user, password: undefined })) };
@@ -7845,7 +7933,8 @@
    if (user) {
     const intendedPage = state.restorePage || state.activePage;
     state.restorePage = null;
-    const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile'].includes(intendedPage)
+    const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'withdrawalProcessing'].includes(intendedPage)
+     && (intendedPage !== 'withdrawalProcessing' || state.withdrawalProcessingTransactionId)
      ? intendedPage
      : 'home';
     if (preferredPage === 'profile') {
@@ -8049,8 +8138,22 @@
     }
     if (typeof saved.asset === 'string' && /^[A-Z0-9]{2,10}$/.test(saved.asset)) state.asset = saved.asset;
     if (typeof saved.selectedPair === 'string' && /^[A-Z0-9]{2,20}$/.test(saved.selectedPair)) state.selectedPair = saved.selectedPair;
-    const validPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile'];
+    const validPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile', 'withdrawalProcessing'];
     if (typeof saved.activePage === 'string' && validPages.includes(saved.activePage)) state.activePage = saved.activePage;
+    if (typeof saved.withdrawalProcessingTransactionId === 'string' && saved.withdrawalProcessingTransactionId.length <= 100) {
+     state.withdrawalProcessingTransactionId = saved.withdrawalProcessingTransactionId;
+    }
+    if (saved.pendingWithdrawalRequest && typeof saved.pendingWithdrawalRequest === 'object') {
+     const pending = saved.pendingWithdrawalRequest;
+     if (typeof pending.requestId === 'string'
+      && /^[0-9a-f-]{36}$/i.test(pending.requestId)
+      && typeof pending.asset === 'string'
+      && Number.isFinite(pending.amount)
+      && typeof pending.network === 'string'
+      && typeof pending.address === 'string') {
+      state.pendingWithdrawalRequest = pending;
+     }
+    }
     if (typeof saved.returnPage === 'string' && validPages.includes(saved.returnPage)) state.returnPage = saved.returnPage;
     try {
      const savedTabPage = JSON.parse(sessionStorage.getItem(PAGE_SESSION_STORAGE_KEY) || 'null');
@@ -8151,6 +8254,8 @@
      currentPrice: state.currentPrice,
      activePage: state.activePage,
      returnPage: state.returnPage,
+     withdrawalProcessingTransactionId: state.withdrawalProcessingTransactionId,
+     pendingWithdrawalRequest: state.pendingWithdrawalRequest,
      authMode: state.authMode,
      tradingMode: state.tradingMode,
      side: state.side,
@@ -13886,7 +13991,8 @@
    }
   }
 
-  function withdrawDemoFunds() {
+  async function withdrawDemoFunds() {
+   if (!requireSignedInForTrading()) return;
    const asset = document.getElementById('withdrawAsset').value;
    const network = document.getElementById('withdrawNetwork').value;
    const amount = Number(document.getElementById('withdrawAmount').value);
@@ -13899,34 +14005,130 @@
     notify('Enter a recipient address');
     return;
    }
-   if (!Number.isFinite(amount) || amount <= 0) {
-    notify('Enter a withdrawal amount greater than zero');
+   if (!Number.isFinite(amount) || amount <= 0 || amount > 1e15 || address.length > 200) {
+    notify('Enter a valid withdrawal amount and recipient address');
     return;
    }
-   const balance = getBalance(asset);
-   if (balance.available < amount) {
+   const balance = state.assets.find((entry) => entry.asset === asset);
+   if (!balance || balance.available < amount) {
     notify(`Insufficient ${asset} available balance`);
     return;
    }
-   balance.available -= amount;
-   balance.total -= amount;
-   state.transactions.unshift({
-    id: Date.now(),
-    time: new Date().toLocaleTimeString('en-GB').slice(0, 8),
-    type: 'Withdrawal',
-    asset,
-    network,
-    amount,
-    status: 'Submitted'
-   });
-   renderAssets();
-   renderTransactions();
-   saveDemoState();
-   document.getElementById('withdrawAmount').value = '';
-   document.getElementById('withdrawAddress').value = '';
-   closeModal('withdrawModal');
-   switchBottomTab('transactions');
-   notify(`${amount} ${asset} withdrawn from wallet`);
+   const button = document.querySelector('#withdrawModal button[onclick="withdrawDemoFunds()"]');
+   if (button?.disabled) return;
+   if (button) button.disabled = true;
+   try {
+    const previousRequest = state.pendingWithdrawalRequest;
+    if (previousRequest && (
+     previousRequest.asset !== asset
+     || previousRequest.amount !== amount
+     || previousRequest.network !== network
+     || previousRequest.address !== address
+    )) {
+     notify('A previous withdrawal is awaiting confirmation. Retry using the same asset, amount, network, and address first.');
+     return;
+    }
+    const requestId = previousRequest
+      ? previousRequest.requestId
+      : crypto.randomUUID();
+    state.pendingWithdrawalRequest = { requestId, asset, amount, network, address };
+    saveDemoState(false);
+    const { user } = await requestAuthApi('/api/auth/withdraw', {
+     method: 'POST',
+     headers: {},
+     body: JSON.stringify({ requestId, asset, amount, network, address })
+    });
+    if (!user || !Array.isArray(user.transactions) || !Array.isArray(user.balanceJobs)) {
+     throw new Error('The server did not confirm the withdrawal. Check your account activity before trying again.');
+    }
+    storeAuthenticatedUser(user);
+    const withdrawalJob = user.balanceJobs.find((job) => job.requestId === requestId);
+    if (!withdrawalJob) {
+     throw new Error('The server response did not include the withdrawal record. Check account activity before trying again.');
+    }
+    state.pendingWithdrawalRequest = null;
+    state.withdrawalProcessingTransactionId = withdrawalJob.transactionId;
+    saveDemoState(false);
+    document.getElementById('withdrawAmount').value = '';
+    document.getElementById('withdrawAddress').value = '';
+    closeModal('withdrawModal');
+    openAppPage('withdrawalProcessing');
+   } catch (error) {
+    console.error('Could not submit simulated withdrawal', error);
+    if ([400, 401, 403].includes(error.status)) {
+     state.pendingWithdrawalRequest = null;
+     saveDemoState(false);
+    }
+    notify(error.message || 'Could not submit withdrawal');
+   } finally {
+    if (button) button.disabled = false;
+   }
+  }
+
+  let withdrawalProcessingCountdownTimer = null;
+
+  function renderWithdrawalProcessingPage() {
+   const user = state.currentUser;
+   const transaction = user?.transactions?.find((item) => String(item.id) === String(state.withdrawalProcessingTransactionId));
+   const job = user?.balanceJobs?.find((item) => String(item.transactionId) === String(state.withdrawalProcessingTransactionId));
+   const title = document.getElementById('withdrawalProcessingTitle');
+   const description = document.getElementById('withdrawalProcessingDescription');
+   const status = document.getElementById('withdrawalProcessingStatus');
+   const remaining = document.getElementById('withdrawalProcessingRemaining');
+   const icon = document.getElementById('withdrawalProcessingIcon');
+   if (!transaction || !job) {
+    if (title) title.textContent = 'Withdrawal details unavailable';
+    if (description) description.textContent = 'This withdrawal could not be found in the signed-in account. Check your account activity before submitting another request.';
+    if (status) status.textContent = 'Check account activity';
+    if (remaining) remaining.textContent = 'Unavailable';
+    if (icon) icon.innerHTML = '<i data-lucide="circle-alert" class="h-7 w-7"></i>';
+    if (withdrawalProcessingCountdownTimer) window.clearInterval(withdrawalProcessingCountdownTimer);
+    withdrawalProcessingCountdownTimer = null;
+    return;
+   }
+   const completed = job.status === 'Completed' || String(transaction.status || '').startsWith('Completed');
+   const secondsLeft = Math.max(0, Math.ceil((Number(job.dueAt) - Date.now()) / 1000));
+   const address = document.getElementById('withdrawalProcessingAddress');
+   const amount = document.getElementById('withdrawalProcessingAmount');
+   const network = document.getElementById('withdrawalProcessingNetwork');
+   if (amount) amount.textContent = `${Number(transaction.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${transaction.asset}`;
+   if (network) network.textContent = transaction.network || job.network || '—';
+   if (address) address.textContent = transaction.address || job.address || '—';
+   if (status) status.textContent = completed ? 'Withdrawal completed' : 'Withdrawal processing';
+   if (title) title.textContent = completed ? 'Your withdrawal is complete' : 'Your withdrawal is processing';
+   if (description) description.textContent = completed
+    ? 'The simulated withdrawal has completed and the reserved amount has been removed from your Spot balance.'
+    : 'Your request is being processed. The amount is reserved from your available balance and will complete after the processing period.';
+   if (remaining) remaining.textContent = completed ? 'Completed' : `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, '0')} remaining`;
+   if (icon) {
+    icon.classList.toggle('bg-binanceGreen/10', completed);
+    icon.classList.toggle('text-binanceGreen', completed);
+    icon.classList.toggle('bg-binanceYellow/10', !completed);
+    icon.classList.toggle('text-binanceYellow', !completed);
+    icon.innerHTML = completed
+     ? '<i data-lucide="circle-check" class="h-7 w-7"></i>'
+     : '<i data-lucide="loader-circle" class="h-7 w-7 animate-spin"></i>';
+   }
+   if (withdrawalProcessingCountdownTimer) window.clearInterval(withdrawalProcessingCountdownTimer);
+   withdrawalProcessingCountdownTimer = null;
+   if (!completed) {
+    withdrawalProcessingCountdownTimer = window.setInterval(() => {
+     if (state.activePage !== 'withdrawalProcessing') {
+      window.clearInterval(withdrawalProcessingCountdownTimer);
+      withdrawalProcessingCountdownTimer = null;
+      return;
+     }
+     const seconds = Math.max(0, Math.ceil((Number(job.dueAt) - Date.now()) / 1000));
+     if (remaining) remaining.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} remaining`;
+     if (seconds === 0) {
+      window.clearInterval(withdrawalProcessingCountdownTimer);
+      withdrawalProcessingCountdownTimer = null;
+      if (isLocalPreviewMode()) processDueAdminBalanceJobs();
+      else refreshSignedInAccount();
+     }
+    }, 1000);
+   }
+   if (window.lucide) window.lucide.createIcons();
   }
 
   function executeOrder(event) {

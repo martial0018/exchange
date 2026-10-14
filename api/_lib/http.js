@@ -92,13 +92,13 @@ async function getSessionUser(req) {
     `;
     if (!user) return null;
     const normalizedUser = normalizeUserJsonFields(user);
-    const hasDueCredit = normalizedUser.balance_jobs.some((job) =>
-        job.operation === 'credit'
+    const hasDueBalanceJob = normalizedUser.balance_jobs.some((job) =>
+        ['credit', 'withdrawal'].includes(job.operation)
         && job.status === 'Processing'
         && Number.isFinite(job.dueAt)
         && job.dueAt <= Date.now()
     );
-    if (!hasDueCredit) return normalizedUser;
+    if (!hasDueBalanceJob) return normalizedUser;
     return completeDueBalanceJobs(user.id);
 }
 
