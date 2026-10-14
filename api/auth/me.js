@@ -108,7 +108,7 @@ module.exports = async function handler(req, res) {
                 const notification = {
                     id: processingNotificationId,
                     title: 'Withdrawal processing',
-                    message: `${body.amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${body.asset} withdrawal is processing. The amount is reserved from your available balance. This is a simulated withdrawal; no blockchain transfer will be sent.`,
+                    message: `${body.amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${body.asset} withdrawal record is processing. The amount is reserved from your available balance.`,
                     createdAt,
                     read: false
                 };

@@ -1,5 +1,5 @@
 {
-  "name": "exchange-practice-platform",
+  "name": "exchange-platform",
   "private": true,
   "scripts": {
     "dev": "node dev-server.js",

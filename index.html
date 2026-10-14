@@ -134,7 +134,7 @@
    margin: 0 auto;
    padding: 16px;
    flex-direction: column;
-   overflow-y: auto;
+   overflow-y: visible;
    background: #181a20;
   }
   .profile-phone-wrapper::-webkit-scrollbar {
@@ -164,10 +164,98 @@
   }
   .profile-block {
    display: flex;
-   margin-bottom: 24px;
+   margin-bottom: 20px;
    align-items: center;
    justify-content: space-between;
    gap: 10px;
+  }
+  .profile-page-grid {
+   display: grid;
+   gap: 24px;
+  }
+  .profile-primary-column,
+  .profile-secondary-column {
+   min-width: 0;
+  }
+  .profile-snapshot {
+   margin-bottom: 24px;
+   padding: 16px;
+   border: 1px solid #2b3139;
+   border-radius: 14px;
+   background: linear-gradient(135deg, rgba(240, 185, 11, 0.09), #1e2329 54%);
+  }
+  .profile-snapshot-heading {
+   display: flex;
+   margin-bottom: 14px;
+   align-items: center;
+   justify-content: space-between;
+   gap: 12px;
+  }
+  .profile-snapshot-heading h2 {
+   font-size: 14px;
+   font-weight: 600;
+  }
+  .profile-snapshot-heading span {
+   color: #848e9c;
+   font-size: 10px;
+  }
+  .profile-snapshot-grid {
+   display: grid;
+   grid-template-columns: repeat(3, minmax(0, 1fr));
+   gap: 8px;
+  }
+  .profile-snapshot-stat {
+   min-width: 0;
+   padding: 10px;
+   border: 1px solid rgba(132, 142, 156, 0.12);
+   border-radius: 10px;
+   background: rgba(24, 26, 32, 0.72);
+  }
+  .profile-snapshot-label {
+   display: block;
+   overflow: hidden;
+   color: #848e9c;
+   font-size: 10px;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+  }
+  .profile-snapshot-value {
+   display: block;
+   margin-top: 5px;
+   color: #eaecef;
+   font-size: 18px;
+   font-weight: 700;
+   font-variant-numeric: tabular-nums;
+  }
+  .profile-overview-actions {
+   display: flex;
+   margin-top: 14px;
+   flex-wrap: wrap;
+   gap: 8px;
+  }
+  .profile-overview-action {
+   display: inline-flex;
+   min-height: 34px;
+   padding: 0 11px;
+   align-items: center;
+   gap: 7px;
+   border: 1px solid #3a414a;
+   border-radius: 8px;
+   color: #eaecef;
+   font-size: 10px;
+   font-weight: 600;
+  }
+  .profile-overview-action.primary {
+   border-color: #f0b90b;
+   background: #f0b90b;
+   color: #181a20;
+  }
+  .profile-tools-panel {
+   margin-bottom: 24px;
+   padding: 16px;
+   border: 1px solid #2b3139;
+   border-radius: 14px;
+   background: #1e2329;
   }
   .profile-meta {
    display: flex;
@@ -343,22 +431,36 @@
    align-items: center;
    justify-content: space-between;
   }
-  .profile-section-headline h3 {
-   color: #848e9c;
+  .profile-section-headline h2 {
+   color: #eaecef;
    font-size: 14px;
-   font-weight: 500;
+   font-weight: 600;
   }
   .profile-tools-grid {
    display: grid;
    grid-template-columns: repeat(4, minmax(0, 1fr));
-   gap: 20px 8px;
+   gap: 14px 8px;
   }
   .profile-tool-node {
    display: flex;
    min-width: 0;
+   min-height: 76px;
+   padding: 10px 4px;
    flex-direction: column;
    align-items: center;
+   justify-content: center;
+   border: 1px solid transparent;
+   border-radius: 10px;
+   transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
    text-align: center;
+  }
+  .profile-tool-node:hover,
+  .profile-tool-node:focus-visible {
+   border-color: #3a414a;
+   background: #252a32;
+  }
+  .profile-tool-node:active {
+   transform: scale(0.97);
   }
   .profile-tool-icon {
    display: flex;
@@ -381,66 +483,6 @@
    color: #eaecef;
    font-size: 11px;
    line-height: 1.3;
-  }
-  .profile-carousel-indicator {
-   display: flex;
-   margin: 18px 0 28px;
-   align-items: center;
-   justify-content: center;
-   gap: 4px;
-  }
-  .profile-carousel-dot {
-   width: 4px;
-   height: 4px;
-   border-radius: 50%;
-   background: #2b3139;
-  }
-  .profile-carousel-dot.active {
-   width: 12px;
-   border-radius: 2px;
-   background: #eaecef;
-  }
-  .profile-task-block {
-   margin-top: auto;
-   padding-bottom: 20px;
-  }
-  .profile-task-title {
-   margin-bottom: 4px;
-   font-size: 15px;
-   font-weight: 600;
-  }
-  .profile-task-caption {
-   margin-bottom: 16px;
-   color: #848e9c;
-   font-size: 11px;
-  }
-  .profile-streak-track {
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
-  }
-  .profile-streak-node {
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   gap: 6px;
-   color: #848e9c;
-   font-size: 9px;
-  }
-  .profile-streak-ring {
-   display: flex;
-   width: 28px;
-   height: 28px;
-   align-items: center;
-   justify-content: center;
-   border: 1px solid #2b3139;
-   border-radius: 50%;
-   color: #848e9c;
-  }
-  .profile-streak-ring.active {
-   border-color: #f0b90b;
-   background: rgba(240, 185, 11, 0.12);
-   color: #f0b90b;
   }
   .profile-account-details {
    margin: 8px 0 24px;
@@ -1044,11 +1086,39 @@
   }
   @media (min-width: 768px) {
    .profile-phone-wrapper {
-    max-width: 720px;
-    padding: 24px;
+    max-width: 960px;
+    padding: 28px;
+   }
+   .profile-page-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    align-items: start;
+    gap: 28px;
+   }
+   .profile-secondary-column {
+    position: sticky;
+    top: 12px;
    }
    .profile-account-content {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+   }
+   .profile-account-card--overview,
+   .profile-account-card--signout,
+   .profile-account-note {
+    grid-column: 1 / -1;
+   }
+  }
+  @media (max-width: 420px) {
+   .profile-phone-wrapper {
+    padding: 14px;
+   }
+   .profile-snapshot {
+    padding: 12px;
+   }
+   .profile-snapshot-stat {
+    padding: 8px;
+   }
+   .profile-snapshot-value {
+    font-size: 16px;
    }
   }
   .markets-mobile-mode #headerProBadge,
@@ -1269,7 +1339,6 @@
   .history-selector-chevron {
    width: 10px;
    height: 10px;
-   margin-right: 4px;
    border-right: 2px solid #848e9c;
    border-bottom: 2px solid #848e9c;
    flex-shrink: 0;
@@ -1278,36 +1347,121 @@
   .history-selector-sheet {
    animation: historySheetRise 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
+  .history-selector-heading {
+   display: flex;
+   margin-bottom: 16px;
+   align-items: flex-start;
+   justify-content: space-between;
+   gap: 16px;
+  }
+  .history-selector-heading h2 {
+   margin: 0;
+   font-size: 18px;
+   font-weight: 600;
+   line-height: 24px;
+   letter-spacing: -0.02em;
+  }
+  .history-selector-heading p {
+   margin-top: 4px;
+   color: #848e9c;
+   font-size: 12px;
+   line-height: 18px;
+  }
+  .history-selector-close {
+   display: flex;
+   width: 32px;
+   height: 32px;
+   flex: 0 0 auto;
+   align-items: center;
+   justify-content: center;
+   border-radius: 8px;
+   color: #848e9c;
+  }
+  .history-selector-close:hover,
+  .history-selector-close:focus-visible {
+   background: #2b3139;
+   color: #eaecef;
+  }
+  .history-selector-option {
+   display: flex;
+   width: 100%;
+   min-height: 72px;
+   padding: 12px;
+   align-items: center;
+   gap: 12px;
+   border: 1px solid #2b3139;
+   border-radius: 12px;
+   background: #181a20;
+   text-align: left;
+   transition: border-color 150ms ease, background-color 150ms ease;
+  }
+  .history-selector-option + .history-selector-option {
+   margin-top: 10px;
+  }
+  .history-selector-option:hover,
+  .history-selector-option:focus-visible {
+   border-color: #5c5030;
+   background: #20242b;
+  }
+  .history-selector-option:active {
+   border-color: #f0b90b;
+  }
+  .history-selector-option-icon {
+   display: flex;
+   width: 40px;
+   height: 40px;
+   flex: 0 0 auto;
+   align-items: center;
+   justify-content: center;
+   border-radius: 10px;
+   background: rgba(240, 185, 11, 0.1);
+   color: #f0b90b;
+  }
+  .history-selector-option-copy {
+   min-width: 0;
+   flex: 1 1 auto;
+  }
+  .history-selector-option-title {
+   display: block;
+   margin-bottom: 3px;
+   color: #eaecef;
+   font-size: 14px;
+   font-weight: 600;
+   line-height: 20px;
+  }
+  .history-selector-option-description {
+   display: block;
+   color: #848e9c;
+   font-size: 11px;
+   line-height: 16px;
+  }
   @media (max-width: 639px) {
-   #mobileHistorySelector.history-selector-sheet {
+   #mobileHistorySelector > .history-selector-sheet {
     max-height: calc(100dvh - env(safe-area-inset-top) - 8px);
     overflow-y: auto;
-    padding: 10px 20px calc(18px + env(safe-area-inset-bottom));
+    padding: 10px 16px calc(18px + env(safe-area-inset-bottom));
    }
-   #mobileHistorySelector.history-selector-handle {
-    margin-bottom: 16px;
-   }
-   #mobileHistorySelectorTitle {
+   #mobileHistorySelector .history-selector-handle {
     margin-bottom: 18px;
-    font-size: 21px;
-    line-height: 28px;
    }
-   #mobileHistorySelector button {
-    gap: 12px;
-    padding-top: 8px;
-    padding-bottom: 8px;
+   #mobileHistorySelector .history-selector-heading {
+    margin-bottom: 14px;
    }
-   #mobileHistorySelector button:first-of-type {
-    margin-bottom: 8px;
+   #mobileHistorySelector .history-selector-option {
+    min-height: 68px;
+    padding: 10px;
    }
-   #mobileHistorySelector button > span:first-child > span:first-child {
-    margin-bottom: 4px;
-    font-size: 18px;
-    line-height: 24px;
+   #mobileHistorySelector .history-selector-option-icon {
+    width: 36px;
+    height: 36px;
    }
-   #mobileHistorySelector button > span:first-child > span:nth-child(2) {
-    font-size: 13px;
-    line-height: 18px;
+   #mobileHistorySelector .history-selector-option-description {
+    font-size: 10px;
+    line-height: 15px;
+   }
+   #mobileHistorySelector .history-selector-chevron {
+    width: 8px;
+    height: 8px;
    }
   }
   @keyframes historySheetRise {
@@ -1322,9 +1476,6 @@
   }
   @media (prefers-reduced-motion: reduce) {
    .history-selector-sheet { animation-duration: 1ms; }
-  }
-  #mobileHistorySelector button:active.history-selector-chevron {
-   border-color: #f0b90b;
   }
   .mobile-trades-empty {
    position: relative;
@@ -2930,10 +3081,6 @@
     <div id="homeActivityList" class="divide-y divide-binanceBorder"></div>
    </section>
 
-   <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 px-4 py-3 text-[10px] text-binanceMuted">
-    <span class="inline-flex items-center gap-2"><i data-lucide="shield-alert" class="h-4 w-4 text-binanceYellow"></i> Dashboard overview. Balances and market values are stored in this browser.</span>
-    <button type="button" onclick="openProfilePage()" class="font-semibold text-binanceYellow hover:underline">Manage account</button>
-   </div>
   </div>
  </section>
 
@@ -3121,7 +3268,6 @@
    <div class="mt-5">
     <button id="convertReviewButton" type="button" onclick="reviewConvert()" disabled class="w-full rounded-xl bg-[#2b2a24] py-3.5 text-sm font-bold text-[#5c563f] disabled:cursor-not-allowed">Preview conversion</button>
    </div>
-   <div class="mt-4 rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-[10px] leading-relaxed text-binanceMuted">Prices and balances are shown in-browser. Confirmed conversions update your Spot wallet; nothing is sent to a blockchain.</div>
   </div>
  </section>
 
@@ -3137,14 +3283,8 @@
      </div>
      <button type="submit" class="mt-6 w-full rounded-lg bg-binanceYellow px-4 py-3.5 text-base font-semibold text-binanceBg hover:bg-binanceYellowHover">Log In</button>
     </form>
-    <div class="my-5 flex items-center gap-3 text-sm text-binanceMuted before:h-px before:flex-1 before:bg-binanceBorder after:h-px after:flex-1 after:bg-binanceBorder">or</div>
-    <div class="space-y-3">
-     <button type="button" onclick="notify('Passkey sign-in is not available in this view.')" class="flex w-full items-center justify-center gap-2 rounded-lg border border-binanceMuted/70 px-4 py-3.5 text-base font-medium text-binanceText transition hover:bg-binanceHover"><i data-lucide="key-round" class="h-5 w-5"></i>Continue with Passkey</button>
-     <button type="button" onclick="notify('Google sign-in is not available in this view.')" class="flex w-full items-center justify-center gap-2 rounded-lg border border-binanceMuted/70 px-4 py-3.5 text-base font-medium text-binanceText transition hover:bg-binanceHover"><span class="font-bold text-[#4285F4]">G</span>Continue with Google</button>
-    </div>
     <div class="mt-8 flex flex-col gap-4">
      <button type="button" onclick="openAuthModal('signup')" class="w-fit text-left text-base font-medium text-binanceYellow hover:underline">Create a Binance Account</button>
-     <button type="button" onclick="openModal('supportModal')" class="w-fit text-left text-base font-medium text-binanceYellow hover:underline">Can't log in?</button>
     </div>
    </div>
   </section>
@@ -3472,7 +3612,7 @@
       <div class="flex justify-between gap-4"><dt class="text-binanceMuted">Status</dt><dd id="withdrawalProcessingRemaining" class="font-mono text-binanceYellow">Processing</dd></div>
      </dl>
     </div>
-    <p class="mt-4 rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-left text-[10px] leading-relaxed text-binanceMuted">This is a simulated withdrawal request for the practice exchange. No funds are sent to the network or recipient address.</p>
+    <p class="mt-4 rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-left text-[10px] leading-relaxed text-binanceMuted">This is a simulated withdrawal request. No funds are sent to the network or recipient address.</p>
     <button type="button" onclick="openAppPage('assets')" class="mt-5 w-full rounded-lg border border-binanceBorder py-3 text-xs font-semibold text-white hover:bg-binanceHover">Return to assets</button>
    </article>
   </div>
@@ -3489,93 +3629,96 @@
     </div>
    </div>
 
-   <div class="profile-block">
-    <div class="profile-meta">
-     <div class="profile-avatar-wrap" aria-hidden="true">
-      <div class="profile-avatar-main"></div>
-      <span class="profile-avatar-badge"><i data-lucide="grid-2x2" class="h-2.5 w-2.5"></i></span>
-     </div>
-     <div class="profile-details">
-      <h1 id="profilePageTitle"><span id="profileDisplayName">User</span></h1>
-      <div class="profile-uid-row">
-       <span>@<span id="profileUsername">username</span></span>
-       <button type="button" class="profile-icon-btn !h-5 !w-5 text-binanceMuted" onclick="copyProfileUsername()" aria-label="Copy username"><i data-lucide="copy" class="h-3 w-3"></i></button>
+   <div class="profile-page-grid">
+    <div class="profile-primary-column">
+     <div class="profile-block">
+      <div class="profile-meta">
+       <div class="profile-avatar-wrap" aria-hidden="true">
+        <div class="profile-avatar-main"></div>
+        <span class="profile-avatar-badge"><i data-lucide="grid-2x2" class="h-2.5 w-2.5"></i></span>
+       </div>
+       <div class="profile-details">
+        <h1 id="profilePageTitle"><span id="profileDisplayName">User</span></h1>
+        <div class="profile-uid-row">
+         <span>@<span id="profileUsername">username</span></span>
+         <button type="button" class="profile-icon-btn !h-5 !w-5 text-binanceMuted" onclick="copyProfileUsername()" aria-label="Copy username"><i data-lucide="copy" class="h-3 w-3"></i></button>
+        </div>
+        <div class="profile-badge-row">
+         <span class="profile-status-badge">Personal account</span>
+         <span class="profile-status-badge text-binanceGreen">Signed in</span>
+        </div>
+       </div>
       </div>
-      <div class="profile-badge-row">
-       <span class="profile-status-badge">Regular</span>
-       <span class="profile-status-badge">Account</span>
-      </div>
+      <button type="button" class="profile-share-button" onclick="shareProfile()" aria-label="Share profile"><i data-lucide="share-2" class="h-5 w-5"></i></button>
      </div>
+
+     <section class="profile-snapshot" aria-labelledby="profileSnapshotTitle">
+      <div class="profile-snapshot-heading">
+       <h2 id="profileSnapshotTitle">Account activity</h2>
+       <span>Your activity at a glance</span>
+      </div>
+      <div class="profile-snapshot-grid">
+       <div class="profile-snapshot-stat"><span class="profile-snapshot-label">Transactions</span><span id="profileTransactionCount" class="profile-snapshot-value">0</span></div>
+       <div class="profile-snapshot-stat"><span class="profile-snapshot-label">Open orders</span><span id="profileOpenOrdersCount" class="profile-snapshot-value">0</span></div>
+       <div class="profile-snapshot-stat"><span class="profile-snapshot-label">Futures positions</span><span id="profileFuturesPositionsCount" class="profile-snapshot-value">0</span></div>
+      </div>
+      <div class="profile-overview-actions">
+       <button type="button" class="profile-overview-action primary" onclick="openMobileAssets()"><i data-lucide="wallet" class="h-3.5 w-3.5"></i>View assets</button>
+       <button type="button" class="profile-overview-action" onclick="openTradePage(); switchBottomTab('open')"><i data-lucide="list-checks" class="h-3.5 w-3.5"></i>Manage orders</button>
+      </div>
+     </section>
+
+     <section class="profile-tools-panel" aria-labelledby="profileToolsTitle">
+      <div class="profile-section-headline">
+       <h2 id="profileToolsTitle">Quick actions</h2>
+      </div>
+      <div class="profile-tools-grid" aria-label="Account shortcuts">
+       <button type="button" class="profile-tool-node" onclick="openModal('depositModal')"><span class="profile-tool-icon yellow"><i data-lucide="circle-plus"></i></span><span class="profile-tool-label">Deposit</span></button>
+       <button type="button" class="profile-tool-node" onclick="openModal('withdrawModal')"><span class="profile-tool-icon"><i data-lucide="circle-minus"></i></span><span class="profile-tool-label">Withdraw</span></button>
+       <button type="button" class="profile-tool-node" onclick="openMobileAssets()"><span class="profile-tool-icon"><i data-lucide="wallet"></i></span><span class="profile-tool-label">Assets</span></button>
+       <button type="button" class="profile-tool-node" onclick="openTradePage(); switchBottomTab('open')"><span class="profile-tool-icon"><i data-lucide="chart-candlestick"></i></span><span class="profile-tool-label">Orders</span></button>
+       <button type="button" class="profile-tool-node" onclick="openConvertPage()"><span class="profile-tool-icon yellow"><i data-lucide="arrow-left-right"></i></span><span class="profile-tool-label">Convert</span></button>
+       <button type="button" class="profile-tool-node" onclick="openP2PPage()"><span class="profile-tool-icon"><i data-lucide="users-round"></i></span><span class="profile-tool-label">P2P</span></button>
+       <button type="button" class="profile-tool-node" onclick="openProfileAccountDetails()"><span class="profile-tool-icon"><i data-lucide="settings-2"></i></span><span class="profile-tool-label">Settings</span></button>
+       <button type="button" class="profile-tool-node" onclick="openModal('supportModal')"><span class="profile-tool-icon"><i data-lucide="circle-help"></i></span><span class="profile-tool-label">Support</span></button>
+      </div>
+     </section>
     </div>
-    <button type="button" class="profile-share-button" onclick="shareProfile()" aria-label="Share profile"><i data-lucide="share-2" class="h-5 w-5"></i></button>
-   </div>
 
-   <div class="profile-help-banner">
-    <div class="profile-help-left">
-     <span class="profile-help-icon"><i data-lucide="headset" class="h-4 w-4"></i></span>
-     <span>Need help?</span>
-    </div>
-    <button type="button" class="profile-help-button" onclick="openModal('supportModal')">Help Center</button>
-   </div>
+    <aside class="profile-secondary-column" aria-label="Account and support">
+     <div class="profile-help-banner">
+      <div class="profile-help-left">
+       <span class="profile-help-icon"><i data-lucide="headset" class="h-4 w-4"></i></span>
+       <span>Need help?</span>
+      </div>
+      <button type="button" class="profile-help-button" onclick="openModal('supportModal')">Help Center</button>
+     </div>
 
-   <div class="profile-campaign-grid" aria-label="Account highlights">
-    <button type="button" class="profile-campaign-card" onclick="openMobileAssets()">
-     <i data-lucide="shield-check" class="profile-campaign-icon"></i>
-     <span class="card-text-box">
-      <span class="profile-campaign-label">Account status</span>
-      <span class="profile-campaign-title block">Your account<br>is ready to explore</span>
-     </span>
-    </button>
-    <button type="button" class="profile-campaign-card" onclick="openConvertPage()">
-     <i data-lucide="sparkles" class="profile-campaign-icon muted"></i>
-     <span class="card-text-box">
-      <span class="profile-campaign-label">Explore tools</span>
-      <span class="profile-campaign-title block">Convert assets<br>in a few taps</span>
-     </span>
-    </button>
-   </div>
+     <div class="profile-campaign-grid" aria-label="Account highlights">
+      <button type="button" class="profile-campaign-card" onclick="openProfileAccountDetails()">
+       <i data-lucide="user-round-cog" class="profile-campaign-icon"></i>
+       <span class="card-text-box">
+        <span class="profile-campaign-label">Account settings</span>
+        <span class="profile-campaign-title block">Manage your<br>profile and security</span>
+       </span>
+      </button>
+      <button type="button" class="profile-campaign-card" onclick="openConvertPage()">
+       <i data-lucide="arrow-left-right" class="profile-campaign-icon muted"></i>
+       <span class="card-text-box">
+        <span class="profile-campaign-label">Quick tool</span>
+        <span class="profile-campaign-title block">Convert assets<br>in a few taps</span>
+       </span>
+      </button>
+     </div>
 
-   <div class="profile-section-headline">
-    <h3>Recommended tools</h3>
-    <i data-lucide="chevron-right" class="h-3.5 w-3.5 text-binanceMuted"></i>
-   </div>
-   <div class="profile-tools-grid" aria-label="Account shortcuts">
-    <button type="button" class="profile-tool-node" onclick="openModal('depositModal')"><span class="profile-tool-icon yellow"><i data-lucide="circle-plus"></i></span><span class="profile-tool-label">Deposit</span></button>
-    <button type="button" class="profile-tool-node" onclick="openMobileAssets()"><span class="profile-tool-icon"><i data-lucide="wallet"></i></span><span class="profile-tool-label">Assets</span></button>
-    <button type="button" class="profile-tool-node" onclick="openTradePage(); switchBottomTab('open')"><span class="profile-tool-icon"><i data-lucide="chart-candlestick"></i></span><span class="profile-tool-label">Orders</span></button>
-    <button type="button" class="profile-tool-node" onclick="openConvertPage()"><span class="profile-tool-icon yellow"><i data-lucide="arrow-left-right"></i></span><span class="profile-tool-label">Convert</span></button>
-    <button type="button" class="profile-tool-node" onclick="openP2PPage()"><span class="profile-tool-icon"><i data-lucide="users-round"></i></span><span class="profile-tool-label">P2P</span></button>
-    <button type="button" class="profile-tool-node" onclick="openProfileAccountDetails()"><span class="profile-tool-icon"><i data-lucide="settings-2"></i></span><span class="profile-tool-label">Settings</span></button>
-    <button type="button" class="profile-tool-node" onclick="notify('Earn features are not available in this view.')"><span class="profile-tool-icon yellow"><i data-lucide="gift"></i></span><span class="profile-tool-label">Rewards</span></button>
-    <button type="button" class="profile-tool-node" onclick="openModal('supportModal')"><span class="profile-tool-icon"><i data-lucide="circle-help"></i></span><span class="profile-tool-label">Support</span></button>
-   </div>
-   <div class="profile-carousel-indicator" aria-label="Page 1 of 4">
-    <span class="profile-carousel-dot active"></span><span class="profile-carousel-dot"></span><span class="profile-carousel-dot"></span><span class="profile-carousel-dot"></span>
-   </div>
-
-   <div class="profile-task-block">
-    <div class="profile-task-title">Daily activity</div>
-    <div class="profile-task-caption">Task and reward streaks are coming soon.</div>
-    <div class="profile-streak-track" aria-label="Weekly activity">
-     <div class="profile-streak-node"><span class="profile-streak-ring"><i data-lucide="circle" class="h-3 w-3"></i></span><span>Mon</span></div>
-     <div class="profile-streak-node"><span class="profile-streak-ring"><i data-lucide="circle" class="h-3 w-3"></i></span><span>Tue</span></div>
-     <div class="profile-streak-node"><span class="profile-streak-ring"><i data-lucide="circle" class="h-3 w-3"></i></span><span>Wed</span></div>
-     <div class="profile-streak-node"><span class="profile-streak-ring"><i data-lucide="circle" class="h-3 w-3"></i></span><span>Thu</span></div>
-     <div class="profile-streak-node"><span class="profile-streak-ring"><i data-lucide="circle" class="h-3 w-3"></i></span><span>Fri</span></div>
-     <div class="profile-streak-node"><span class="profile-streak-ring"><i data-lucide="circle" class="h-3 w-3"></i></span><span>Sat</span></div>
-     <div class="profile-streak-node"><span class="profile-streak-ring"><i data-lucide="circle" class="h-3 w-3"></i></span><span>Sun</span></div>
-    </div>
-   </div>
-
-   <details id="profileAccountDetails" class="profile-account-details">
+     <details id="profileAccountDetails" class="profile-account-details">
     <summary>Profile, security & wallet details</summary>
     <div class="profile-account-content">
      <div class="profile-account-card profile-account-card--overview">
       <h2>Account overview</h2>
       <div class="grid grid-cols-2 gap-2 text-[10px]">
-       <div class="rounded bg-binanceBg p-2"><span class="block text-binanceMuted">Account status</span><span class="mt-1 block font-semibold text-binanceGreen">Active · local</span></div>
+       <div class="rounded bg-binanceBg p-2"><span class="block text-binanceMuted">Account status</span><span class="mt-1 block font-semibold text-binanceGreen">Signed in</span></div>
        <div class="rounded bg-binanceBg p-2"><span class="block text-binanceMuted">Member since</span><span id="profileMemberSince" class="mt-1 block font-semibold text-white">—</span></div>
-       <div class="col-span-2 rounded bg-binanceBg p-2"><span class="block text-binanceMuted">Transactions</span><span id="profileTransactionCount" class="mt-1 block font-semibold text-white">0</span></div>
       </div>
      </div>
      <div class="profile-account-card">
@@ -3599,36 +3742,46 @@
        <label>Confirm new password<input id="profileConfirmPassword" type="password" autocomplete="new-password" minlength="8" required></label>
        <button type="submit" class="w-fit rounded border border-binanceBorder bg-binanceHover px-3 py-2 text-[10px] font-semibold text-white">Update password</button>
       </form>
-      <p class="mt-3 text-[10px] text-binanceMuted">Two-factor authentication is unavailable in this browser-only view.</p>
+      <p class="mt-3 text-[10px] text-binanceMuted">Two-factor authentication is not available yet. Use a unique password and keep it private.</p>
      </div>
      <div class="profile-account-card profile-account-card--signout">
       <div>
        <h2>Sign out</h2>
-       <p class="text-[10px] leading-relaxed text-binanceMuted">Your account remains saved in this browser.</p>
+       <p class="text-[10px] leading-relaxed text-binanceMuted">You can sign back in with your registered username or email and password.</p>
       </div>
       <button type="button" onclick="logoutUser()" class="shrink-0 rounded border border-binanceRed/40 px-3 py-2 text-[10px] font-semibold text-binanceRed">Log out</button>
      </div>
-     <p class="profile-account-note text-[10px] leading-relaxed text-binanceMuted">This is a browser-only profile. Details and passwords are stored locally and are not protected like a production account.</p>
+     <p class="profile-account-note text-[10px] leading-relaxed text-binanceMuted">Review profile details carefully before saving. Never share your password or verification codes.</p>
     </div>
-   </details>
+     </details>
+    </aside>
+   </div>
   </div>
  </section>
 
  <div id="mobileHistorySelector" class="fixed inset-0 z-[100] hidden flex items-end justify-center bg-black/70 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="mobileHistorySelectorTitle" onclick="if (event.target === this) closeMobileHistorySelector()" onkeydown="handleMobileHistoryDialogKeydown(event)">
-  <div class="history-selector-sheet w-full max-w-[440px] rounded-t-3xl border border-binanceBorder bg-[#1e2329] px-6 pb-8 pt-3 shadow-2xl sm:rounded-3xl" onclick="event.stopPropagation()">
-   <div class="history-selector-handle mb-6 h-1 w-10 rounded-full bg-[#474d57] mx-auto" aria-hidden="true"></div>
-   <h2 id="mobileHistorySelectorTitle" class="mb-7 text-2xl font-semibold tracking-tight text-binanceText">Select History</h2>
-   <button id="mobileHistoryAssetsButton" type="button" onclick="selectMobileHistory('assets')" class="mb-4 flex w-full items-center justify-between gap-6 py-3 text-left group">
-    <span class="pr-2">
-     <span class="mb-1.5 block text-xl font-semibold text-binanceText group-active:text-binanceYellow">Assets</span>
-     <span class="block text-sm leading-relaxed text-binanceMuted">Overall, Deposit, Withdraw, Fiat Buy &amp; Sell, Convert, Pay, Transfer, Distribution...</span>
+  <div class="history-selector-sheet w-full max-w-[440px] rounded-t-3xl border border-binanceBorder bg-[#1e2329] px-5 pb-5 pt-3 shadow-2xl sm:rounded-3xl" onclick="event.stopPropagation()">
+   <div class="history-selector-handle mb-5 h-1 w-10 rounded-full bg-[#474d57] mx-auto" aria-hidden="true"></div>
+   <div class="history-selector-heading">
+    <div>
+     <h2 id="mobileHistorySelectorTitle">History</h2>
+     <p>Choose which activity you want to review.</p>
+    </div>
+    <button type="button" class="history-selector-close" onclick="closeMobileHistorySelector()" aria-label="Close history selector"><i data-lucide="x" class="h-4 w-4"></i></button>
+   </div>
+   <button id="mobileHistoryAssetsButton" type="button" onclick="selectMobileHistory('assets')" class="history-selector-option">
+    <span class="history-selector-option-icon"><i data-lucide="wallet" class="h-5 w-5"></i></span>
+    <span class="history-selector-option-copy">
+     <span class="history-selector-option-title">Assets</span>
+     <span class="history-selector-option-description">Deposits, withdrawals, transfers, conversions and more</span>
     </span>
     <span class="history-selector-chevron" aria-hidden="true"></span>
    </button>
-   <button type="button" onclick="selectMobileHistory('trades')" class="flex w-full items-center justify-between gap-6 py-3 text-left group">
-    <span class="pr-2">
-     <span class="mb-1.5 block text-xl font-semibold text-binanceText group-active:text-binanceYellow">My Trades</span>
-     <span class="block text-sm leading-relaxed text-binanceMuted">Spot, Cross Margin, Isolated Margin, USDⓈ-M Futures, COIN-M Futures...</span>
+   <button type="button" onclick="selectMobileHistory('trades')" class="history-selector-option">
+    <span class="history-selector-option-icon"><i data-lucide="chart-candlestick" class="h-5 w-5"></i></span>
+    <span class="history-selector-option-copy">
+     <span class="history-selector-option-title">My Trades</span>
+     <span class="history-selector-option-description">Open orders, order history and trade history</span>
     </span>
     <span class="history-selector-chevron" aria-hidden="true"></span>
    </button>
@@ -3847,7 +4000,7 @@
      <label class="text-binanceMuted block mb-1">Amount</label>
      <input id="withdrawAmount" type="number" min="0" step="any" placeholder="0.00" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
     </div>
-    <p class="rounded border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-[10px] leading-relaxed text-binanceMuted">Simulated withdrawal only: the amount is reserved now and the request completes after 90 seconds. No blockchain transfer is sent.</p>
+    <p class="hidden text-[10px] leading-relaxed text-binanceMuted">Demo only: no funds are sent. Withdrawal status updates after 90 seconds.</p>
    </div>
    <button type="button" onclick="withdrawDemoFunds()" class="w-full py-2.5 rounded font-bold bg-binanceYellow text-binanceBg hover:bg-binanceYellowHover">Submit Withdrawal</button>
   </div>
@@ -4131,8 +4284,6 @@
    </div>
 
    <div id="authFeedback" role="status" aria-live="polite" class="hidden mb-3 rounded border px-3 py-2 text-xs"></div>
-   <a id="authLiveSignInLink" href="https://exchange-seven-jade.vercel.app/" target="_blank" rel="noopener noreferrer" class="hidden mb-3 block rounded border border-binanceYellow/40 bg-binanceYellow/10 px-3 py-2 text-center text-xs font-semibold text-binanceYellow hover:bg-binanceYellow/20">Sign in to your existing account on the live site</a>
-
    <div class="flex mb-4 rounded border border-binanceBorder bg-binanceBg p-1">
     <button id="authTabLogin" type="button" onclick="switchAuthView('login')" class="flex-1 rounded py-2 text-xs font-bold bg-binanceYellow text-binanceBg" aria-selected="true">Log in</button>
     <button id="authTabSignup" type="button" onclick="switchAuthView('signup')" class="flex-1 rounded py-2 text-xs font-bold text-binanceMuted" aria-selected="false">Sign up</button>
@@ -4808,9 +4959,9 @@
    ];
   }
 
-  function migrateLegacyPracticeWallet(wallet) {
+  function migrateLegacyWallet(wallet) {
    const legacyBalances = { BTC: 0.2441, USDT: 10000, ETH: 1.3425 };
-   const isLegacyPracticeWallet = Array.isArray(wallet)
+   const isLegacyWallet = Array.isArray(wallet)
     && wallet.length === Object.keys(legacyBalances).length
     && Object.entries(legacyBalances).every(([asset, amount]) => {
      const balance = wallet.find((entry) => entry?.asset === asset);
@@ -4819,7 +4970,7 @@
       && balance.available === amount
       && balance.inOrders === 0;
     });
-   return isLegacyPracticeWallet? createDefaultWallet(): wallet;
+   return isLegacyWallet? createDefaultWallet(): wallet;
   }
 
   function cloneWallet(wallet) {
@@ -4836,22 +4987,22 @@
     const parsed = JSON.parse(stored);
     state.users = Array.isArray(parsed)? parsed: [];
     let removedPlaintextPasswords = false;
-    let migratedPracticeWallet = false;
+    let migratedWallet = false;
     state.users.forEach((user) => {
      if (Object.prototype.hasOwnProperty.call(user, 'password')) {
       delete user.password;
       removedPlaintextPasswords = true;
      }
      if (Array.isArray(user.wallet)) {
-      const wallet = migrateLegacyPracticeWallet(user.wallet);
+      const wallet = migrateLegacyWallet(user.wallet);
       if (wallet !== user.wallet) {
        user.wallet = wallet;
-       migratedPracticeWallet = true;
+       migratedWallet = true;
       }
      }
     });
     state.users.forEach(ensureUserActivity);
-    if (removedPlaintextPasswords || migratedPracticeWallet) saveUsers();
+    if (removedPlaintextPasswords || migratedWallet) saveUsers();
    } catch (error) {
     console.error('Could not load stored users', error);
     notify('Saved accounts could not be loaded from this browser');
@@ -4991,7 +5142,13 @@
     return;
    }
    ensureUserActivity(state.currentUser);
-   const notifications = state.currentUser.notifications;
+   const notifications = state.currentUser.notifications.map((item) => ({
+    ...item,
+    message: (item.message || '')
+     .replace(/simulated withdrawal/gi, 'withdrawal record')
+     .replace(/\s*No blockchain transfer (?:was|will be) sent\.?/gi, '')
+     .replace(/\s*to your practice account/gi, ' to your account')
+   }));
    const unread = notifications.filter((item) => !item.read).length;
    count.textContent = unread > 99? '99+': String(unread);
    count.classList.toggle('hidden', unread === 0);
@@ -5001,7 +5158,7 @@
      <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
        <div class="text-xs font-semibold text-white">${escapeHTML(item.title || 'Account update')}</div>
-       <div class="mt-1 text-[10px] leading-relaxed text-binanceMuted">${escapeHTML(item.message || '')}</div>
+       <div class="mt-1 text-[10px] leading-relaxed text-binanceMuted">${escapeHTML((item.message || '').replace(/simulated withdrawal/gi, 'withdrawal record').replace(/\s*to your practice account/gi, ' to your account'))}</div>
        <div class="mt-1 text-[9px] text-binanceMuted">${escapeHTML(item.createdAt || '')}</div>
       </div>
       ${!item.read? '<span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-binanceYellow"></span>': ''}
@@ -5038,7 +5195,7 @@
      .map((item) => [item.id, `${item.title}|${item.message}`])
    );
    state.currentUser = user;
-   const wallet = migrateLegacyPracticeWallet(user.wallet || createDefaultWallet());
+   const wallet = migrateLegacyWallet(user.wallet || createDefaultWallet());
    if (wallet !== user.wallet) user.wallet = wallet;
    state.assets = cloneWallet(wallet);
    state.fundingAssets = hasFundingWallet? cloneWallet(user.fundingWallet): [];
@@ -5178,7 +5335,7 @@
     message: jobDetails.operation === 'setWallet'
      ? 'Your wallet reset is processing.'
      : jobDetails.operation === 'withdrawal'
-      ? `${Math.abs(jobDetails.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${jobDetails.asset} withdrawal is processing. The amount is reserved from your available balance. No blockchain transfer will be sent.`
+      ? `${Math.abs(jobDetails.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${jobDetails.asset} withdrawal is processing. The amount is reserved from your available balance.`
       : `${Math.abs(jobDetails.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${jobDetails.asset} ${jobDetails.amount < 0? 'balance adjustment': 'credit'} is processing for your account.`,
     createdAt: time,
     read: false
@@ -5240,7 +5397,7 @@
      }
      const transaction = user.transactions.find((entry) => entry.id === job.transactionId);
      if (transaction) {
-      transaction.status = 'Completed (practice)';
+      transaction.status = 'Completed (simulated)';
       transaction.completedAt = new Date(now).toLocaleString('en-GB');
      }
      job.status = 'Completed';
@@ -5251,7 +5408,7 @@
       message: job.operation === 'setWallet'
        ? 'Your wallet reset has completed.'
        : job.operation === 'withdrawal'
-        ? `Your simulated withdrawal of ${Math.abs(job.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${job.asset} has completed. No blockchain transfer was sent.`
+        ? `Your withdrawal record for ${Math.abs(job.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${job.asset} has completed.`
         : `${Math.abs(job.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${job.asset} ${job.amount < 0? 'balance adjustment': 'credit'} has completed in your account.`,
       createdAt: new Date(now).toLocaleString('en-GB'),
       read: false
@@ -5989,7 +6146,7 @@
     pair: `${instrument.asset}USDT`,
     category: 'tradfi',
     display: instrument.asset,
-    subtitle: `${instrument.name} · Binance TradFi perpetual reference`
+    subtitle: `${instrument.name} · Binance TradFi reference price · simulated USDT orders`
    }));
    const futuresCatalog = FUTURES_MARKET_CATALOG.map((contract) => ({
     ...contract,
@@ -6030,7 +6187,7 @@
     'for-you': ['Market', 'Binance spot prices and live TradFi references'],
     favorites: ['Market', 'Your saved crypto and TradFi markets'],
     crypto: ['Pair', 'Live Binance spot prices · all quote assets'],
-    tradfi: ['Instrument', 'Binance USDⓈ-M TradFi perpetual quotes · reference prices']
+    tradfi: ['Instrument', 'TradFi reference prices · simulated orders settle against your USDT Spot balance']
    };
    const [columnName, description] = sectionTitles[state.marketSection];
    document.getElementById('marketsColumnName').textContent = columnName;
@@ -6077,7 +6234,11 @@
     const favorite = state.favoritePairs.includes(coin.pair);
     const tradfi = coin.category === 'tradfi';
     const tradeableSpot = coin.category === 'crypto' && coin.quoteAsset === 'USDT';
-    const action = tradfi? `notify('TradFi watchlist quotes are for reference only; trading is not enabled.')`
+    const tradeableTradfi = Number.isFinite(coin.price) && coin.price > 0;
+    const action = tradfi
+     ? tradeableTradfi
+      ? `openMarketPair('${coin.pair}', demoMarketPrice('${coin.asset}'), '${coin.asset}')`
+      : `notify('Waiting for a valid TradFi reference price')`
      : coin.category === 'futures'? `openFuturesPair('${coin.pair}', demoMarketPrice('${coin.asset}'), '${coin.asset}')`
       : tradeableSpot
        ? `openMarketPair('${coin.pair}', spotMarketPrice('${coin.pair}', ${coin.price}), '${coin.asset}')`
@@ -6093,7 +6254,7 @@
       <span data-market-quote-volume="${escapeHTML(coin.category === 'crypto'? coin.pair: coin.asset)}" data-market-quote-unit="${escapeHTML(coin.category === 'crypto'? coin.quoteAsset: '$')}" class="hidden text-right font-mono text-[10px] text-binanceMuted sm:block">${coin.category === 'crypto'? escapeHTML(coin.quoteAsset): '$'} ${coin.volume}</span>
       <div class="flex items-center gap-1">
        <button type="button" onclick="toggleMarketFavorite('${coin.pair}')" aria-label="${favorite? 'Remove from': 'Add to'} favorites" aria-pressed="${favorite}" class="rounded p-1.5 ${favorite? 'text-binanceYellow': 'text-binanceMuted'}"><i data-lucide="star" class="h-4 w-4" ${favorite? 'fill="currentColor"': ''}></i></button>
-       <button type="button" onclick="${action}" class="rounded ${tradfi || !tradeableSpot && coin.category === 'crypto'? 'border border-binanceBorder text-binanceMuted': 'bg-binanceYellow text-binanceBg'} px-2.5 py-1.5 text-[9px] font-bold">${tradfi? 'Details': tradeableSpot || coin.category === 'futures'? 'Trade': 'View only'}</button>
+       <button type="button" onclick="${action}" class="rounded ${!tradfi && !tradeableSpot && coin.category === 'crypto'? 'border border-binanceBorder text-binanceMuted': 'bg-binanceYellow text-binanceBg'} px-2.5 py-1.5 text-[9px] font-bold">${tradfi || tradeableSpot || coin.category === 'futures'? 'Trade': 'View only'}</button>
       </div>
      </div>
     `;
@@ -6102,7 +6263,11 @@
    mobileList.innerHTML = filtered.length? filtered.map((coin) => {
     const favorite = state.favoritePairs.includes(coin.pair);
     const tradeableSpot = coin.category === 'crypto' && coin.quoteAsset === 'USDT';
-    const action = coin.category === 'tradfi'? `notify('TradFi watchlist quotes are for reference only; trading is not enabled.')`
+    const tradeableTradfi = coin.category === 'tradfi' && Number.isFinite(coin.price) && coin.price > 0;
+    const action = coin.category === 'tradfi'
+     ? tradeableTradfi
+      ? `openMarketPair('${coin.pair}', demoMarketPrice('${coin.asset}'), '${coin.asset}')`
+      : `notify('Waiting for a valid TradFi reference price')`
      : coin.category === 'futures'? `openFuturesPair('${coin.pair}', demoMarketPrice('${coin.asset}'), '${coin.asset}')`
       : tradeableSpot
        ? `openMarketPair('${coin.pair}', spotMarketPrice('${coin.pair}', ${coin.price}), '${coin.asset}')`
@@ -6696,8 +6861,8 @@
    const transactions = state.transactions.slice(0, 6);
    document.getElementById('assetsPageTransactions').innerHTML = transactions.length? transactions.map((transaction) => `
     <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
-     <div class="min-w-0"><div class="truncate text-xs font-semibold text-white">${escapeHTML(transaction.type || 'Transaction')}</div><div class="mt-1 truncate text-[9px] text-binanceMuted">${escapeHTML(transaction.time || '—')}${transaction.network? ` · ${escapeHTML(transaction.network)}`: ''}${transaction.fromWallet && transaction.toWallet? ` · ${escapeHTML(transaction.fromWallet)} → ${escapeHTML(transaction.toWallet)}`: ''}</div></div>
-     <div class="text-right"><div class="font-mono text-[10px] ${transaction.side === 'sell'? 'text-binanceRed': transaction.side === 'transfer'? 'text-binanceText': 'text-binanceGreen'}">${transaction.side === 'sell'? '−': transaction.side === 'transfer'? '': '+'}${visible? Number(transaction.amount || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(transaction.asset || '')}</div><div class="mt-1 text-[9px] ${String(transaction.status || '').toLowerCase().includes('completed')? 'text-binanceGreen': 'text-binanceYellow'}">${escapeHTML(transaction.status || '—')}</div></div>
+     <div class="min-w-0"><div class="truncate text-xs font-semibold text-white">${escapeHTML(getTransactionTypeLabel(transaction.type))}</div><div class="mt-1 truncate text-[9px] text-binanceMuted">${escapeHTML(transaction.time || '—')}${transaction.network? ` · ${escapeHTML(transaction.network)}`: ''}${transaction.fromWallet && transaction.toWallet? ` · ${escapeHTML(transaction.fromWallet)} → ${escapeHTML(transaction.toWallet)}`: ''}</div></div>
+     <div class="text-right"><div class="font-mono text-[10px] ${transaction.side === 'sell'? 'text-binanceRed': transaction.side === 'transfer'? 'text-binanceText': 'text-binanceGreen'}">${transaction.side === 'sell'? '−': transaction.side === 'transfer'? '': '+'}${visible? Number(transaction.amount || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(transaction.asset || '')}</div><div class="mt-1 text-[9px] ${String(transaction.status || '').toLowerCase().includes('completed')? 'text-binanceGreen': 'text-binanceYellow'}">${escapeHTML(getTransactionStatusLabel(transaction.status))}</div></div>
     </div>
    `).join(''): '<div class="p-6 text-center text-xs text-binanceMuted">Your wallet activity will appear here.</div>';
    if (window.lucide) window.lucide.createIcons();
@@ -6997,12 +7162,12 @@
     return `
      <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3">
       <div class="min-w-0">
-       <div class="truncate text-xs font-semibold text-white">${escapeHTML(transaction.type || 'Transaction')}</div>
+       <div class="truncate text-xs font-semibold text-white">${escapeHTML(getTransactionTypeLabel(transaction.type))}</div>
        <div class="mt-1 truncate text-[10px] text-binanceMuted">${escapeHTML(transaction.time || '—')}${transaction.network? ` · ${escapeHTML(transaction.network)}`: ''}${transaction.fromWallet && transaction.toWallet? ` · ${escapeHTML(transaction.fromWallet)} → ${escapeHTML(transaction.toWallet)}`: ''}</div>
       </div>
       <div class="text-right">
        <div class="font-mono text-xs ${transaction.side === 'sell'? 'text-binanceRed': 'text-binanceGreen'}">${transaction.side === 'sell'? '−': '+'}${visible? Number(transaction.amount || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(transaction.asset || '')}</div>
-       <div class="mt-1 text-[10px] ${completed? 'text-binanceGreen': 'text-binanceYellow'}">${escapeHTML(transaction.status || '—')}</div>
+       <div class="mt-1 text-[10px] ${completed? 'text-binanceGreen': 'text-binanceYellow'}">${escapeHTML(getTransactionStatusLabel(transaction.status))}</div>
       </div>
      </div>
     `;
@@ -7061,6 +7226,8 @@
     : '—';
    const transactions = Array.isArray(user.transactions)? user.transactions: [];
    document.getElementById('profileTransactionCount').textContent = transactions.length.toLocaleString();
+   document.getElementById('profileOpenOrdersCount').textContent = (Array.isArray(state.openOrders)? state.openOrders: []).length.toLocaleString();
+   document.getElementById('profileFuturesPositionsCount').textContent = (Array.isArray(state.futuresPositions)? state.futuresPositions: []).length.toLocaleString();
 
    ensureUserActivity(user);
    if (window.lucide) window.lucide.createIcons();
@@ -7179,17 +7346,16 @@
     signupTab.setAttribute('aria-selected', String(!isLogin));
    }
    setAuthFeedback('');
-   document.getElementById('authLiveSignInLink')?.classList.add('hidden');
    if (!isLogin) validateSignupForm();
   }
 
   function openAuthModal(mode = 'login') {
    const storageNote = document.getElementById('authStorageNote');
    if (storageNote) {
-    storageNote.textContent = isLocalPreviewMode()
-     ? 'Preview accounts are stored only in this browser and are separate for each preview address. Use the same preview address where you signed up. All balances and trading activity stay in the account.'
-     : ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname)
-      ? 'Local preview sign-in uses the live account service. Balances and trading activity in this preview remain in the account.'
+    storageNote.textContent = usesLiveAuthService()
+     ? 'Sign-in and new registrations use the live account service. Older local-preview accounts remain stored in this browser.'
+     : isLocalPreviewMode()
+      ? 'This static preview stores accounts in this browser only.'
       : 'Account sign-in is protected by the server. All balances and trading activity remain in the account.';
    }
    switchAuthView(mode);
@@ -7235,6 +7401,10 @@
     || host === '127.0.0.1'
     || host === '[::1]'
     || host === '::1';
+  }
+
+  function usesLiveAuthService() {
+   return isLocalPreviewMode() && window.location.protocol !== 'file:';
   }
 
   function getLocalPreviewSession() {
@@ -7482,7 +7652,7 @@
      && typeof payload.network === 'string' && payload.network.trim().length > 0 && payload.network.length <= 80
      && typeof payload.fromAddress === 'string' && payload.fromAddress.trim().length > 0 && payload.fromAddress.length <= 200) {
      const queued = enqueueAdminBalanceJob(targetUser, {
-      type: 'Practice Deposit',
+      type: 'Balance Credit',
       asset: payload.asset,
       amount: payload.amount,
       operation: 'credit',
@@ -7519,16 +7689,16 @@
      transaction = {
       id,
       time: now.toLocaleString('en-GB'),
-      status: 'Completed (practice)',
+      status: 'Completed (simulated)',
       adminUsername: sessionUser.username,
-      type: 'Practice Deposit',
+      type: 'Balance Credit',
       asset,
       amount,
       side: 'buy',
       network: payload.network.trim(),
       fromAddress: payload.fromAddress.trim()
      };
-     notificationMessage = `${amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${asset} has been credited to your practice account.`;
+     notificationMessage = `${amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${asset} has been credited to your account.`;
     } else if (payload.action === 'balance_adjustment'
      && typeof payload.asset === 'string' && /^[A-Z0-9]{2,20}$/.test(payload.asset)
      && ['total', 'available', 'inOrders'].every((field) => Number.isFinite(payload[field]) && payload[field] >= 0 && payload[field] <= 1e15)
@@ -7542,7 +7712,7 @@
      transaction = {
       id,
       time: now.toLocaleString('en-GB'),
-      status: 'Completed (practice)',
+      status: 'Completed (simulated)',
       adminUsername: sessionUser.username,
       type: change === 0 ? 'Admin Balance Allocation Update' : 'Admin Balance Adjustment',
       asset,
@@ -7550,7 +7720,7 @@
       side: change >= 0 ? 'buy' : 'sell',
       details: `Total balance updated by an administrator`
      };
-     notificationMessage = `Your ${asset} practice balance was updated by an administrator.`;
+     notificationMessage = `Your ${asset} balance was updated by an administrator.`;
     } else if (payload.action === 'wallet_reset') {
      wallet.splice(0, wallet.length, ...createDefaultWallet());
      operation = 'setWallet';
@@ -7558,14 +7728,14 @@
      transaction = {
       id,
       time: now.toLocaleString('en-GB'),
-      status: 'Completed (practice)',
+      status: 'Completed (simulated)',
       adminUsername: sessionUser.username,
       type: 'Admin Wallet Reset',
       asset,
       amount: 0,
-      details: 'Reset to the zero-balance practice wallet'
+      details: 'Reset to the zero-balance wallet'
      };
-     notificationMessage = 'Your practice wallet reset has completed.';
+     notificationMessage = 'Your wallet reset has completed.';
     } else {
      throw new Error('Invalid administrator action');
     }
@@ -7615,8 +7785,8 @@
    return null;
   }
 
-  async function requestAuthApi(path, options = {}) {
-   if (isLocalPreviewMode()) {
+  async function requestAuthApi(path, options = {}, useLiveService = false) {
+   if (isLocalPreviewMode() && !useLiveService) {
     const previewResult = handleLocalPreviewApi(path, options);
     if (previewResult !== null) {
      return previewResult;
@@ -7917,7 +8087,7 @@
    if (user) {
     const hasFundingWallet = Array.isArray(user.fundingWallet);
     ensureUserActivity(user);
-    const wallet = migrateLegacyPracticeWallet(user.wallet || createDefaultWallet());
+    const wallet = migrateLegacyWallet(user.wallet || createDefaultWallet());
     if (wallet !== user.wallet) user.wallet = wallet;
     state.assets = cloneWallet(wallet);
     state.fundingAssets = hasFundingWallet? cloneWallet(user.fundingWallet): [];
@@ -7994,7 +8164,8 @@
     const { user } = await requestAuthApi('/api/auth/signup', {
      method: 'POST',
      body: JSON.stringify({ username, email, fullName, password })
-    });
+    }, usesLiveAuthService());
+    if (usesLiveAuthService()) setLocalPreviewSession(user);
     storeAuthenticatedUser(user);
     closeModal('authModal');
     document.getElementById('authSignupView').reset();
@@ -8015,10 +8186,27 @@
    const button = document.getElementById('loginSubmitButton');
    if (button) button.disabled = true;
    try {
-    const { user } = await requestAuthApi('/api/auth/login', {
+    const loginOptions = {
      method: 'POST',
      body: JSON.stringify({ identifier, password })
-    });
+    };
+    let loginResult;
+    if (usesLiveAuthService()) {
+     try {
+      loginResult = await requestAuthApi('/api/auth/login', loginOptions, true);
+      setLocalPreviewSession(loginResult.user);
+     } catch (error) {
+      const canUsePreviewAccount = error.status === 401
+       || error.status === 502
+       || error.status === 503
+       || error.message === 'The account service could not be reached. Check your connection and try again.';
+      if (!canUsePreviewAccount || !getLocalPreviewAccountByIdentifier(identifier)) throw error;
+      loginResult = handleLocalPreviewApi('/api/auth/login', loginOptions);
+     }
+    } else {
+     loginResult = await requestAuthApi('/api/auth/login', loginOptions);
+    }
+    const { user } = loginResult;
     if (user.role === 'admin') {
      setAdminSession(user);
      closeModal('authModal');
@@ -8034,15 +8222,7 @@
     notify(`Signed in as ${user.username}`);
    } catch (error) {
     console.error('Account sign in failed', error);
-    const isPreviewPasswordMismatch = isLocalPreviewMode() && error.message === 'Invalid username/email or password';
-    setAuthFeedback(isPreviewPasswordMismatch
-     ? "That password does not match this browser's local preview account. Live-site accounts use a separate sign-in."
-     : error.message);
-    const liveSignInLink = document.getElementById('authLiveSignInLink');
-    if (liveSignInLink) {
-     liveSignInLink.classList.toggle('hidden', !isLocalPreviewMode()
-      || (!isPreviewPasswordMismatch && !error.message.startsWith('No preview account was found')));
-    }
+    setAuthFeedback(error.message);
    } finally {
     if (button) button.disabled = false;
    }
@@ -8081,7 +8261,7 @@
     const saved = JSON.parse(stored);
     if (!saved || ![1, 2].includes(saved.version)) return;
     if (Array.isArray(saved.assets) && saved.assets.every((asset) => asset && typeof asset.asset === 'string')) {
-     state.assets = migrateLegacyPracticeWallet(saved.assets);
+     state.assets = migrateLegacyWallet(saved.assets);
     }
     if (Array.isArray(saved.openOrders)) state.openOrders = saved.openOrders;
     if (Array.isArray(saved.orderHistory)) state.orderHistory = saved.orderHistory;
@@ -10945,13 +11125,12 @@
        && typeof job.processingNotificationId === 'string'
       )
       : null;
-     const hasProcessingTransaction = creditJob && Array.isArray(updatedUser.transactions)
-      && updatedUser.transactions.some((transaction) =>
-       transaction.id === creditJob.transactionId
-       && transaction.type === 'Practice Deposit'
-       && transaction.asset === payload.asset
-       && transaction.amount === payload.amount
-       && transaction.status === 'Processing'
+     const hasProcessingTransaction = creditJob      && Array.isArray(updatedUser.transactions)
+     && updatedUser.transactions.some((transaction) =>
+      transaction.id === creditJob.transactionId
+      && transaction.asset === payload.asset
+      && transaction.amount === payload.amount
+      && transaction.status === 'Processing'
       );
      const hasProcessingNotification = creditJob && Array.isArray(updatedUser.notifications)
       && updatedUser.notifications.some((notification) => notification.id === creditJob.processingNotificationId);
@@ -13528,7 +13707,7 @@
     <tr class="border-b border-binanceBorder hover:bg-binanceHover/30">
      <td class="p-2.5 text-binanceMuted">${escapeHTML(transaction.time || '—')}</td>
      <td class="p-2.5">
-      <div>${escapeHTML(transaction.type || 'Transaction')}</div>
+      <div>${escapeHTML(getTransactionTypeLabel(transaction.type))}</div>
       ${transaction.counterparty? `
        <div class="mt-1 text-[10px] text-binanceMuted">P2P with ${escapeHTML(transaction.counterparty)} · ${transaction.side === 'sell'? 'Proceeds': 'Paid'} ${Number(transaction.quoteAmount || 0).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${escapeHTML(transaction.quoteAsset || '')}</div>
       `: ''}
@@ -13541,13 +13720,21 @@
      </td>
      <td class="p-2.5">${escapeHTML(transaction.asset || '—')}</td>
      <td class="p-2.5 ${transaction.side === 'sell'? 'text-binanceRed': transaction.side === 'transfer'? 'text-binanceText': 'text-binanceGreen'}">${transaction.side === 'sell'? '−': transaction.side === 'transfer'? '': '+'}${Number(transaction.amount).toLocaleString('en-US', { maximumFractionDigits: 8 })}</td>
-     <td class="p-2.5 ${String(transaction.status || '').toLowerCase().includes('completed')? 'text-binanceGreen': 'text-binanceYellow'}">${escapeHTML(transaction.status || '—')}</td>
+     <td class="p-2.5 ${String(transaction.status || '').toLowerCase().includes('completed')? 'text-binanceGreen': 'text-binanceYellow'}">${escapeHTML(getTransactionStatusLabel(transaction.status))}</td>
     </tr>
    `).join('');
    if (state.activePage === 'home') renderUserHomeDashboard();
    if (state.activePage === 'assets') renderAssetsPage();
    if (state.activePage === 'convert') renderConvertPage();
    if (document.getElementById('mobileAssetsHistoryPage') && !document.getElementById('mobileAssetsHistoryPage').classList.contains('hidden')) renderMobileAssetsHistory();
+  }
+
+  function getTransactionTypeLabel(type) {
+   return String(type || 'Transaction').replace(/^practice\s+/i, '');
+  }
+
+  function getTransactionStatusLabel(status) {
+   return String(status || '—').replace(/\s*\(practice\)/gi, '');
   }
 
   function getMobileAssetsHistoryTransactions() {
@@ -13583,13 +13770,14 @@
    }
    list.innerHTML = transactions.map((transaction) => {
     const rawType = String(transaction.type || 'Transaction');
+    const displayType = getTransactionTypeLabel(rawType);
     const normalizedType = rawType.toLowerCase();
     const label = normalizedType.includes('deposit')? 'Deposit'
      : normalizedType.includes('withdraw')? 'Withdraw'
       : normalizedType.includes('convert')? 'Convert'
        : normalizedType.includes('transfer')? 'Transfer'
         : normalizedType.includes('p2p')? rawType.replace(/^P2P /i, 'Fiat ')
-         : rawType.replace(/^[A-Za-z0-9]+\s+/i, '');
+         : displayType.replace(/^[A-Za-z0-9]+\s+/i, '');
     const amount = Number(transaction.amount || 0);
     const isNegative = transaction.side === 'sell' || (!transaction.side && /withdraw|sale|pay|debit|adjustment/i.test(rawType));
     const amountText = `${isNegative? '−': normalizedType.includes('transfer')? '': '+'}${Math.abs(Number.isFinite(amount)? amount: 0).toLocaleString('en-US', { maximumFractionDigits: 8 })} ${escapeHTML(transaction.asset || '')}`.trim();
@@ -13597,7 +13785,7 @@
     const description = transaction.fromWallet && transaction.toWallet
      ? `${transaction.fromWallet} → ${transaction.toWallet}`
      : transaction.details || transaction.counterparty || transaction.network || '';
-    const status = String(transaction.status || '—').replace(/\s*\( \)/i, '');
+    const status = getTransactionStatusLabel(transaction.status).replace(/\s*\( \)/i, '');
     const valueColor = isNegative? 'text-binanceRed': /deposit|purchase|convert|buy|credit/i.test(rawType)? 'text-binanceGreen': 'text-binanceText';
     return `
      <article class="flex items-start justify-between gap-3 border-b border-binanceBorder py-4">
@@ -13684,7 +13872,7 @@
    const csvValue = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
    const csv = [
     ['Time', 'Type', 'Asset', 'Amount', 'Status'],
-    ...rows.map((transaction) => [transaction.time || '', transaction.type || 'Transaction', transaction.asset || '', transaction.amount ?? '', transaction.status || ''])
+    ...rows.map((transaction) => [transaction.time || '', getTransactionTypeLabel(transaction.type), transaction.asset || '', transaction.amount ?? '', getTransactionStatusLabel(transaction.status)])
    ].map((row) => row.map(csvValue).join(',')).join('\r\n');
    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
    const link = document.createElement('a');
@@ -14101,8 +14289,8 @@
    if (status) status.textContent = completed ? 'Withdrawal completed' : 'Withdrawal processing';
    if (title) title.textContent = completed ? 'Your withdrawal is complete' : 'Your withdrawal is processing';
    if (description) description.textContent = completed
-    ? 'The simulated withdrawal has completed and the reserved amount has been removed from your Spot balance.'
-    : 'Your request is being processed. The amount is reserved from your available balance and will complete after the processing period.';
+    ? 'Your withdrawal record is complete, and the reserved amount has been removed from your Spot balance.'
+    : 'Your withdrawal request is being processed. The amount is reserved from your available balance.';
    if (remaining) remaining.textContent = completed ? 'Completed' : `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, '0')} remaining`;
    if (icon) {
     icon.classList.toggle('bg-binanceGreen/10', completed);

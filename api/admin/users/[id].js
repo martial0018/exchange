@@ -46,13 +46,13 @@ function createTransaction({ id, action, actor, body, now, beforeWallet, afterWa
     const common = {
         id,
         time: now.toLocaleString('en-GB'),
-        status: action === 'balance_credit' ? 'Processing' : 'Completed (practice)',
+        status: action === 'balance_credit' ? 'Processing' : 'Completed (simulated)',
         adminUsername: actor.username
     };
     if (action === 'balance_credit') {
         return {
             ...common,
-            type: 'Practice Deposit',
+            type: 'Balance Credit',
             asset: body.asset,
             amount: body.amount,
             side: 'buy',
@@ -66,7 +66,7 @@ function createTransaction({ id, action, actor, body, now, beforeWallet, afterWa
             type: 'Admin Wallet Reset',
             asset: 'WALLET',
             amount: 0,
-            details: 'Reset to the zero-balance practice wallet'
+            details: 'Reset to the zero-balance wallet'
         };
     }
     const oldBalance = beforeWallet.find((entry) => entry.asset === body.asset);
@@ -136,7 +136,7 @@ module.exports = async function handler(req, res) {
             let details;
             if (walletReset) {
                 afterWallet.splice(0, afterWallet.length, ...DEFAULT_WALLET);
-                details = { description: 'Reset to zero-balance practice wallet' };
+                details = { description: 'Reset to zero-balance wallet' };
             } else if (body.action === 'balance_credit') {
                 details = {
                     asset: body.asset,
@@ -173,10 +173,10 @@ module.exports = async function handler(req, res) {
                 id: processingCredit ? `${id}-processing` : `${id}-completed`,
                 title: processingCredit ? 'Balance transaction processing' : 'Balance transaction completed',
                 message: body.action === 'wallet_reset'
-                    ? 'Your practice wallet reset has completed.'
+                    ? 'Your wallet reset has completed.'
                     : processingCredit
                         ? `${body.amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${body.asset} credit is processing. It will be added to your Spot balance when processing completes.`
-                        : `Your ${body.asset} practice balance was updated by an administrator.`,
+                        : `Your ${body.asset} balance was updated by an administrator.`,
                 createdAt: now.toLocaleString('en-GB'),
                 read: false
             }, ...(Array.isArray(user.notifications) ? user.notifications : [])].slice(0, 1000);
@@ -230,9 +230,9 @@ module.exports = async function handler(req, res) {
         if (!result) return sendJson(res, 404, { error: 'Account not found or balance asset is unavailable' });
         if (!result.duplicate) {
             const actionName = {
-                balance_credit: 'Admin credited practice balance',
-                balance_adjustment: 'Admin adjusted practice balance',
-                wallet_reset: 'Admin reset practice wallet'
+                balance_credit: 'Admin credited account balance',
+                balance_adjustment: 'Admin adjusted account balance',
+                wallet_reset: 'Admin reset account wallet'
             }[body.action] || 'Admin updated account';
             const details = [`Action by: @${admin.username}`];
             if (body.asset) details.push(`Asset: ${body.asset}`);

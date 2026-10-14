@@ -55,7 +55,7 @@ async function completeDueBalanceJobs(userId) {
 
             const transaction = transactions.find((entry) => entry.id === dueJob.transactionId);
             if (transaction) {
-                transaction.status = 'Completed (practice)';
+                transaction.status = 'Completed (simulated)';
                 transaction.completedAt = new Date(now).toLocaleString('en-GB');
             }
 
@@ -69,8 +69,8 @@ async function completeDueBalanceJobs(userId) {
                 id: dueJob.completionNotificationId || `${dueJob.id}-completed`,
                 title: dueJob.operation === 'withdrawal' ? 'Withdrawal completed' : 'Balance transaction completed',
                 message: dueJob.operation === 'withdrawal'
-                    ? `Your simulated withdrawal of ${formatAmount(dueJob.amount)} ${dueJob.asset} has completed. No blockchain transfer was sent.`
-                    : `${formatAmount(dueJob.amount)} ${dueJob.asset} has been credited to your practice account.`,
+                    ? `Your withdrawal record for ${formatAmount(dueJob.amount)} ${dueJob.asset} has completed.`
+                    : `${formatAmount(dueJob.amount)} ${dueJob.asset} has been credited to your account.`,
                 createdAt: new Date(now).toLocaleString('en-GB'),
                 read: false
             });
@@ -102,7 +102,7 @@ async function completeDueBalanceJobs(userId) {
     if (user && completedJobs.length) {
         const details = completedJobs.slice(0, 8).map((job) => {
             const action = job.operation === 'withdrawal' ? 'Withdrawal' : 'Balance credit';
-            return `${action}: ${formatAmount(job.amount)} ${job.asset} completed (simulated practice balance)`;
+            return `${action}: ${formatAmount(job.amount)} ${job.asset} completed (simulated balance)`;
         });
         if (completedJobs.length > details.length) details.push(`${completedJobs.length - details.length} more completed operation(s)`);
         await sendTelegramActivity(
