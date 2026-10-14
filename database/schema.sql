@@ -73,3 +73,27 @@ CREATE TABLE IF NOT EXISTS crypto_deposit_addresses (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (asset, network)
 );
+
+CREATE TABLE IF NOT EXISTS support_threads (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS support_threads_one_open_per_user_idx
+    ON support_threads (user_id) WHERE status = 'open';
+CREATE INDEX IF NOT EXISTS support_threads_updated_at_idx ON support_threads (updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS support_messages (
+    id BIGSERIAL PRIMARY KEY,
+    thread_id BIGINT NOT NULL REFERENCES support_threads(id) ON DELETE CASCADE,
+    sender_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    sender_role TEXT NOT NULL CHECK (sender_role IN ('user', 'admin')),
+    body TEXT NOT NULL CHECK (length(body) BETWEEN 1 AND 2000),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS support_messages_thread_created_idx
+    ON support_messages (thread_id, created_at, id);

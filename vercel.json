@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/support/chat",
+      "destination": "/api/auth/me?supportChat=1"
+    }
+  ]
+}

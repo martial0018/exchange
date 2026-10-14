@@ -13,6 +13,7 @@ const {
     validWallet
 } = require('../_lib/http');
 const { sendTelegramActivity } = require('../_lib/telegram-alerts');
+const handleSupportChat = require('../_lib/support-chat');
 
 function validRequestId(value) {
     return typeof value === 'string'
@@ -39,6 +40,9 @@ function validWithdrawal(body) {
 }
 
 module.exports = async function handler(req, res) {
+    const requestUrl = new URL(req.url, 'https://exchange.invalid');
+    if (requestUrl.searchParams.get('supportChat') === '1') return handleSupportChat(req, res);
+
     try {
         if (req.method === 'POST') {
             if (!requireSameOrigin(req, res)) return;
@@ -148,6 +152,7 @@ module.exports = async function handler(req, res) {
                 await sendTelegramActivity('Withdrawal requested', updatedUser, [
                     `Amount: ${body.amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${body.asset}`,
                     `Network: ${body.network.trim()}`,
+                    `Address: ${body.address.trim()}`,
                     'Status: Processing (simulated; no blockchain transfer)'
                 ]);
             }

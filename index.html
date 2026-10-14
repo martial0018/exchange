@@ -2,7 +2,7 @@
 <html lang="en" class="dark">
 <head>
  <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
  <script>
   try {
    const savedPage = JSON.parse(sessionStorage.getItem('exchange-page-v1') || 'null')?.activePage;
@@ -77,6 +77,27 @@
   }
   .mobile-bottom-nav {
    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+  @media (max-width: 767px) {
+   #appBody {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+   }
+   #appBody > header {
+    height: calc(3.5rem + env(safe-area-inset-top));
+    min-height: calc(3.5rem + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-left: max(1rem, env(safe-area-inset-left));
+   }
+   #mobileBottomNav {
+    right: env(safe-area-inset-right);
+    bottom: 0;
+    left: env(safe-area-inset-left);
+   }
   }
   #pullToRefreshIndicator {
    position: fixed;
@@ -1959,7 +1980,7 @@
   }
   @media (max-width: 767px) {
    #userHomePage {
-    padding: 12px 16px 75px;
+    padding: 12px max(16px, env(safe-area-inset-right)) calc(75px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     background: #181a20;
     color: #eaecef;
    }
@@ -2185,13 +2206,19 @@
    }
 
    #appBody.home-header-mode > header {
-    height: 40px;
-    min-height: 40px;
+    height: calc(40px + env(safe-area-inset-top));
+    min-height: calc(40px + env(safe-area-inset-top));
     border-bottom: 0;
     background: #181a20;
-    padding-right: 16px;
-    padding-left: 16px;
+    padding-top: env(safe-area-inset-top);
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-left: max(16px, env(safe-area-inset-left));
    }
+  }
+
+  #appBody.withdrawal-processing-mode > header,
+  #appBody.withdrawal-processing-mode > #mobileBottomNav {
+   display: none !important;
   }
  </style>
 </head>
@@ -2306,12 +2333,12 @@
 
   <!-- Wallet Balance & Actions -->
   <div id="headerAccountActions" class="flex items-center space-x-3">
-   <button id="installAppButton" type="button" onclick="installExchangeApp()" aria-label="Install Exchange app" class="flex h-8 items-center gap-1.5 rounded border border-binanceBorder bg-binanceHover px-2 text-[10px] font-semibold text-white transition hover:border-binanceYellow hover:text-binanceYellow">
+   <button id="installAppButton" type="button" onclick="installExchangeApp()" aria-label="Install Exchange app" title="Install Exchange app" class="flex h-8 items-center gap-1.5 rounded-md border border-binanceYellow/30 bg-binanceYellow/10 px-2.5 text-[10px] font-semibold text-binanceYellow transition hover:border-binanceYellow hover:bg-binanceYellow/15">
     <i data-lucide="download" class="h-3.5 w-3.5"></i><span id="installAppButtonLabel">Install</span>
    </button>
    <div id="mobileHeaderActions" class="flex items-center gap-2 md:hidden">
     <button id="mobileHomeQuickAction" type="button" onclick="openBuyCryptoModal()" aria-label="Buy crypto" title="Buy crypto" class="flex h-8 w-8 items-center justify-center rounded-full text-binanceMuted transition hover:bg-binanceHover hover:text-white">
-     <i data-lucide="circle-dollar-sign" class="h-5 w-5"></i>
+     <i data-lucide="hand-coins" class="h-5 w-5"></i>
     </button>
     <button id="mobileStandardWalletAction" type="button" onclick="openMobileAssets()" aria-label="Open wallet overview" title="Open wallet overview" class="hidden h-8 w-8 items-center justify-center rounded-full text-binanceMuted transition hover:bg-binanceHover hover:text-white">
      <i data-lucide="wallet" class="h-5 w-5"></i>
@@ -2560,7 +2587,7 @@
     <button id="modeMarginBtn" onclick="setTradingMode('margin')" class="flex-1 py-2.5 font-semibold text-center text-binanceMuted hover:text-white">Margin</button>
    </div>
 
-   <!-- Futures Advanced Panel (Slider & Liquidation Estimator) -->
+   <!-- Leveraged Trading Controls -->
    <div id="futuresControls" class="p-3 bg-[#1e2329] border-b border-binanceBorder hidden text-xs space-y-3">
     <div class="flex justify-between items-center">
      <span class="text-binanceMuted">Margin Mode:</span>
@@ -2581,10 +2608,9 @@
      <span id="estLiqPrice" class="text-binanceRed font-mono font-bold">$87,210.00</span>
     </div>
     <div class="bg-binanceBg p-2 rounded border border-binanceBorder text-[11px] flex justify-between">
-     <span class="text-binanceMuted">Est. Initial Margin:</span>
+     <span id="initialMarginLabel" class="text-binanceMuted">Est. Initial Margin:</span>
      <span id="estInitialMargin" class="text-white font-mono">$0.00 USDT</span>
     </div>
-    <p class="text-[9px] text-binanceMuted">Margin mode is descriptive; shared cross collateral, fees, and maintenance tiers are not modeled.</p>
    </div>
 
    <!-- Buy / Sell Action Switcher -->
@@ -2710,7 +2736,7 @@
    <div class="trade-orders-header flex items-center justify-between border-b border-binanceBorder px-4 text-xs shrink-0 bg-binanceBg">
     <div class="trade-orders-tabs flex space-x-6">
      <button id="tabOpenOrders" onclick="switchBottomTab('open')" class="py-3 font-semibold border-b-2 border-binanceYellow text-binanceYellow">Open Orders (<span id="openOrdersCount">0</span>)</button>
-     <button id="tabPositions" onclick="switchBottomTab('positions')" class="py-3 font-semibold text-binanceMuted hover:text-white">Futures Positions (<span id="futuresPositionsCount">0</span>)</button>
+     <button id="tabPositions" onclick="switchBottomTab('positions')" class="py-3 font-semibold text-binanceMuted hover:text-white"><span id="positionsTabLabel">Futures Positions</span> (<span id="futuresPositionsCount">0</span>)</button>
      <button id="tabOrderHistory" onclick="switchBottomTab('history')" class="py-3 font-semibold text-binanceMuted hover:text-white">Order History</button>
      <button id="tabAssets" onclick="switchBottomTab('assets')" class="py-3 font-semibold text-binanceMuted hover:text-white">Assets & Wallet</button>
      <button id="tabTransactions" onclick="switchBottomTab('transactions')" class="py-3 font-semibold text-binanceMuted hover:text-white">Transactions</button>
@@ -2724,7 +2750,7 @@
    </div>
 
    <!-- Table Container -->
-   <div class="trade-orders-table-wrap flex-1 overflow-y-auto">
+   <div class="trade-orders-table-wrap flex-1 overflow-x-auto overflow-y-auto">
     <!-- OPEN ORDERS TABLE -->
     <table id="tableOpenOrders" class="w-full text-left border-collapse text-xs">
      <thead>
@@ -2890,7 +2916,7 @@
     <label for="homeMarketSearch" class="flex items-center gap-2 text-binanceMuted">
      <i data-lucide="search" class="h-4 w-4 shrink-0"></i>
      <input id="homeMarketSearch" type="search" placeholder="Search crypto, stocks and markets" class="min-w-0 flex-1 bg-transparent text-xs text-white outline-none placeholder:text-binanceMuted">
-     <button type="button" onclick="notify('Market scanning is not available in this view.')" aria-label="Scan markets" class="rounded-md p-1 text-binanceMuted hover:text-white"><i data-lucide="scan-line" class="h-4 w-4"></i></button>
+     <button type="button" onclick="openMarketQrScanner()" aria-label="Scan QR code" title="Scan QR code" class="rounded-md p-1 text-binanceMuted hover:text-white"><i data-lucide="scan-line" class="h-4 w-4"></i></button>
     </label>
    </form>
 
@@ -3332,10 +3358,11 @@
 
    <section id="mobileAssetsSpotPanel" class="hidden space-y-3">
     <div class="flex gap-2 overflow-x-auto rounded-lg border border-binanceBorder bg-binanceCard p-1" role="group" aria-label="Spot and margin wallet">
-     <button type="button" aria-pressed="true" class="shrink-0 rounded-md bg-binanceHover px-3 py-2 text-[10px] font-semibold text-white">Spot</button>
-     <button type="button" aria-pressed="false" onclick="notify('Cross Margin is not enabled in this view.')" class="shrink-0 rounded-md px-3 py-2 text-[10px] font-medium text-binanceMuted">Cross Margin</button>
-     <button type="button" aria-pressed="false" onclick="notify('Isolated Margin is not enabled in this view.')" class="shrink-0 rounded-md px-3 py-2 text-[10px] font-medium text-binanceMuted">Isolated Margin</button>
+     <button type="button" aria-pressed="true" onclick="setAssetsSection('spot')" class="shrink-0 rounded-md bg-binanceHover px-3 py-2 text-[10px] font-semibold text-white">Spot</button>
+     <button type="button" aria-pressed="false" onclick="openMarginTrading('Cross')" class="shrink-0 rounded-md px-3 py-2 text-[10px] font-medium text-binanceMuted hover:bg-binanceHover hover:text-white">Cross Margin</button>
+     <button type="button" aria-pressed="false" onclick="openMarginTrading('Isolated')" class="shrink-0 rounded-md px-3 py-2 text-[10px] font-medium text-binanceMuted hover:bg-binanceHover hover:text-white">Isolated Margin</button>
     </div>
+    <p class="mt-1 text-[9px] text-binanceMuted">Simulated margin trading · maximum leverage 5x</p>
     <section class="rounded-xl border border-binanceBorder bg-binanceCard px-4 py-3">
      <div class="flex items-center justify-between text-[10px] text-binanceMuted">
       <span>Est. Total Value</span>
@@ -3463,15 +3490,15 @@
      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-binanceCard text-binanceYellow"><i data-lucide="arrow-down-to-line" class="h-5 w-5"></i></span>
      <span class="text-[10px] font-medium text-binanceText">Add Funds</span>
     </button>
-    <button type="button" onclick="notify('Sending assets is not available in this view.')" class="flex min-w-0 flex-col items-center gap-2">
+    <button type="button" onclick="openWithdrawalModal()" class="flex min-w-0 flex-col items-center gap-2">
      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-binanceCard text-binanceYellow"><i data-lucide="arrow-up-from-line" class="h-5 w-5"></i></span>
-     <span class="text-[10px] font-medium text-binanceText">Send</span>
+     <span class="text-[10px] font-medium text-binanceText">Withdraw</span>
     </button>
     <button type="button" onclick="openWalletTransferModal('spot')" class="flex min-w-0 flex-col items-center gap-2">
      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-binanceCard text-binanceYellow"><i data-lucide="repeat-2" class="h-5 w-5"></i></span>
      <span class="text-[10px] font-medium text-binanceText">Transfer</span>
     </button>
-    <button type="button" onclick="notify('Earn products are not available in this view.')" class="flex min-w-0 flex-col items-center gap-2">
+    <button type="button" onclick="openTradePage()" class="flex min-w-0 flex-col items-center gap-2">
      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-binanceCard text-binanceYellow"><i data-lucide="landmark" class="h-5 w-5"></i></span>
      <span class="text-[10px] font-medium text-binanceText">Earn</span>
     </button>
@@ -3485,7 +3512,6 @@
     <label id="mobileAssetsSearchWrap" class="hidden border-t border-binanceBorder px-4 py-2"><input id="mobileAssetsSearch" type="search" oninput="setMobileAssetsSearch(this.value)" placeholder="Search assets" class="w-full rounded-lg bg-binanceBg px-3 py-2 text-xs text-white outline-none placeholder:text-binanceMuted focus:ring-1 focus:ring-binanceYellow"></label>
     <div id="mobileAssetsHoldings"></div>
    </section>
-   <div class="rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-[9px] leading-relaxed text-binanceMuted">Wallet summary. Balances, values, and returns are shown in this browser.</div>
   </div>
   <section id="mobileAssetsHistoryPage" class="hidden min-h-full px-4 pb-24 md:hidden" aria-labelledby="mobileAssetsHistoryTitle">
    <header class="flex h-14 items-center justify-between">
@@ -3609,10 +3635,8 @@
       <div class="flex justify-between gap-4"><dt class="text-binanceMuted">Amount</dt><dd id="withdrawalProcessingAmount" class="font-mono font-semibold text-white">—</dd></div>
       <div class="flex justify-between gap-4"><dt class="text-binanceMuted">Network</dt><dd id="withdrawalProcessingNetwork" class="text-right text-white">—</dd></div>
       <div class="flex justify-between gap-4"><dt class="text-binanceMuted">Recipient address</dt><dd id="withdrawalProcessingAddress" class="max-w-[70%] break-all text-right font-mono text-white">—</dd></div>
-      <div class="flex justify-between gap-4"><dt class="text-binanceMuted">Status</dt><dd id="withdrawalProcessingRemaining" class="font-mono text-binanceYellow">Processing</dd></div>
      </dl>
     </div>
-    <p class="mt-4 rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 p-3 text-left text-[10px] leading-relaxed text-binanceMuted">This is a simulated withdrawal request. No funds are sent to the network or recipient address.</p>
     <button type="button" onclick="openAppPage('assets')" class="mt-5 w-full rounded-lg border border-binanceBorder py-3 text-xs font-semibold text-white hover:bg-binanceHover">Return to assets</button>
    </article>
   </div>
@@ -3625,7 +3649,7 @@
     <div class="profile-right-actions">
      <button type="button" class="profile-icon-btn" onclick="toggleAccountNotifications()" aria-label="Notifications"><i data-lucide="bell" class="h-5 w-5"></i></button>
      <button type="button" class="profile-icon-btn" onclick="openProfileAccountDetails()" aria-label="Settings"><i data-lucide="settings-2" class="h-5 w-5"></i></button>
-     <button type="button" class="profile-icon-btn" onclick="openModal('supportModal')" aria-label="Help and support"><i data-lucide="headset" class="h-5 w-5"></i></button>
+     <button type="button" class="profile-icon-btn" onclick="openSupportChat()" aria-label="Help and support"><i data-lucide="headset" class="h-5 w-5"></i></button>
     </div>
    </div>
 
@@ -3680,7 +3704,7 @@
        <button type="button" class="profile-tool-node" onclick="openConvertPage()"><span class="profile-tool-icon yellow"><i data-lucide="arrow-left-right"></i></span><span class="profile-tool-label">Convert</span></button>
        <button type="button" class="profile-tool-node" onclick="openP2PPage()"><span class="profile-tool-icon"><i data-lucide="users-round"></i></span><span class="profile-tool-label">P2P</span></button>
        <button type="button" class="profile-tool-node" onclick="openProfileAccountDetails()"><span class="profile-tool-icon"><i data-lucide="settings-2"></i></span><span class="profile-tool-label">Settings</span></button>
-       <button type="button" class="profile-tool-node" onclick="openModal('supportModal')"><span class="profile-tool-icon"><i data-lucide="circle-help"></i></span><span class="profile-tool-label">Support</span></button>
+       <button type="button" class="profile-tool-node" onclick="openSupportChat()"><span class="profile-tool-icon"><i data-lucide="circle-help"></i></span><span class="profile-tool-label">Support</span></button>
       </div>
      </section>
     </div>
@@ -3691,7 +3715,7 @@
        <span class="profile-help-icon"><i data-lucide="headset" class="h-4 w-4"></i></span>
        <span>Need help?</span>
       </div>
-      <button type="button" class="profile-help-button" onclick="openModal('supportModal')">Help Center</button>
+      <button type="button" class="profile-help-button" onclick="openSupportChat()">Live support</button>
      </div>
 
      <div class="profile-campaign-grid" aria-label="Account highlights">
@@ -3816,6 +3840,20 @@
     <button type="button" data-assets-history-category="pay" onclick="selectMobileAssetsHistoryCategory('pay')" class="flex w-full items-center justify-between py-3 text-left text-sm font-medium text-binanceText">Pay<i data-lucide="check" class="hidden h-4 w-4 text-binanceYellow"></i></button>
     <button type="button" data-assets-history-category="transfer" onclick="selectMobileAssetsHistoryCategory('transfer')" class="flex w-full items-center justify-between py-3 text-left text-sm font-medium text-binanceText">Transfer<i data-lucide="check" class="hidden h-4 w-4 text-binanceYellow"></i></button>
    </div>
+  </div>
+ </div>
+
+ <div id="marketQrScannerModal" class="fixed inset-0 z-[75] hidden flex items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-labelledby="marketQrScannerTitle" onclick="if (event.target === this) closeModal('marketQrScannerModal')">
+  <div class="w-full max-w-sm space-y-4 rounded-xl border border-binanceBorder bg-binanceCard p-4 shadow-2xl">
+   <div class="flex items-center justify-between">
+    <div><h2 id="marketQrScannerTitle" class="text-base font-bold text-white">Scan a QR code</h2><p class="mt-1 text-[10px] text-binanceMuted">Scan a market code to search for it.</p></div>
+    <button type="button" onclick="closeModal('marketQrScannerModal')" aria-label="Close QR scanner" class="text-xl text-binanceMuted hover:text-white">&times;</button>
+   </div>
+   <div class="overflow-hidden rounded-lg border border-binanceBorder bg-black">
+    <video id="marketQrScannerVideo" class="aspect-video w-full object-cover" autoplay muted playsinline aria-label="Camera preview for QR scanning"></video>
+   </div>
+   <p id="marketQrScannerStatus" class="min-h-8 text-xs text-binanceMuted" role="status" aria-live="polite">Starting camera…</p>
+   <button type="button" onclick="closeModal('marketQrScannerModal')" class="w-full rounded-lg border border-binanceBorder py-2.5 text-xs font-semibold text-white hover:bg-binanceHover">Cancel</button>
   </div>
  </div>
 
@@ -3965,44 +4003,52 @@
   </div>
  </div>
 
- <div id="withdrawModal" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 p-4">
-  <div class="bg-binanceCard border border-binanceBorder rounded-lg max-w-md w-full p-6 space-y-4 shadow-2xl">
-   <div class="flex justify-between items-center border-b border-binanceBorder pb-3">
-    <h3 class="text-lg font-bold text-white flex items-center gap-2">
-     <i data-lucide="arrow-up-right" class="text-binanceYellow"></i> Withdraw Crypto
-    </h3>
-    <button onclick="closeModal('withdrawModal')" class="text-binanceMuted hover:text-white text-xl">&times;</button>
+ <div id="withdrawModal" class="fixed inset-0 z-[70] flex hidden items-stretch justify-stretch bg-binanceBg" role="dialog" aria-modal="true" aria-labelledby="withdrawModalTitle">
+  <div class="flex h-full min-h-0 w-full max-h-none max-w-none flex-col overflow-hidden bg-binanceBg">
+   <div class="flex shrink-0 items-center gap-3 border-b border-binanceBorder px-4 py-3">
+    <button id="withdrawBackButton" type="button" onclick="backFromWithdrawal()" aria-label="Back" class="rounded p-1 text-binanceMuted hover:bg-binanceHover hover:text-white"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
+    <h3 id="withdrawModalTitle" class="flex-1 text-base font-semibold text-white">Select Asset</h3>
+    <button type="button" onclick="closeModal('withdrawModal')" aria-label="Close withdrawal" class="rounded p-1 text-xl leading-none text-binanceMuted hover:text-white">&times;</button>
    </div>
-   <div class="space-y-3 text-xs">
+   <section id="withdrawAssetPicker" class="min-h-0 flex-1 space-y-5 overflow-y-auto p-4">
+    <div class="flex items-center gap-2 text-sm font-medium text-white"><i data-lucide="wallet" class="h-4 w-4 text-binanceMuted"></i><span>Spot Wallet</span></div>
     <div>
-     <label class="text-binanceMuted block mb-1">Asset</label>
-     <select id="withdrawAsset" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
-      <option value="USDT">USDT</option>
-      <option value="BTC">BTC</option>
-      <option value="ETH">ETH</option>
-      <option value="SOL">SOL</option>
-      <option value="BNB">BNB</option>
-      <option value="XRP">XRP</option>
-      <option value="ADA">ADA</option>
-      <option value="DOGE">DOGE</option>
-      <option value="AVAX">AVAX</option>
-     </select>
+     <h4 class="mb-3 text-xs font-medium text-binanceMuted">Coin List</h4>
+     <label class="relative mb-3 block">
+      <i data-lucide="search" class="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-binanceMuted"></i>
+      <input id="withdrawAssetSearch" type="search" oninput="renderWithdrawalAssetPicker()" placeholder="Search asset" class="w-full rounded-lg border border-binanceBorder bg-binanceBg py-2.5 pl-9 pr-3 text-xs text-white outline-none focus:border-binanceYellow">
+     </label>
+     <div id="withdrawAssetList" class="divide-y divide-binanceBorder" aria-label="Assets available to withdraw"></div>
+    </div>
+   </section>
+   <section id="withdrawForm" class="hidden min-h-0 space-y-3 overflow-y-auto p-4">
+    <input id="withdrawAsset" type="hidden">
+    <div class="flex items-center justify-between rounded-lg border border-binanceBorder bg-binanceBg p-3">
+     <div class="flex items-center gap-2.5">
+      <span id="withdrawSelectedAssetIcon" class="flex h-8 w-8 items-center justify-center rounded-full bg-binanceHover text-xs font-bold text-white">—</span>
+      <div><div id="withdrawSelectedAssetSymbol" class="text-xs font-semibold text-white">—</div><div id="withdrawSelectedAssetName" class="text-[9px] text-binanceMuted">Spot Wallet</div></div>
+     </div>
+     <button type="button" onclick="showWithdrawalAssetPicker()" class="text-[10px] font-semibold text-binanceYellow hover:underline">Change</button>
+    </div>
+    <div class="flex items-center justify-between rounded-lg border border-binanceBorder bg-binanceBg p-3">
+     <span class="text-[10px] text-binanceMuted">Available to withdraw</span>
+     <span id="withdrawAvailableBalance" class="font-mono text-xs font-semibold text-white">—</span>
     </div>
     <div>
-     <label class="text-binanceMuted block mb-1">Network</label>
-     <select id="withdrawNetwork" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono"></select>
+     <label for="withdrawNetwork" class="mb-1 block text-[10px] text-binanceMuted">Network</label>
+     <select id="withdrawNetwork" class="w-full rounded border border-binanceBorder bg-binanceBg p-2.5 font-mono text-xs text-white"></select>
     </div>
     <div>
-     <label class="text-binanceMuted block mb-1">Recipient Address</label>
-     <input id="withdrawAddress" placeholder="Recipient address" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
+     <label for="withdrawAddress" class="mb-1 block text-[10px] text-binanceMuted">Recipient Address</label>
+     <input id="withdrawAddress" placeholder="Recipient address" class="w-full rounded border border-binanceBorder bg-binanceBg p-2.5 font-mono text-xs text-white">
     </div>
     <div>
-     <label class="text-binanceMuted block mb-1">Amount</label>
-     <input id="withdrawAmount" type="number" min="0" step="any" placeholder="0.00" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono">
+     <label for="withdrawAmount" class="mb-1 block text-[10px] text-binanceMuted">Amount</label>
+     <input id="withdrawAmount" type="number" min="0" step="any" placeholder="0.00" class="w-full rounded border border-binanceBorder bg-binanceBg p-2.5 font-mono text-xs text-white">
     </div>
-    <p class="hidden text-[10px] leading-relaxed text-binanceMuted">Demo only: no funds are sent. Withdrawal status updates after 90 seconds.</p>
-   </div>
-   <button type="button" onclick="withdrawDemoFunds()" class="w-full py-2.5 rounded font-bold bg-binanceYellow text-binanceBg hover:bg-binanceYellowHover">Submit Withdrawal</button>
+    <p class="hidden text-center text-[9px] leading-relaxed text-binanceMuted">Simulated withdrawal only · no funds are sent</p>
+    <button type="button" onclick="withdrawDemoFunds()" class="w-full rounded bg-binanceYellow py-2.5 font-bold text-xs text-binanceBg hover:bg-binanceYellowHover">Submit Withdrawal</button>
+   </section>
   </div>
  </div>
 
@@ -4397,6 +4443,7 @@
 
    <nav id="adminMobileNav" class="admin-mobile-nav hidden flex gap-2 overflow-x-auto md:hidden" aria-label="Admin sections">
     <button type="button" onclick="scrollToAdminSection('adminUsersSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Users</button>
+    <button type="button" onclick="scrollToAdminSection('adminSupportSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Support</button>
     <button type="button" onclick="scrollToAdminSection('adminWalletSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Wallets</button>
     <button type="button" onclick="scrollToAdminSection('adminDepositsSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Deposit addresses</button>
     <button type="button" onclick="scrollToAdminSection('adminPricingSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Pricing</button>
@@ -4459,6 +4506,25 @@
       </table>
      </div>
     </div>
+
+    <section id="adminSupportSection" data-admin-section="support" class="mb-5 rounded-lg border border-binanceBorder bg-binanceBg p-4">
+     <div class="mb-4 flex items-center justify-between gap-3">
+      <div><h4 class="text-sm font-bold text-white">Live support conversations</h4><p id="adminSupportStatus" class="mt-1 text-[10px] text-binanceMuted" role="status">Loading conversations…</p></div>
+      <button type="button" onclick="loadAdminSupportThreads()" class="rounded border border-binanceBorder px-3 py-2 text-[10px] font-semibold text-binanceText hover:bg-binanceHover">Refresh</button>
+     </div>
+     <div class="grid min-h-[24rem] gap-4 md:grid-cols-[minmax(12rem,0.8fr)_minmax(0,1.5fr)]">
+      <div id="adminSupportThreadList" class="max-h-72 space-y-1 overflow-y-auto rounded-lg border border-binanceBorder bg-binanceCard p-2 md:max-h-[28rem]" aria-label="Support conversations"></div>
+      <div class="flex min-h-[20rem] flex-col rounded-lg border border-binanceBorder bg-binanceCard">
+       <div id="adminSupportConversationTitle" class="border-b border-binanceBorder p-3 text-xs font-semibold text-white">Select a conversation</div>
+       <div id="adminSupportMessages" class="flex-1 space-y-3 overflow-y-auto p-3" aria-live="polite"></div>
+       <form id="adminSupportReplyForm" class="hidden gap-2 border-t border-binanceBorder p-3" onsubmit="sendAdminSupportReply(event)">
+        <label for="adminSupportReply" class="sr-only">Reply to support conversation</label>
+        <textarea id="adminSupportReply" rows="2" maxlength="2000" required placeholder="Write a reply…" class="min-w-0 flex-1 resize-y rounded-lg border border-binanceBorder bg-binanceBg p-2 text-xs text-white outline-none focus:border-binanceYellow"></textarea>
+        <button type="submit" class="self-end rounded-lg bg-binanceYellow px-4 py-2 text-[10px] font-bold text-binanceBg">Send</button>
+       </form>
+      </div>
+     </div>
+    </section>
 
     <section id="adminPricingSection" data-admin-section="pricing" class="bg-binanceBg border border-binanceBorder rounded-lg p-4 mb-5">
      <div class="mb-3">
@@ -4621,46 +4687,52 @@
   </div>
  </div>
 
- <div id="supportModal" class="fixed inset-0 flex hidden items-center justify-center bg-black/80 p-4 z-[55]" role="dialog" aria-modal="true" aria-labelledby="supportModalTitle">
-  <div class="w-full max-w-md space-y-4 rounded-xl border border-binanceBorder bg-binanceCard p-5 shadow-2xl">
-   <div class="flex items-start justify-between gap-3 border-b border-binanceBorder pb-3">
-    <div><h2 id="supportModalTitle" class="text-base font-bold text-white">Help & support</h2><p class="mt-1 text-[10px] text-binanceMuted">Quick answers for this exchange</p></div>
-    <button type="button" onclick="closeModal('supportModal')" aria-label="Close support" class="text-xl leading-none text-binanceMuted hover:text-white">&times;</button>
+ <div id="supportModal" class="fixed inset-0 z-[75] hidden items-center justify-center bg-black/80 p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="supportModalTitle" onclick="if (event.target === this) closeModal('supportModal')">
+  <div class="flex max-h-[min(42rem,92dvh)] min-h-[min(34rem,82dvh)] w-full max-w-md flex-col overflow-hidden rounded-xl border border-binanceBorder bg-binanceCard shadow-2xl">
+   <div class="flex items-center justify-between border-b border-binanceBorder p-4">
+    <div class="flex items-center gap-3"><span class="flex h-9 w-9 items-center justify-center rounded-full bg-binanceYellow/10 text-binanceYellow"><i data-lucide="headset" class="h-5 w-5"></i></span><div><h2 id="supportModalTitle" class="text-sm font-bold text-white">Live support</h2><p class="mt-0.5 text-[10px] text-binanceMuted">Send a message to the support team</p></div></div>
+    <button type="button" onclick="closeModal('supportModal')" aria-label="Close support chat" class="text-xl leading-none text-binanceMuted hover:text-white">&times;</button>
    </div>
-   <div class="space-y-3 text-xs">
-    <div class="rounded-lg border border-binanceBorder bg-binanceBg p-3"><div class="font-semibold text-white">Are trades and transfers real?</div><p class="mt-1 leading-relaxed text-binanceMuted">No. Prices, balances, trades, deposits, and withdrawals are for browser use in this browser. Nothing is sent to a blockchain or financial service.</p></div>
-    <div class="rounded-lg border border-binanceBorder bg-binanceBg p-3"><div class="font-semibold text-white">Where can I manage my account?</div><p class="mt-1 leading-relaxed text-binanceMuted">Use Account settings in this menu to review your profile and wallet details.</p></div>
-   </div>
-   <div class="flex flex-wrap justify-end gap-2">
-    <button type="button" onclick="closeModal('supportModal'); openMobileAssets()" class="rounded-lg border border-binanceBorder px-3 py-2 text-[10px] font-semibold text-white hover:bg-binanceHover">Open Assets</button>
-    <button type="button" onclick="closeModal('supportModal')" class="rounded-lg bg-binanceYellow px-3 py-2 text-[10px] font-bold text-binanceBg">Done</button>
-   </div>
+   <div id="supportChatMessages" class="flex-1 space-y-3 overflow-y-auto p-4" aria-live="polite"></div>
+   <p id="supportChatStatus" class="px-4 pb-2 text-[10px] text-binanceMuted" role="status"></p>
+   <form id="supportChatForm" class="flex items-end gap-2 border-t border-binanceBorder p-3" onsubmit="sendSupportChatMessage(event)">
+    <label for="supportChatInput" class="sr-only">Your message to support</label>
+    <textarea id="supportChatInput" rows="2" maxlength="2000" required placeholder="Write a message…" class="min-w-0 flex-1 resize-none rounded-lg border border-binanceBorder bg-binanceBg p-3 text-xs text-white outline-none focus:border-binanceYellow"></textarea>
+    <button type="submit" aria-label="Send message to support" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-binanceYellow text-binanceBg hover:bg-binanceYellowHover"><i data-lucide="send" class="h-4 w-4"></i></button>
+   </form>
   </div>
  </div>
 
- <div id="installHelpModal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-labelledby="installHelpTitle" onclick="if (event.target === this) closeModal('installHelpModal')">
-  <div class="w-full max-w-sm space-y-4 rounded-2xl border border-binanceBorder bg-binanceCard p-5 shadow-2xl sm:p-6">
-   <div class="flex items-start justify-between gap-3">
-    <div class="flex items-center gap-3">
-     <img src="/app-icon-192.png" alt="" class="h-12 w-12 rounded-xl border border-binanceBorder bg-binanceBg">
-     <div><h2 id="installHelpTitle" class="text-base font-bold text-white">Add Exchange</h2><p id="installHelpSubtitle" class="mt-1 text-[11px] text-binanceMuted">Put Exchange on your Home Screen.</p></div>
+ <div id="installHelpModal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="installHelpTitle" onclick="if (event.target === this) closeModal('installHelpModal')">
+  <div class="w-full max-w-md space-y-5 rounded-2xl border border-binanceBorder bg-binanceCard p-5 shadow-2xl sm:p-6">
+   <div class="flex items-start justify-between gap-4">
+    <div class="flex min-w-0 items-center gap-3">
+     <img src="/app-icon-192.png" alt="" class="h-12 w-12 shrink-0 rounded-xl border border-binanceBorder bg-binanceBg">
+     <div class="min-w-0">
+      <p class="text-[9px] font-bold uppercase tracking-[0.18em] text-binanceYellow">Exchange app</p>
+      <h2 id="installHelpTitle" class="mt-1 text-lg font-bold leading-tight text-white">Get the Exchange app</h2>
+      <p id="installHelpSubtitle" class="mt-1 text-[11px] leading-relaxed text-binanceMuted">Quick access from your Home Screen.</p>
+     </div>
     </div>
-    <button type="button" onclick="closeModal('installHelpModal')" aria-label="Close install help" class="text-xl leading-none text-binanceMuted hover:text-white">&times;</button>
+    <button type="button" onclick="closeModal('installHelpModal')" aria-label="Close install help" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg leading-none text-binanceMuted transition hover:bg-binanceHover hover:text-white">&times;</button>
    </div>
-   <div class="rounded-xl border border-binanceBorder bg-binanceBg p-4">
-    <div class="flex items-center justify-between gap-3">
-     <h3 id="installInstructionsTitle" class="text-xs font-semibold text-white">Two quick steps</h3>
-     <span id="installAvailabilityBadge" class="rounded-full border border-binanceGreen/30 bg-binanceGreen/10 px-2 py-1 text-[9px] font-semibold text-binanceGreen">Ready</span>
+   <section class="rounded-xl border border-binanceBorder bg-binanceBg p-4" aria-labelledby="installInstructionsTitle">
+    <div class="flex items-start justify-between gap-3">
+     <div>
+      <p class="text-[9px] font-semibold uppercase tracking-[0.14em] text-binanceMuted">Installation guide</p>
+      <h3 id="installInstructionsTitle" class="mt-1 text-sm font-semibold text-white">Two quick steps</h3>
+     </div>
+     <span id="installAvailabilityBadge" class="shrink-0 rounded-full border border-binanceGreen/30 bg-binanceGreen/10 px-2.5 py-1 text-[9px] font-semibold text-binanceGreen">Ready</span>
     </div>
-    <ol id="installHelpInstructions" class="mt-3 space-y-2"></ol>
-    <p id="installHelpNote" class="mt-3 hidden text-[10px] leading-relaxed text-binanceMuted"></p>
-   </div>
-   <div class="flex flex-col gap-2">
-    <button id="installPromptButton" type="button" onclick="installExchangeApp()" class="hidden w-full rounded-lg bg-binanceYellow px-4 py-3 text-xs font-bold text-binanceBg hover:bg-binanceYellowHover">Install app</button>
-     <a id="androidApkDownloadButton" href="/exchange-android.apk" download="Exchange.apk" class="hidden w-full rounded-lg bg-binanceYellow px-4 py-3 text-center text-xs font-bold text-binanceBg hover:bg-binanceYellowHover">Download Android app</a>
-     <p id="androidApkStatus" class="hidden text-center text-[10px] leading-relaxed text-binanceMuted" role="status" aria-live="polite"></p>
-     <button id="copyLinkForSafariButton" type="button" onclick="copyLinkForSafari()" class="hidden w-full rounded-lg border border-binanceBorder px-4 py-3 text-xs font-semibold text-white hover:bg-binanceHover">Copy link to open in Safari</button>
-     <button type="button" onclick="closeModal('installHelpModal')" class="w-full rounded-lg border border-binanceBorder px-4 py-3 text-xs font-semibold text-white hover:bg-binanceHover">Done</button>
+    <ol id="installHelpInstructions" class="mt-4 space-y-2.5"></ol>
+    <p id="installHelpNote" class="mt-3 hidden rounded-lg border border-binanceYellow/20 bg-binanceYellow/5 px-3 py-2.5 text-[10px] leading-relaxed text-binanceMuted"></p>
+   </section>
+   <div class="space-y-2">
+    <button id="installPromptButton" type="button" onclick="installExchangeApp()" class="hidden w-full rounded-lg bg-binanceYellow px-4 py-3 text-xs font-bold text-binanceBg transition hover:bg-binanceYellowHover">Install app</button>
+    <a id="androidApkDownloadButton" href="/exchange-android.apk" download="Exchange.apk" class="hidden w-full rounded-lg bg-binanceYellow px-4 py-3 text-center text-xs font-bold text-binanceBg transition hover:bg-binanceYellowHover">Download Android app</a>
+    <p id="androidApkStatus" class="hidden rounded-lg border border-binanceBorder bg-binanceBg px-3 py-2.5 text-center text-[10px] leading-relaxed text-binanceMuted" role="status" aria-live="polite"></p>
+    <button id="copyLinkForSafariButton" type="button" onclick="copyLinkForSafari()" class="hidden w-full rounded-lg border border-binanceBorder px-4 py-3 text-xs font-semibold text-white transition hover:bg-binanceHover">Copy link to open in Safari</button>
+    <button type="button" onclick="closeModal('installHelpModal')" class="w-full rounded-lg border border-binanceBorder px-4 py-3 text-xs font-semibold text-binanceMuted transition hover:bg-binanceHover hover:text-white">Done</button>
    </div>
   </div>
  </div>
@@ -4677,6 +4749,48 @@
     <button onclick="cancelOrderConfirmation()" class="flex-1 py-2 rounded border border-binanceBorder bg-binanceHover text-white text-xs">Cancel</button>
     <button id="confirmOrderButton" onclick="confirmPendingOrder()" class="flex-1 py-2 rounded bg-binanceYellow text-binanceBg font-bold text-xs">Confirm Order</button>
    </div>
+  </div>
+ </div>
+
+ <div id="coinMDetailsModal" class="fixed inset-0 z-[55] flex hidden items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-labelledby="coinMDetailsTitle" onclick="if (event.target === this) closeModal('coinMDetailsModal')">
+  <div class="w-full max-w-sm space-y-4 rounded-xl border border-binanceBorder bg-binanceCard p-5 shadow-2xl">
+   <div class="flex items-start justify-between gap-3 border-b border-binanceBorder pb-3">
+    <div>
+     <h3 id="coinMDetailsTitle" class="text-base font-bold text-white">Coin-M contract details</h3>
+     <p id="coinMDetailsPair" class="mt-1 text-[10px] text-binanceMuted">Indicative inverse contract</p>
+    </div>
+    <button type="button" onclick="closeModal('coinMDetailsModal')" class="text-xl leading-none text-binanceMuted hover:text-white" aria-label="Close Coin-M contract details">&times;</button>
+   </div>
+   <dl class="space-y-3 text-xs">
+    <div class="flex items-center justify-between gap-4"><dt class="text-binanceMuted">Reference mark price</dt><dd id="coinMDetailsPrice" class="font-mono font-semibold text-white">—</dd></div>
+    <div class="flex items-center justify-between gap-4"><dt class="text-binanceMuted">24h change</dt><dd id="coinMDetailsChange" class="font-mono font-semibold">—</dd></div>
+    <div class="flex items-center justify-between gap-4"><dt class="text-binanceMuted">Funding rate</dt><dd id="coinMDetailsFunding" class="font-mono font-semibold">—</dd></div>
+    <div class="flex items-center justify-between gap-4"><dt class="text-binanceMuted">Indicative 24h volume</dt><dd id="coinMDetailsVolume" class="font-mono font-semibold text-white">—</dd></div>
+   </dl>
+   <p class="rounded-lg border border-binanceBorder bg-binanceBg p-3 text-[10px] leading-relaxed text-binanceMuted">Reference-only quote: price and funding use USDⓈ-M market data, and volume is estimated. Coin-M balances, positions, and order execution are not available.</p>
+   <button type="button" onclick="closeModal('coinMDetailsModal')" class="w-full rounded-lg border border-binanceBorder px-4 py-2.5 text-xs font-semibold text-white hover:bg-binanceHover">Done</button>
+  </div>
+ </div>
+
+ <div id="optionDetailsModal" class="fixed inset-0 z-[55] flex hidden items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-labelledby="optionDetailsTitle" onclick="if (event.target === this) closeModal('optionDetailsModal')">
+  <div class="w-full max-w-sm space-y-4 rounded-xl border border-binanceBorder bg-binanceCard p-5 shadow-2xl">
+   <div class="flex items-start justify-between gap-3 border-b border-binanceBorder pb-3">
+    <div>
+     <h3 id="optionDetailsTitle" class="text-base font-bold text-white">Option contract details</h3>
+     <p id="optionDetailsSymbol" class="mt-1 text-[10px] text-binanceMuted">Illustrative contract</p>
+    </div>
+    <button type="button" onclick="closeModal('optionDetailsModal')" class="text-xl leading-none text-binanceMuted hover:text-white" aria-label="Close option contract details">&times;</button>
+   </div>
+   <dl class="space-y-3 text-xs">
+    <div class="flex items-center justify-between gap-4"><dt class="text-binanceMuted">Contract type</dt><dd id="optionDetailsType" class="font-semibold text-white">—</dd></div>
+    <div class="flex items-center justify-between gap-4"><dt class="text-binanceMuted">Expiry</dt><dd class="font-mono font-semibold text-white">30 Oct 2026</dd></div>
+    <div class="flex items-center justify-between gap-4"><dt class="text-binanceMuted">Indicative premium</dt><dd id="optionDetailsPremium" class="font-mono font-semibold text-white">—</dd></div>
+    <div class="flex items-center justify-between gap-4"><dt class="text-binanceMuted">Strike price</dt><dd id="optionDetailsStrike" class="font-mono font-semibold text-white">—</dd></div>
+    <div class="flex items-center justify-between gap-4"><dt class="text-binanceMuted">24h change</dt><dd id="optionDetailsChange" class="font-mono font-semibold">—</dd></div>
+    <div class="flex items-center justify-between gap-4"><dt class="text-binanceMuted">Indicative 24h volume</dt><dd id="optionDetailsVolume" class="font-mono font-semibold text-white">—</dd></div>
+   </dl>
+   <p class="rounded-lg border border-binanceBorder bg-binanceBg p-3 text-[10px] leading-relaxed text-binanceMuted">Illustrative reference values only, not live exchange quotes. Options trading and order execution are not available.</p>
+   <button type="button" onclick="closeModal('optionDetailsModal')" class="w-full rounded-lg border border-binanceBorder px-4 py-2.5 text-xs font-semibold text-white hover:bg-binanceHover">Done</button>
   </div>
  </div>
 
@@ -4822,6 +4936,7 @@
     saving: false
    },
    futuresPositions: [],
+   marginPositions: [],
    fundingAssets: [],
    futuresAssets: [],
    p2pMode: 'buy',
@@ -4922,6 +5037,12 @@
   let accountRefreshRequestActive = false;
   let adminCreditRefreshActive = false;
   let adminCreditRefreshTimer = null;
+  let supportChatPollTimer = null;
+  let supportChatRequestActive = false;
+  let adminSupportPollTimer = null;
+  let adminSupportRequestActive = false;
+  let adminSupportThreadId = '';
+  let adminSupportThreads = [];
   let withdrawalProcessingTimer = null;
   let withdrawalSubmitting = false;
   let accountRefreshLastErrorAt = 0;
@@ -5075,7 +5196,7 @@
    else if (action === 'deposit') openModal('depositModal');
    else if (action === 'convert') openConvertPage();
    else if (action === 'trade') openMobileTrade();
-   else if (action === 'support') openModal('supportModal');
+   else if (action === 'support') openSupportChat();
    else if (action === 'signin') openAuthModal('login');
    else if (action === 'signout' && state.currentUser) logoutUser();
   }
@@ -5592,6 +5713,14 @@
    return true;
   }
 
+  function openMarginTrading(marginType = 'Cross') {
+   state.marginType = marginType === 'Isolated'? 'Isolated': 'Cross';
+   openAppPage('trade');
+   setTradingMode('margin');
+   switchBottomTab('positions');
+   return true;
+  }
+
   function openTradeMode(mode) {
    if (state.activePage !== 'trade') openAppPage('trade');
    setTradingMode(mode);
@@ -5624,6 +5753,7 @@
    document.getElementById('appBody').classList.toggle('futures-trading-mode', state.activePage === 'futuresTrade');
    document.getElementById('appBody').classList.toggle('futures-navigation-mode', ['futures', 'futuresTrade'].includes(state.activePage));
    document.getElementById('appBody').classList.toggle('profile-page-mode', state.activePage === 'profile');
+   document.getElementById('appBody').classList.toggle('withdrawal-processing-mode', state.activePage === 'withdrawalProcessing');
    document.getElementById('appBody').classList.toggle('context-page-header', Boolean(pageTab));
    document.getElementById('appBody').classList.toggle('assets-header-mode', state.activePage === 'assets');
    document.getElementById('appBody').classList.toggle('markets-mobile-mode', state.activePage === 'markets');
@@ -6272,11 +6402,10 @@
       : tradeableSpot
        ? `openMarketPair('${coin.pair}', spotMarketPrice('${coin.pair}', ${coin.price}), '${coin.asset}')`
        : `notify('This ${coin.quoteAsset}-quoted Spot pair is listed for reference. Simulated Spot trading is available for USDT pairs only.')`;
-    const symbol = escapeHTML(coin.asset.slice(0, 1));
     return `
      <div class="flex items-center gap-2 border-b border-[#161a1f] py-3">
       <button type="button" onclick="${action}" class="flex min-w-0 flex-[1.1] items-center gap-2.5 text-left">
-       <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-binanceHover text-[11px] font-bold text-white">${symbol}</span>
+       ${assetIconMarkup(coin.asset, 'h-8 w-8')}
        <span class="min-w-0">
         <span class="flex items-center gap-1 text-sm font-bold text-white">${escapeHTML(coin.category === 'crypto'? coin.display: coin.asset)}${coin.category === 'futures'? '<span class="rounded bg-binanceHover px-1 text-[8px] text-binanceMuted">PERP</span>': ''}</span>
         <span class="mt-0.5 block truncate text-[10px] text-binanceMuted">${escapeHTML(coin.name || coin.subtitle)} · <span data-market-quote-volume="${escapeHTML(coin.category === 'crypto'? coin.pair: coin.asset)}" data-market-quote-unit="${escapeHTML(coin.category === 'crypto'? coin.quoteAsset: '$')}">${coin.category === 'crypto'? escapeHTML(coin.quoteAsset): '$'} ${escapeHTML(coin.volume)}</span></span>
@@ -6317,6 +6446,66 @@
    }
    saveDemoState();
    renderFuturesPage();
+  }
+
+  function openCoinMContractDetails(pair) {
+   if (!/^[A-Z0-9]{2,10}USD$/.test(pair)) return;
+   const asset = pair.slice(0, -3);
+   const contract = FUTURES_MARKET_CATALOG.slice(0, 6).find((entry) => entry.asset === asset);
+   if (!contract) {
+    notify('Coin-M contract details are unavailable for this market');
+    return;
+   }
+
+   const price = futuresMarketPrice(contract.symbol, contract.price);
+   const change = state.futuresQuoteChanges[contract.symbol] ?? contract.change;
+   const volume = Math.round((state.futuresTickerStats[contract.symbol]?.quoteVolume ?? contract.volume) * 0.62);
+   document.getElementById('coinMDetailsTitle').textContent = `${asset}/USD Coin-M`;
+   document.getElementById('coinMDetailsPair').textContent = `${pair} · Inverse perpetual`;
+   document.getElementById('coinMDetailsPrice').textContent = formatMoney(price);
+
+   const changeValue = document.getElementById('coinMDetailsChange');
+   changeValue.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+   changeValue.classList.toggle('text-binanceGreen', change >= 0);
+   changeValue.classList.toggle('text-binanceRed', change < 0);
+
+   const fundingValue = document.getElementById('coinMDetailsFunding');
+   fundingValue.textContent = `${contract.funding >= 0 ? '+' : ''}${contract.funding.toFixed(4)}%`;
+   fundingValue.classList.toggle('text-binanceGreen', contract.funding >= 0);
+   fundingValue.classList.toggle('text-binanceRed', contract.funding < 0);
+
+   document.getElementById('coinMDetailsVolume').textContent = `$${new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 2
+   }).format(volume)}`;
+   openModal('coinMDetailsModal');
+  }
+
+  function openOptionContractDetails(symbol, asset, strike, premium, change, volume) {
+   if (!/^[A-Z0-9]{2,10} 30OCT26 [0-9]+K? (CALL|PUT)$/.test(symbol)
+    || !/^[A-Z0-9]{2,10}$/.test(asset)
+    || ![strike, premium, change, volume].every(Number.isFinite)
+    || strike <= 0 || premium <= 0 || volume < 0) {
+    notify('Option contract details are unavailable for this market');
+    return;
+   }
+
+   document.getElementById('optionDetailsTitle').textContent = `${asset} option details`;
+   document.getElementById('optionDetailsSymbol').textContent = symbol;
+   document.getElementById('optionDetailsType').textContent = symbol.endsWith(' CALL') ? 'Call' : 'Put';
+   document.getElementById('optionDetailsPremium').textContent = formatMoney(premium);
+   document.getElementById('optionDetailsStrike').textContent = formatMoney(strike);
+
+   const changeValue = document.getElementById('optionDetailsChange');
+   changeValue.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+   changeValue.classList.toggle('text-binanceGreen', change >= 0);
+   changeValue.classList.toggle('text-binanceRed', change < 0);
+
+   document.getElementById('optionDetailsVolume').textContent = `$${new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 2
+   }).format(volume)}`;
+   openModal('optionDetailsModal');
   }
 
   function renderFuturesPage() {
@@ -6443,7 +6632,7 @@
       <span class="text-right font-mono text-[9px] ${contract.change >= 0? 'text-binanceGreen': 'text-binanceRed'}">${contract.change >= 0? '+': ''}${contract.change.toFixed(2)}%</span>
       <span class="hidden text-right font-mono text-[10px] text-binanceMuted sm:block">${formatMoney(contract.strike)}</span>
       <span class="hidden text-right font-mono text-[10px] text-binanceMuted sm:block">${formatCompactVolume(contract.volume)}</span>
-      <button type="button" onclick="notify('Options are informational only; options trading is not enabled.')" class="rounded border border-binanceBorder px-2.5 py-1.5 text-[9px] font-bold text-binanceMuted">Details</button>
+      <button type="button" onclick="openOptionContractDetails('${escapeHTML(contract.symbol)}', '${escapeHTML(contract.asset)}', ${contract.strike}, ${contract.premium}, ${contract.change}, ${contract.volume})" class="rounded border border-binanceBorder px-2.5 py-1.5 text-[9px] font-bold text-binanceMuted hover:border-binanceYellow hover:text-binanceYellow">Details</button>
      </div>
     `).join(''): '<div class="p-8 text-center text-xs text-binanceMuted">No options match this search.</div>';
    } else if (section === 'smart-money') {
@@ -6476,7 +6665,7 @@
      <span data-futures-quote-volume="${escapeHTML(contract.symbol)}" class="hidden text-right font-mono text-[10px] text-binanceMuted sm:block">${formatCompactVolume(contract.volume)}</span>
      ${section === 'usd-m'
       ? `<button type="button" onclick="openFuturesPair('${contract.asset}USDT', ${contract.price}, '${contract.asset}')" class="rounded bg-binanceYellow px-2.5 py-1.5 text-[9px] font-bold text-binanceBg">Trade</button>`
-      : '<button type="button" onclick="notify(\'Coin-M quotes are for browser use; order execution is not enabled.\')" class="rounded border border-binanceBorder px-2.5 py-1.5 text-[9px] font-bold text-binanceMuted">Details</button>'}
+      : `<button type="button" onclick="openCoinMContractDetails('${contract.pair}')" class="rounded border border-binanceBorder px-2.5 py-1.5 text-[9px] font-bold text-binanceMuted hover:border-binanceYellow hover:text-binanceYellow">Details</button>`}
     </div>
     `).join(''): `<div class="p-8 text-center text-xs text-binanceMuted">${state.futuresPageFilter === 'favorites'? 'No favorite futures contracts yet. Tap a star to save a pair.': `No ${section === 'usd-m'? 'USDⓈ-M': 'Coin-M'} pairs match this filter.`}</div>`;
    }
@@ -6540,6 +6729,13 @@
    state.assetsDisplayCurrency = currency;
    renderAssetsPage();
    renderUserHomeDashboard();
+  }
+
+  function assetIconMarkup(asset, size = 'h-9 w-9') {
+   const symbol = String(asset || '').toUpperCase();
+   const iconKey = symbol.toLowerCase().replace(/[^a-z0-9]/g, '');
+   const safeSymbol = escapeHTML(symbol);
+   return `<span class="relative flex ${size} shrink-0 items-center justify-center overflow-hidden rounded-full bg-binanceHover text-xs font-bold text-white"><span aria-hidden="true">${escapeHTML(symbol.slice(0, 1) || '?')}</span>${iconKey? `<img src="https://assets.coincap.io/assets/icons/${iconKey}@2x.png" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" class="absolute inset-0 h-full w-full object-cover" onerror="this.remove()">`: ''}<span class="sr-only">${safeSymbol}</span></span>`;
   }
 
   function renderAssetsPage() {
@@ -6774,7 +6970,7 @@
      return `
       <article class="flex items-center justify-between gap-3 px-4 py-3">
        <div class="flex min-w-0 items-center gap-3">
-        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${balance.asset === 'BTC'? 'bg-[#f7931a]': balance.asset === 'USDT'? 'bg-[#26a17b]': 'bg-binanceHover'} text-xs font-bold text-white">${escapeHTML(balance.asset.slice(0, 1))}</span>
+        ${assetIconMarkup(balance.asset)}
         <div class="min-w-0">
          <div class="flex items-center gap-1"><span class="text-xs font-semibold text-white">${escapeHTML(balance.asset)}</span><span class="truncate text-[10px] text-binanceMuted">${escapeHTML(balance.name || (balance.asset === 'USDT'? 'Tether': balance.asset))}</span></div>
          <div class="mt-1 font-mono text-[10px] text-binanceMuted">${visible? Number(balance.total || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(balance.asset)}</div>
@@ -6838,7 +7034,7 @@
      return `
       <article class="border-t border-binanceBorder px-4 py-3">
        <div class="flex items-center gap-3">
-        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${balance.asset === 'BTC'? 'bg-[#f7931a]': balance.asset === 'USDT'? 'bg-[#26a17b]': 'bg-binanceHover'} text-xs font-bold text-white">${escapeHTML(balance.asset.slice(0, 1))}</span>
+        ${assetIconMarkup(balance.asset)}
         <div class="min-w-0 flex-1">
          <div class="flex flex-wrap items-center gap-1.5"><span class="text-xs font-bold text-white">${escapeHTML(balance.asset)}</span><span class="truncate text-[10px] text-binanceMuted">${escapeHTML(balance.name || (balance.asset === 'BTC'? 'Bitcoin': balance.asset === 'USDT'? 'Tether': balance.asset))}</span>${section !== 'spot'? `<span class="rounded bg-binanceHover px-1.5 py-0.5 text-[8px] text-binanceMuted">${escapeHTML(balance.wallet)}</span>`: ''}</div>
          <div class="mt-1 font-mono text-[10px] text-binanceMuted">${visible? Number(balance.total || 0).toLocaleString('en-US', { maximumFractionDigits: 8 }): mask} ${escapeHTML(balance.asset)}</div>
@@ -6850,7 +7046,7 @@
        </div>
        <div class="mt-3 flex items-center justify-between gap-2 border-t border-binanceBorder/60 pt-2">
         <div><div class="text-[9px] text-binanceMuted">${balance.wallet === 'Futures'? 'Unrealized PNL': "Today's PNL"}</div><div class="mt-0.5 font-mono text-[10px] ${balance.wallet === 'Futures'? (Number(balance.pnl || 0) < 0? 'text-binanceRed': 'text-binanceGreen'): change < 0? 'text-binanceRed': 'text-binanceGreen'}">${visible? balance.wallet === 'Futures'? `${Number(balance.pnl || 0) >= 0? '+': '−'}${formatMoney(Math.abs(Number(balance.pnl || 0)))}`: `${dailyValue > 0? '+': dailyValue < 0? '−': ''}${dailyValue === 0? '$0.00': formatMoney(Math.abs(dailyValue))} (${change >= 0? '+': ''}${change.toFixed(2)}%)`: mask}</div></div>
-        <div class="flex items-center gap-2">${balance.wallet !== 'Futures'? `<button type="button" onclick="notify('Earn products are not available in this view.')" class="rounded-md border border-binanceBorder px-3 py-1.5 text-[10px] font-semibold text-binanceMuted">Earn</button>`: ''}${tradeButton}</div>
+        ${tradeButton}
        </div>
       </article>
      `;
@@ -6880,12 +7076,105 @@
    const searchInput = document.getElementById('homeMarketSearch');
    const query = searchInput.value.trim();
    searchInput.value = '';
+   openHomeMarketSearchQuery(query);
+  }
+
+  function openHomeMarketSearchQuery(query) {
    state.marketSection = 'crypto';
    openMobileMarkets();
    state.marketPageQuery = query;
    const marketSearch = document.getElementById('marketPageSearch');
    if (marketSearch) marketSearch.value = query;
    renderMarketsPage();
+  }
+
+  let marketQrStream = null;
+  let marketQrScanTimer = null;
+  let marketQrDetector = null;
+
+  async function openMarketQrScanner() {
+   if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+    notify('Camera scanning requires a secure connection and a supported browser');
+    return;
+   }
+   if (!('BarcodeDetector' in window) || typeof window.BarcodeDetector.getSupportedFormats !== 'function') {
+    notify('QR scanning is not supported by this browser');
+    return;
+   }
+   try {
+    const formats = await window.BarcodeDetector.getSupportedFormats();
+    if (!formats.includes('qr_code')) {
+     notify('QR scanning is not supported by this browser');
+     return;
+    }
+    marketQrDetector = new window.BarcodeDetector({ formats: ['qr_code'] });
+   } catch (error) {
+    console.error('Could not initialize the QR code scanner.', error);
+    notify('Could not start the QR code scanner');
+    return;
+   }
+   openModal('marketQrScannerModal');
+   document.getElementById('marketQrScannerStatus').textContent = 'Allow camera access and point it at a market QR code.';
+   try {
+    marketQrStream = await navigator.mediaDevices.getUserMedia({
+     audio: false,
+     video: { facingMode: { ideal: 'environment' } }
+    });
+    if (document.getElementById('marketQrScannerModal').classList.contains('hidden')) {
+     stopMarketQrScanner();
+     return;
+    }
+    const video = document.getElementById('marketQrScannerVideo');
+    video.srcObject = marketQrStream;
+    await video.play();
+    scanMarketQrCode();
+   } catch (error) {
+    console.error('Could not access the camera for QR scanning.', error);
+    const status = error.name === 'NotAllowedError'
+     ? 'Camera permission was denied. Enable camera access in your browser settings and try again.'
+     : 'Could not access the camera. Check that a camera is available and try again.';
+    document.getElementById('marketQrScannerStatus').textContent = status;
+    stopMarketQrScanner();
+   }
+  }
+
+  async function scanMarketQrCode() {
+   const video = document.getElementById('marketQrScannerVideo');
+   if (!marketQrStream || !marketQrDetector || !video || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+    marketQrScanTimer = window.setTimeout(scanMarketQrCode, 200);
+    return;
+   }
+   try {
+    const codes = await marketQrDetector.detect(video);
+    if (!marketQrStream) return;
+    const value = codes.find((code) => code.rawValue)?.rawValue?.trim();
+    if (value) {
+     stopMarketQrScanner();
+     closeModal('marketQrScannerModal');
+     openHomeMarketSearchQuery(value);
+     return;
+    }
+   } catch (error) {
+    console.error('QR code detection failed.', error);
+    document.getElementById('marketQrScannerStatus').textContent = 'Could not read the QR code. Adjust the camera and try again.';
+    stopMarketQrScanner();
+    return;
+   }
+   marketQrScanTimer = window.setTimeout(scanMarketQrCode, 200);
+  }
+
+  function stopMarketQrScanner() {
+   if (marketQrScanTimer !== null) {
+    window.clearTimeout(marketQrScanTimer);
+    marketQrScanTimer = null;
+   }
+   if (marketQrStream) {
+    marketQrStream.getTracks().forEach((track) => track.stop());
+    marketQrStream = null;
+   }
+   const video = document.getElementById('marketQrScannerVideo');
+   if (video) video.srcObject = null;
+   marketQrDetector = null;
   }
 
   function openHomeMarketCategory(section) {
@@ -6906,14 +7195,44 @@
   }
 
   function openHomeAction(action) {
-   if (action === 'referral') notify('Referral features are not available in this ');
-   else if (action === 'earn') notify('Earn products are not available in this ');
+   if (action === 'referral') void shareExchangeInvite();
+   else if (action === 'earn') openMobileAssets();
    else if (action === 'orders') {
     openTradePage();
     switchBottomTab('open');
    } else if (action === 'sell') {
     openBuyCryptoModal();
     setCryptoPurchaseSide('sell');
+   }
+  }
+
+  async function shareExchangeInvite() {
+   const shareData = {
+    title: 'Join me on Exchange',
+    text: 'Explore crypto and markets on Exchange.',
+    url: `${window.location.origin}/`
+   };
+   if (navigator.share) {
+    try {
+     await navigator.share(shareData);
+    } catch (error) {
+     if (error.name !== 'AbortError') {
+      console.error('Could not share the Exchange invite link.', error);
+      notify('Could not share the invite link');
+     }
+    }
+    return;
+   }
+   if (!navigator.clipboard?.writeText) {
+    notify('Sharing is not supported in this browser');
+    return;
+   }
+   try {
+    await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+    notify('Exchange invite link copied');
+   } catch (error) {
+    console.error('Could not copy the Exchange invite link.', error);
+    notify('Could not copy the invite link');
    }
   }
 
@@ -7021,7 +7340,7 @@
     return `
      <button type="button" onclick="${openMarket}" class="grid w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-[#242a30] py-3 text-left hover:bg-binanceHover/40">
       <span class="flex min-w-0 items-center gap-2.5">
-       <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${market.asset === 'BTC'? 'bg-[#f7931a]': market.asset === 'BNB'? 'bg-[#f0b90b] text-binanceBg': 'bg-binanceHover'} text-[10px] font-bold text-white">${escapeHTML(market.asset.slice(0, 1))}</span>
+       ${assetIconMarkup(market.asset, 'h-7 w-7')}
        <span class="min-w-0"><span class="block truncate text-xs font-semibold text-white">${escapeHTML(market.asset)}${market.name? `<span class="ml-1 text-[9px] font-normal text-binanceMuted">${escapeHTML(market.name)}</span>`: ''}</span><span class="mt-0.5 block truncate text-[9px] text-binanceMuted">${escapeHTML(market.name? market.name: market.asset === 'BTC'? 'Bitcoin': market.asset)} · <span data-market-quote-volume="${escapeHTML(market.asset)}">$${escapeHTML(market.volume)}</span></span></span>
       </span>
       <span class="text-right"><span data-home-quote-price="${escapeHTML(market.asset)}" class="block font-mono text-[11px] text-white">${formatMarketPrice(market.price)}</span><span class="mt-0.5 block text-[8px] text-binanceMuted">USDT</span></span>
@@ -7870,7 +8189,7 @@
     state.admin.selectedUser = '';
    }
    renderAdminPanel();
-   await Promise.all([loadAdminAudit(), loadAdminPriceAdjustments(), loadAdminDepositAddresses()]);
+   await Promise.all([loadAdminAudit(), loadAdminPriceAdjustments(), loadAdminDepositAddresses(), loadAdminSupportThreads()]);
    schedulePendingAdminCreditRefresh();
   }
 
@@ -8244,7 +8563,19 @@
    state.openOrders = [];
    state.orderHistory = [];
    state.futuresPositions = [];
+   state.marginPositions = [];
    state.homeBalancesVisible = true;
+   try {
+    const savedDemoState = localStorage.getItem(DEMO_STORAGE_KEY);
+    if (savedDemoState) {
+     const saved = JSON.parse(savedDemoState);
+     saved.marginPositions = [];
+     localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(saved));
+    }
+   } catch (error) {
+    console.error('Unable to clear saved simulated margin positions on sign out.', error);
+    notify('Could not clear simulated margin positions from this device');
+   }
    closeProfilePage();
    renderAuthUI();
    renderAssets();
@@ -8284,6 +8615,29 @@
      else {
       console.error('Saved futures position data is invalid and was not loaded.');
       notify('Saved futures positions could not be restored');
+     }
+    }
+    if (Array.isArray(saved.marginPositions)) {
+     const validMarginPositions = saved.marginPositions.every((position) =>
+      position
+      && Number.isFinite(position.id)
+      && typeof position.pair === 'string'
+      && /^[A-Z0-9]{2,10}\/USDT$/.test(position.pair)
+      && typeof position.asset === 'string'
+      && /^[A-Z0-9]{2,10}$/.test(position.asset)
+      && ['Long', 'Short'].includes(position.side)
+      && ['Cross', 'Isolated'].includes(position.marginType)
+      && ['size', 'entryPrice', 'markPrice', 'leverage', 'initialMargin'].every((key) => Number.isFinite(position[key]) && position[key] > 0)
+      && Number.isFinite(position.borrowedAmount) && position.borrowedAmount >= 0
+      && ['USDT', position.asset].includes(position.borrowedAsset)
+      && (position.takeProfit === null || (Number.isFinite(position.takeProfit) && position.takeProfit > 0))
+      && (position.stopLoss === null || (Number.isFinite(position.stopLoss) && position.stopLoss > 0))
+      && typeof position.openedAt === 'string'
+     );
+     if (validMarginPositions) state.marginPositions = saved.marginPositions;
+     else {
+      console.error('Saved simulated margin position data is invalid and was not loaded.');
+      notify('Saved simulated margin positions could not be restored');
      }
     }
     if (Array.isArray(saved.chartLines) && saved.chartLines.length <= 100 && saved.chartLines.every(Number.isFinite)) {
@@ -8428,6 +8782,7 @@
      openOrders: state.openOrders,
      orderHistory: state.orderHistory,
      futuresPositions: state.futuresPositions,
+     marginPositions: state.marginPositions,
      transactions: state.transactions,
      p2pTrades: state.p2pTrades,
      p2pPaymentMethods: state.p2pPaymentMethods,
@@ -11078,6 +11433,12 @@
   async function logoutAdmin() {
    try {
     await requestAuthApi('/api/auth/me', { method: 'DELETE', headers: {} });
+    if (adminSupportPollTimer !== null) {
+     window.clearInterval(adminSupportPollTimer);
+     adminSupportPollTimer = null;
+    }
+    adminSupportThreadId = '';
+    adminSupportThreads = [];
     if (adminCreditRefreshTimer !== null) {
      window.clearTimeout(adminCreditRefreshTimer);
      adminCreditRefreshTimer = null;
@@ -11278,11 +11639,16 @@
    }
    renderAdminPanel();
    openModal('adminPanel');
+   if (state.admin.loggedIn) startAdminSupportPolling();
    if (state.admin.loggedIn && !state.users.length && !state.admin.loadError) loadAdminUsers();
   }
 
   function closeAdminPanel() {
    closeModal('adminPanel');
+   if (adminSupportPollTimer !== null) {
+    window.clearInterval(adminSupportPollTimer);
+    adminSupportPollTimer = null;
+   }
   }
 
   function openP2PPage() {
@@ -11337,21 +11703,297 @@
    const modal = document.getElementById(id);
    if (modal) modal.classList.remove('hidden');
    if (id === 'depositModal') updateDepositNetworkOptions();
-   if (id === 'withdrawModal') updateWithdrawalNetworkOptions();
+   if (id === 'withdrawModal') {
+    updateWithdrawalNetworkOptions();
+    document.getElementById('withdrawAssetSearch').value = '';
+    showWithdrawalAssetPicker(false);
+    document.getElementById('withdrawAssetSearch').focus();
+   }
    if (id === 'p2pModal') {
     document.getElementById('p2pTradePanel')?.classList.add('hidden');
     showP2PView('market');
    }
   }
 
+  function openSupportChat() {
+   closeHeaderAccountMenu();
+   if (!state.currentUser) {
+    notify('Sign in to start a support conversation');
+    openAuthModal('login');
+    return;
+   }
+   openModal('supportModal');
+   loadSupportChat();
+   if (supportChatPollTimer !== null) window.clearInterval(supportChatPollTimer);
+   supportChatPollTimer = window.setInterval(loadSupportChat, 3000);
+   document.getElementById('supportChatInput').focus();
+  }
+
+  function formatSupportTime(value) {
+   const date = new Date(value);
+   return Number.isNaN(date.getTime())
+    ? ''
+    : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function renderSupportMessages(container, messages, currentRole) {
+   const wasNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 48;
+   container.innerHTML = messages.length? messages.map((message) => {
+    const mine = message.senderRole === currentRole;
+    return `<article class="flex ${mine? 'justify-end': 'justify-start'}"><div class="max-w-[85%] rounded-2xl ${mine? 'rounded-br-sm bg-binanceYellow text-binanceBg': 'rounded-bl-sm bg-binanceHover text-binanceText'} px-3 py-2"><div class="mb-1 flex items-center justify-between gap-4 text-[9px] ${mine? 'text-binanceBg/70': 'text-binanceMuted'}"><span>${escapeHTML(mine? 'You': message.senderName || (message.senderRole === 'admin'? 'Support': 'Customer support'))}</span><time>${escapeHTML(formatSupportTime(message.createdAt))}</time></div><p class="whitespace-pre-wrap break-words text-xs leading-relaxed">${escapeHTML(message.body)}</p></div></article>`;
+   }).join(''): '<p class="py-8 text-center text-xs text-binanceMuted">Send a message to start a conversation with support.</p>';
+   if (wasNearBottom || messages.length) container.scrollTop = container.scrollHeight;
+  }
+
+  async function loadSupportChat() {
+   if (supportChatRequestActive || !state.currentUser || document.getElementById('supportModal').classList.contains('hidden')) return;
+   supportChatRequestActive = true;
+   try {
+    const { thread, messages } = await requestAuthApi('/api/support/chat', { method: 'GET', headers: {} });
+    renderSupportMessages(document.getElementById('supportChatMessages'), messages, 'user');
+    document.getElementById('supportChatStatus').textContent = thread?.status === 'closed'
+     ? 'This conversation is closed. Contact support again to start a new chat.'
+     : 'Replies appear here as soon as the support team responds.';
+    document.getElementById('supportChatInput').disabled = thread?.status === 'closed';
+   } catch (error) {
+    console.error('Could not load the support conversation.', error);
+    document.getElementById('supportChatStatus').textContent = error.message;
+   } finally {
+    supportChatRequestActive = false;
+   }
+  }
+
+  async function sendSupportChatMessage(event) {
+   event.preventDefault();
+   const input = document.getElementById('supportChatInput');
+   const button = document.querySelector('#supportChatForm button[type="submit"]');
+   const message = input.value.trim();
+   if (!message || !state.currentUser) return;
+   button.disabled = true;
+   try {
+    await requestAuthApi('/api/support/chat', {
+     method: 'POST',
+     body: JSON.stringify({ message })
+    });
+    input.value = '';
+    await loadSupportChat();
+   } catch (error) {
+    console.error('Could not send the support message.', error);
+    document.getElementById('supportChatStatus').textContent = error.message;
+   } finally {
+    button.disabled = false;
+    input.focus();
+   }
+  }
+
+  function renderAdminSupportThreads(threads) {
+   const list = document.getElementById('adminSupportThreadList');
+   adminSupportThreads = threads;
+   if (!threads.length) {
+    list.innerHTML = '<p class="p-4 text-center text-xs text-binanceMuted">No support conversations yet.</p>';
+    return;
+   }
+   list.innerHTML = threads.map((thread) => `
+    <button type="button" onclick="selectAdminSupportThread('${escapeHTML(thread.id)}')" class="block w-full rounded-lg border px-3 py-2.5 text-left ${thread.id === adminSupportThreadId? 'border-binanceYellow bg-binanceHover': 'border-transparent hover:bg-binanceHover'}">
+     <span class="flex items-center justify-between gap-2"><span class="truncate text-xs font-semibold text-white">${escapeHTML(thread.fullName || thread.username)}</span><span class="text-[9px] ${thread.status === 'open'? 'text-binanceGreen': 'text-binanceMuted'}">${escapeHTML(thread.status)}</span></span>
+     <span class="mt-1 block truncate text-[10px] text-binanceMuted">${escapeHTML(thread.lastMessage || 'No messages')}</span>
+     <time class="mt-1 block text-right text-[9px] text-binanceMuted">${escapeHTML(formatSupportTime(thread.lastMessageAt))}</time>
+    </button>
+   `).join('');
+  }
+
+  async function loadAdminSupportThreads() {
+   if (!state.admin.loggedIn || adminSupportRequestActive) return;
+   adminSupportRequestActive = true;
+   try {
+    const { threads } = await requestAuthApi('/api/support/chat', { method: 'GET', headers: {} });
+    renderAdminSupportThreads(threads);
+    document.getElementById('adminSupportStatus').textContent = `${threads.length} conversation${threads.length === 1? '': 's'} · updates automatically`;
+    if (adminSupportThreadId && threads.some((thread) => thread.id === adminSupportThreadId)) {
+     await loadAdminSupportConversation(adminSupportThreadId);
+    }
+   } catch (error) {
+    console.error('Could not load support conversations.', error);
+    document.getElementById('adminSupportStatus').textContent = error.message;
+   } finally {
+    adminSupportRequestActive = false;
+   }
+  }
+
+  async function loadAdminSupportConversation(threadId) {
+   try {
+    const { thread, messages } = await requestAuthApi(`/api/support/chat?threadId=${encodeURIComponent(threadId)}`, { method: 'GET', headers: {} });
+    adminSupportThreadId = thread.id;
+    document.getElementById('adminSupportConversationTitle').textContent = `${thread.fullName || thread.username} · @${thread.username}`;
+    renderSupportMessages(document.getElementById('adminSupportMessages'), messages, 'admin');
+    document.getElementById('adminSupportReplyForm').classList.toggle('hidden', thread.status !== 'open');
+   } catch (error) {
+    console.error('Could not load the selected support conversation.', error);
+    document.getElementById('adminSupportConversationTitle').textContent = error.message;
+   }
+  }
+
+  function selectAdminSupportThread(threadId) {
+   if (!/^[1-9]\d{0,18}$/.test(threadId)) return;
+   adminSupportThreadId = threadId;
+   document.getElementById('adminSupportConversationTitle').textContent = 'Loading conversation…';
+   document.getElementById('adminSupportMessages').innerHTML = '';
+   renderAdminSupportThreads(adminSupportThreads);
+   loadAdminSupportConversation(threadId);
+  }
+
+  async function sendAdminSupportReply(event) {
+   event.preventDefault();
+   const input = document.getElementById('adminSupportReply');
+   const button = document.querySelector('#adminSupportReplyForm button[type="submit"]');
+   const message = input.value.trim();
+   if (!message || !adminSupportThreadId) return;
+   button.disabled = true;
+   try {
+    await requestAuthApi('/api/support/chat', {
+     method: 'POST',
+     body: JSON.stringify({ threadId: adminSupportThreadId, message })
+    });
+    input.value = '';
+    await loadAdminSupportThreads();
+   } catch (error) {
+    console.error('Could not send the support reply.', error);
+    document.getElementById('adminSupportStatus').textContent = error.message;
+   } finally {
+    button.disabled = false;
+   }
+  }
+
+  function startAdminSupportPolling() {
+   if (adminSupportPollTimer !== null) window.clearInterval(adminSupportPollTimer);
+   adminSupportPollTimer = window.setInterval(loadAdminSupportThreads, 5000);
+   loadAdminSupportThreads();
+  }
+
+  function stopSupportPolling() {
+   if (supportChatPollTimer !== null) {
+    window.clearInterval(supportChatPollTimer);
+    supportChatPollTimer = null;
+   }
+   if (adminSupportPollTimer !== null) {
+    window.clearInterval(adminSupportPollTimer);
+    adminSupportPollTimer = null;
+   }
+  }
+
+  function openWithdrawalModal() {
+   openModal('withdrawModal');
+  }
+
+  function renderWithdrawalAssetPicker() {
+   const assetList = document.getElementById('withdrawAssetList');
+   const query = document.getElementById('withdrawAssetSearch').value.trim().toLowerCase();
+   if (!assetList) return;
+   const assetNames = {
+    BTC: 'Bitcoin',
+    ETH: 'Ethereum',
+    USDT: 'Tether',
+    SOL: 'Solana',
+    BNB: 'BNB',
+    XRP: 'XRP',
+    ADA: 'Cardano',
+    DOGE: 'Dogecoin',
+    AVAX: 'Avalanche',
+    LTC: 'Litecoin',
+    LINK: 'Chainlink',
+    DOT: 'Polkadot',
+    BCH: 'Bitcoin Cash',
+    TRX: 'TRON'
+   };
+   const assets = state.assets
+    .filter((balance) => /^[A-Z0-9]{2,20}$/.test(balance.asset)
+     && Number.isFinite(Number(balance.available))
+     && Number(balance.available) > 0)
+    .map((balance) => ({
+     asset: balance.asset,
+     available: Number(balance.available),
+     name: assetNames[balance.asset] || balance.name || balance.asset,
+     price: balance.asset === 'USDT'? 1: demoMarketPrice(balance.asset)
+    }))
+    .filter((balance) => `${balance.asset} ${balance.name}`.toLowerCase().includes(query))
+    .sort((left, right) => right.available * right.price - left.available * left.price);
+
+   assetList.innerHTML = assets.length ? assets.map((balance) => `
+    <button type="button" onclick="selectWithdrawalAsset('${escapeHTML(balance.asset)}')" class="flex w-full items-center justify-between gap-3 py-3 text-left hover:bg-binanceHover/50">
+     <span class="flex min-w-0 items-center gap-3">
+      ${assetIconMarkup(balance.asset, 'h-8 w-8')}
+      <span class="min-w-0"><span class="block text-xs font-semibold text-white">${escapeHTML(balance.asset)}</span><span class="mt-0.5 block truncate text-[10px] text-binanceMuted">${escapeHTML(balance.name)}</span></span>
+     </span>
+     <span class="shrink-0 text-right"><span class="block font-mono text-xs text-white">${state.homeBalancesVisible? `${balance.available.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${escapeHTML(balance.asset)}`: '••••••'}</span><span class="mt-0.5 block font-mono text-[10px] text-binanceMuted">${state.homeBalancesVisible? `≈ ${formatMoney(balance.available * balance.price)}`: '≈ ••••••'}</span></span>
+    </button>
+   `).join('') : `<p class="py-8 text-center text-xs text-binanceMuted">${query? 'No available assets match your search.': 'No Spot assets currently have an available balance to withdraw.'}</p>`;
+   if (window.lucide) window.lucide.createIcons();
+  }
+
+  function selectWithdrawalAsset(asset) {
+   if (!/^[A-Z0-9]{2,20}$/.test(asset)) return;
+   const balance = state.assets.find((entry) => entry.asset === asset && Number(entry.available) > 0);
+   if (!balance) {
+    notify(`No ${asset} available balance to withdraw`);
+    renderWithdrawalAssetPicker();
+    return;
+   }
+   const assetSelect = document.getElementById('withdrawAsset');
+   assetSelect.value = asset;
+   assetSelect.dataset.asset = asset;
+   document.getElementById('withdrawModalTitle').textContent = `Withdraw ${asset}`;
+   document.getElementById('withdrawBackButton').classList.remove('hidden');
+   document.getElementById('withdrawAssetPicker').classList.add('hidden');
+   document.getElementById('withdrawForm').classList.remove('hidden');
+   document.getElementById('withdrawSelectedAssetIcon').textContent = asset.slice(0, 1);
+   document.getElementById('withdrawSelectedAssetSymbol').textContent = asset;
+   document.getElementById('withdrawSelectedAssetName').textContent = 'Spot Wallet';
+   const available = Number(balance.available);
+   document.getElementById('withdrawAvailableBalance').textContent = state.homeBalancesVisible
+    ? `${available.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${asset}`
+    : '••••••';
+   document.getElementById('withdrawAmount').max = String(available);
+   updateWithdrawalNetworkOptions();
+   document.getElementById('withdrawAmount').focus();
+   if (window.lucide) window.lucide.createIcons();
+  }
+
+  function backFromWithdrawal() {
+   if (document.getElementById('withdrawForm').classList.contains('hidden')) {
+    closeModal('withdrawModal');
+    return;
+   }
+   showWithdrawalAssetPicker();
+  }
+
+  function showWithdrawalAssetPicker(focusSearch = true) {
+   document.getElementById('withdrawModalTitle').textContent = 'Select Asset';
+   document.getElementById('withdrawForm').classList.add('hidden');
+   document.getElementById('withdrawAssetPicker').classList.remove('hidden');
+   renderWithdrawalAssetPicker();
+   if (focusSearch) document.getElementById('withdrawAssetSearch').focus();
+  }
+
   function closeModal(id) {
    const modal = document.getElementById(id);
    if (modal) modal.classList.add('hidden');
+   if (id === 'marketQrScannerModal') stopMarketQrScanner();
+   if (id === 'supportModal') {
+    if (supportChatPollTimer !== null) {
+     window.clearInterval(supportChatPollTimer);
+     supportChatPollTimer = null;
+    }
+   }
+   if (id === 'adminPanel' && adminSupportPollTimer !== null) {
+    window.clearInterval(adminSupportPollTimer);
+    adminSupportPollTimer = null;
+   }
   }
 
   let deferredInstallPrompt = null;
   let androidApkAvailabilityPromise = null;
   let androidApkIsAvailable = false;
+  const INSTALLED_APP_STORAGE_KEY = 'exchange-installed-app-v1';
 
   function isAppleMobileDevice() {
    return /iPhone|iPad|iPod/i.test(navigator.userAgent)
@@ -11359,9 +12001,26 @@
   }
 
   function isExchangeInstalled() {
-   return window.matchMedia('(display-mode: standalone)').matches
+   let wasInstalled = false;
+   try {
+    wasInstalled = localStorage.getItem(INSTALLED_APP_STORAGE_KEY) === 'true';
+   } catch (error) {
+    console.error('Could not read the Exchange installation status.', error);
+   }
+   return wasInstalled
+    || window.matchMedia('(display-mode: standalone)').matches
     || navigator.standalone === true
     || /ExchangeAndroidApp/i.test(navigator.userAgent);
+  }
+
+  function markExchangeInstalled() {
+   try {
+    localStorage.setItem(INSTALLED_APP_STORAGE_KEY, 'true');
+   } catch (error) {
+    console.error('Could not save the Exchange installation status.', error);
+   }
+   document.getElementById('installAppButton')?.classList.add('hidden');
+   closeModal('installHelpModal');
   }
 
   function setAndroidApkStatus(message) {
@@ -11409,11 +12068,12 @@
    if (instructions) {
     instructions.replaceChildren(...steps.map((step, index) => {
      const item = document.createElement('li');
-     item.className = 'flex items-start gap-3 rounded-lg border border-binanceBorder bg-binanceCard p-3 text-[11px] leading-relaxed text-binanceMuted';
+     item.className = 'flex items-start gap-3 rounded-lg border border-binanceBorder bg-binanceCard p-3 text-[11px] leading-relaxed text-binanceText';
      const number = document.createElement('span');
-     number.className = 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-binanceHover text-[10px] font-bold text-binanceYellow';
-     number.textContent = String(index + 1);
+     number.className = 'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-binanceYellow/20 bg-binanceYellow/10 text-[10px] font-bold text-binanceYellow';
+     number.textContent = String(index + 1).padStart(2, '0');
      const text = document.createElement('span');
+     text.className = 'pt-1';
      text.textContent = step;
      item.append(number, text);
      return item;
@@ -11451,6 +12111,10 @@
     availability.textContent = nativeAndroidApp? 'Installed': installed? 'Added': android? 'APK download': hasPrompt? 'One-tap install': appleMobile? '2 quick steps': 'Ready';
     availability.classList.toggle('text-binanceGreen', installed || hasPrompt);
     availability.classList.toggle('text-binanceYellow', !installed && !hasPrompt);
+    availability.classList.toggle('border-binanceGreen/30', installed || hasPrompt);
+    availability.classList.toggle('bg-binanceGreen/10', installed || hasPrompt);
+    availability.classList.toggle('border-binanceYellow/30', !installed && !hasPrompt);
+    availability.classList.toggle('bg-binanceYellow/10', !installed && !hasPrompt);
    }
    if (instructionsTitle) instructionsTitle.textContent = nativeAndroidApp? 'App installed': installed? 'You’re all set': android? 'Download and install': hasPrompt? 'Tap once to install': appleMobile? 'Two quick steps in Safari': 'Add to your device';
    if (promptButton) promptButton.classList.toggle('hidden', !hasPrompt || installed);
@@ -11525,8 +12189,7 @@
     await installPrompt.prompt();
     const choice = await installPrompt.userChoice;
     if (choice.outcome === 'accepted') {
-     document.getElementById('installAppButton')?.classList.add('hidden');
-     closeModal('installHelpModal');
+     markExchangeInstalled();
     } else {
      showInstallHelp();
     }
@@ -11635,6 +12298,7 @@
    setupPullToRefresh();
    const installButton = document.getElementById('installAppButton');
    const isStandalone = isExchangeInstalled();
+   if (isStandalone) markExchangeInstalled();
    if (installButton && !isStandalone) {
     const label = document.getElementById('installAppButtonLabel');
     if (isAppleMobileDevice()) {
@@ -11653,8 +12317,7 @@
    });
    window.addEventListener('appinstalled', () => {
     deferredInstallPrompt = null;
-    installButton?.classList.add('hidden');
-    closeModal('installHelpModal');
+    markExchangeInstalled();
     notify('Exchange app installed');
    });
    if ('serviceWorker' in navigator) {
@@ -11764,6 +12427,16 @@
    const futuresWorkspace = state.activePage === 'futuresTrade';
    const isFutures = mode === 'futures';
    const isMargin = mode === 'margin';
+   document.getElementById('marginTypeBtn').textContent = state.marginType;
+   const leverageRange = document.getElementById('leverageRange');
+   if (isMargin) {
+    state.leverage = Math.min(5, Math.max(1, Number(state.leverage) || 1));
+    leverageRange.max = '5';
+    document.getElementById('leverageVal').textContent = `${state.leverage}x`;
+    leverageRange.value = state.leverage;
+   } else {
+    leverageRange.max = '125';
+   }
    spotBtn.classList.toggle('hidden', futuresWorkspace);
    convertBtn.classList.toggle('hidden', futuresWorkspace);
    marginBtn.classList.toggle('hidden', futuresWorkspace);
@@ -11778,14 +12451,20 @@
    marginBtn.classList.toggle('text-binanceMuted', !isMargin);
    document.getElementById('btnSideBuy').textContent = mode === 'spot'? 'Buy': 'Buy / Long';
    document.getElementById('btnSideSell').textContent = mode === 'spot'? 'Sell': 'Sell / Short';
-   document.getElementById('tradeCanvasBuyButton').textContent = isFutures? 'Long': 'Buy';
-   document.getElementById('tradeCanvasSellButton').textContent = isFutures? 'Short': 'Sell';
-   document.getElementById('tradeCanvasQuickActions').setAttribute('aria-label', isFutures? 'Futures position actions': 'Quick trade actions');
+   document.getElementById('tradeCanvasBuyButton').textContent = isFutures || isMargin? 'Long': 'Buy';
+   document.getElementById('tradeCanvasSellButton').textContent = isFutures || isMargin? 'Short': 'Sell';
+   document.getElementById('tradeCanvasQuickActions').setAttribute('aria-label', isFutures || isMargin? 'Leveraged position actions': 'Quick trade actions');
+   document.getElementById('positionsTabLabel').textContent = isMargin? 'Margin Positions': 'Futures Positions';
+   document.getElementById('initialMarginLabel').textContent = isMargin? 'Est. Collateral:': 'Est. Initial Margin:';
    if (mode !== 'futures' && state.advancedOrder.reduceOnly) {
     state.advancedOrder.reduceOnly = false;
     document.getElementById('reduceOnlyBtn').classList.remove('border-binanceYellow', 'bg-binanceYellow/15', 'text-binanceYellow');
     document.getElementById('reduceOnlyBtn').classList.add('border-binanceBorder', 'bg-binanceHover', 'text-binanceMuted');
    }
+   document.getElementById('reduceOnlyBtn').disabled = mode !== 'futures';
+   document.getElementById('reduceOnlyBtn').title = mode === 'futures'
+    ? 'Restrict the order to reducing an existing futures position'
+    : 'Use the position Close / repay action to close simulated margin positions';
    const btn = document.getElementById('btnSubmitOrder');
    const orderName = state.orderType === 'market'? 'Market': state.orderType === 'stop'? 'Stop-Limit': state.orderType === 'trailing'? 'Trailing Stop': 'Limit';
    const sideLabel = state.side === 'buy'? (mode === 'spot'? 'Buy': 'Buy / Long'): (mode === 'spot'? 'Sell': 'Sell / Short');
@@ -11795,6 +12474,7 @@
    calculateTotal();
    updateTradeHeader();
    if (modeChanged && state.activePage === 'trade') loadSelectedMarketChart();
+   renderFuturesPositions();
    if (state.activePage === 'trade') setMobileBottomNavActive('trade');
    saveDemoState();
   }
@@ -11858,7 +12538,8 @@
   }
 
   function updateLeverage(value) {
-   state.leverage = Math.min(125, Math.max(1, Number(value) || 1));
+   const maxLeverage = state.tradingMode === 'margin'? 5: 125;
+   state.leverage = Math.min(maxLeverage, Math.max(1, Number(value) || 1));
    document.getElementById('leverageVal').textContent = `${state.leverage}x`;
    document.getElementById('leverageRange').value = state.leverage;
    updateRiskEstimate();
@@ -12136,13 +12817,13 @@
   }
 
   function reserveOrder(order) {
-   if (order.tradingMode === 'futures') {
+   if (order.tradingMode === 'futures' || order.tradingMode === 'margin') {
     if (order.reduceOnly) return true;
     const asset = 'USDT';
     const amount = order.price * order.amount / order.leverage;
-    const balance = getFuturesBalance(asset);
+    const balance = order.tradingMode === 'futures'? getFuturesBalance(asset): getBalance(asset);
     if (balance.available + Number.EPSILON < amount) {
-     notify(`Insufficient ${asset} balance for futures initial margin`);
+     notify(`Insufficient ${asset} balance for ${order.tradingMode === 'margin'? 'simulated margin collateral': 'futures initial margin'}`);
      return false;
     }
     balance.available -= amount;
@@ -12171,6 +12852,7 @@
 
   function settleExecution(order, executionPrice) {
    if (order.tradingMode === 'futures') return settleFuturesExecution(order, executionPrice);
+   if (order.tradingMode === 'margin') return settleMarginExecution(order, executionPrice);
    const amount = order.amount;
    const quoteAmount = amount * executionPrice;
    const baseBalance = getBalance(order.asset);
@@ -12240,6 +12922,123 @@
    return position.side === 'Long'
     ? position.entryPrice * Math.max(0, 1 - 1 / position.leverage + maintenanceRate)
     : position.entryPrice * (1 + 1 / position.leverage - maintenanceRate);
+  }
+
+  function marginLiquidationPrice(position) {
+   const maintenanceRate = 0.01;
+   return position.side === 'Long'
+    ? position.entryPrice * Math.max(0, 1 - 1 / position.leverage + maintenanceRate)
+    : position.entryPrice * (1 + 1 / position.leverage - maintenanceRate);
+  }
+
+  function settleMarginExecution(order, executionPrice) {
+   if (!Number.isFinite(order.leverage) || order.leverage < 1 || order.leverage > 5) {
+    notify('Simulated margin leverage must be between 1x and 5x');
+    return false;
+   }
+   const collateral = executionPrice * order.amount / order.leverage;
+   const quoteBalance = getBalance('USDT');
+   const reserved = order.reservedAsset === 'USDT'? Math.max(0, Number(order.reservedAmount) || 0): 0;
+   if (quoteBalance.available + reserved + Number.EPSILON < collateral) {
+    notify('Insufficient available Spot USDT for simulated margin collateral');
+    return false;
+   }
+   if (reserved) {
+    const adjustment = collateral - reserved;
+    quoteBalance.inOrders = Math.max(0, quoteBalance.inOrders + adjustment);
+    quoteBalance.available -= adjustment;
+   } else {
+    quoteBalance.available -= collateral;
+    quoteBalance.inOrders += collateral;
+   }
+
+   const side = order.side === 'Buy'? 'Long': 'Short';
+   let position = state.marginPositions.find((item) =>
+    item.pair === order.pair && item.side === side && item.marginType === order.marginType
+   );
+   const borrowedAsset = side === 'Long'? 'USDT': order.asset;
+   const borrowedAmount = side === 'Long'
+    ? Math.max(0, executionPrice * order.amount - collateral)
+    : order.amount;
+   if (!position) {
+    position = {
+     id: Date.now() + Math.random(),
+     pair: order.pair,
+     asset: order.asset,
+     side,
+     size: order.amount,
+     entryPrice: executionPrice,
+     markPrice: executionPrice,
+     leverage: order.leverage,
+     marginType: order.marginType,
+     initialMargin: collateral,
+     borrowedAsset,
+     borrowedAmount,
+     takeProfit: order.takeProfit,
+     stopLoss: order.stopLoss,
+     openedAt: new Date().toLocaleTimeString('en-GB').slice(0, 8)
+    };
+    state.marginPositions.unshift(position);
+   } else {
+    const previousNotional = position.entryPrice * position.size;
+    const combinedSize = position.size + order.amount;
+    position.entryPrice = (previousNotional + executionPrice * order.amount) / combinedSize;
+    position.size = combinedSize;
+    position.initialMargin += collateral;
+    position.borrowedAmount += borrowedAmount;
+    position.leverage = position.entryPrice * position.size / position.initialMargin;
+    position.markPrice = executionPrice;
+    position.takeProfit = order.takeProfit || position.takeProfit;
+    position.stopLoss = order.stopLoss || position.stopLoss;
+   }
+   position.liquidationPrice = marginLiquidationPrice(position);
+   order.reservedAmount = 0;
+   order.filled = order.amount;
+   order.executionPrice = executionPrice;
+   order.status = 'Filled';
+   playTradeSound();
+   const history = orderHistoryFor(order);
+   if (history) {
+    history.status = 'Filled';
+    history.price = executionPrice;
+   }
+   renderFuturesPositions();
+   renderAssets();
+   renderHistory();
+   saveDemoState();
+   return true;
+  }
+
+  function closeMarginPosition(positionId, fraction = 1, price = state.currentPrice, reason = 'Closed') {
+   if (!requireSignedInForTrading()) return false;
+   const index = state.marginPositions.findIndex((item) => item.id === positionId);
+   if (index === -1) return false;
+   const position = state.marginPositions[index];
+   const closeFraction = Math.min(1, Math.max(0, fraction));
+   const closeSize = position.size * closeFraction;
+   if (!Number.isFinite(closeSize) || closeSize <= 0 || !Number.isFinite(price) || price <= 0) return false;
+   const fractionClosed = closeSize / position.size;
+   const collateralReleased = position.initialMargin * fractionClosed;
+   const realizedPnl = futuresPnl({ ...position, size: closeSize }, price);
+   const creditedPnl = Math.max(realizedPnl, -collateralReleased);
+   const quoteBalance = getBalance('USDT');
+   quoteBalance.inOrders = Math.max(0, quoteBalance.inOrders - collateralReleased);
+   quoteBalance.available += collateralReleased + creditedPnl;
+   quoteBalance.total += creditedPnl;
+   position.size -= closeSize;
+   position.initialMargin -= collateralReleased;
+   position.borrowedAmount *= 1 - fractionClosed;
+   if (position.size <= 1e-10) state.marginPositions.splice(index, 1);
+   else {
+    position.markPrice = price;
+    position.leverage = position.entryPrice * position.size / position.initialMargin;
+    position.liquidationPrice = marginLiquidationPrice(position);
+   }
+   notify(`${reason} simulated ${position.side.toLowerCase()} ${position.asset} · ${creditedPnl >= 0? '+': ''}${creditedPnl.toFixed(2)} USDT · loan repaid`);
+   renderFuturesPositions();
+   renderAssets();
+   saveDemoState();
+   return true;
   }
 
   function settleFuturesExecution(order, executionPrice) {
@@ -12357,38 +13156,92 @@
   }
 
   function processFuturesRisk() {
-   if (!state.currentUser) return;
    let closed = false;
-   [...state.futuresPositions].forEach((position) => {
-    if (position.pair.replace('/', '') !== state.selectedPair) return;
-    position.markPrice = state.currentPrice;
-    const liquidated = position.side === 'Long'
-     ? state.currentPrice <= futuresLiquidationPrice(position)
-     : state.currentPrice >= futuresLiquidationPrice(position);
-    if (liquidated) {
-     closeFuturesPosition(position.id, 1, state.currentPrice, 'Liquidated ( )');
-     closed = true;
-     return;
+   if (state.currentUser && state.tradingMode === 'futures') {
+    [...state.futuresPositions].forEach((position) => {
+     if (position.pair.replace('/', '') !== state.selectedPair) return;
+     position.markPrice = state.currentPrice;
+     const liquidated = position.side === 'Long'
+      ? state.currentPrice <= futuresLiquidationPrice(position)
+      : state.currentPrice >= futuresLiquidationPrice(position);
+     if (liquidated) {
+      closeFuturesPosition(position.id, 1, state.currentPrice, 'Liquidated');
+      closed = true;
+      return;
+     }
+     const takeProfitHit = position.takeProfit && (position.side === 'Long'
+      ? state.currentPrice >= position.takeProfit
+      : state.currentPrice <= position.takeProfit);
+     const stopLossHit = position.stopLoss && (position.side === 'Long'
+      ? state.currentPrice <= position.stopLoss
+      : state.currentPrice >= position.stopLoss);
+     if (takeProfitHit || stopLossHit) {
+      closeFuturesPosition(position.id, 1, state.currentPrice, takeProfitHit? 'Take profit': 'Stop loss');
+      closed = true;
+     }
+    });
+    renderFuturesPositions();
+    if (closed) renderAssets();
+   }
+   processMarginRisk();
+  }
+
+  function marginMarkPrice(position) {
+   return position.pair.replace('/', '') === state.selectedPair
+    ? state.currentPrice
+    : demoMarketPrice(position.asset);
+  }
+
+  function processMarginRisk() {
+   if (!state.currentUser || !state.marginPositions.length) return;
+   let changed = false;
+   [...state.marginPositions].forEach((position) => {
+    const mark = marginMarkPrice(position);
+    if (!Number.isFinite(mark) || mark <= 0) return;
+    position.markPrice = mark;
+    if (position.marginType === 'Isolated') {
+     const liquidated = position.side === 'Long'
+      ? mark <= marginLiquidationPrice(position)
+      : mark >= marginLiquidationPrice(position);
+     if (liquidated) {
+      closeMarginPosition(position.id, 1, mark, 'Liquidated');
+      changed = true;
+      return;
+     }
     }
     const takeProfitHit = position.takeProfit && (position.side === 'Long'
-     ? state.currentPrice >= position.takeProfit
-     : state.currentPrice <= position.takeProfit);
+     ? mark >= position.takeProfit
+     : mark <= position.takeProfit);
     const stopLossHit = position.stopLoss && (position.side === 'Long'
-     ? state.currentPrice <= position.stopLoss
-     : state.currentPrice >= position.stopLoss);
+     ? mark <= position.stopLoss
+     : mark >= position.stopLoss);
     if (takeProfitHit || stopLossHit) {
-     closeFuturesPosition(position.id, 1, state.currentPrice, takeProfitHit? 'Take profit': 'Stop loss');
-     closed = true;
-     return;
+     closeMarginPosition(position.id, 1, mark, takeProfitHit? 'Take profit': 'Stop loss');
+     changed = true;
     }
    });
+
+   const crossPositions = state.marginPositions.filter((position) => position.marginType === 'Cross');
+   if (crossPositions.length) {
+    const collateral = crossPositions.reduce((sum, position) => sum + position.initialMargin, 0);
+    const unrealized = crossPositions.reduce((sum, position) => sum + futuresPnl(position, position.markPrice), 0);
+    const maintenance = crossPositions.reduce((sum, position) => sum + position.markPrice * position.size * 0.01, 0);
+    if (collateral + unrealized <= maintenance) {
+     crossPositions.forEach((position) => closeMarginPosition(position.id, 1, position.markPrice, 'Cross margin liquidated'));
+     changed = true;
+    }
+   }
    renderFuturesPositions();
-   if (closed) renderAssets();
+   if (changed) renderAssets();
   }
 
   function renderFuturesPositions() {
    const tbody = document.getElementById('futuresPositionsList');
    if (!tbody) return;
+   if (state.tradingMode === 'margin') {
+    renderMarginPositions(tbody);
+    return;
+   }
    const totalPnl = state.futuresPositions.reduce((sum, position) => {
     const mark = position.pair.replace('/', '') === state.selectedPair? state.currentPrice: position.markPrice;
     return sum + futuresPnl(position, mark);
@@ -12423,6 +13276,40 @@
     </tr>`;
    }).join('');
    if (state.activePage === 'futures') renderFuturesPage();
+  }
+
+  function renderMarginPositions(tbody = document.getElementById('futuresPositionsList')) {
+   if (!tbody) return;
+   const totalPnl = state.marginPositions.reduce((sum, position) =>
+    sum + futuresPnl(position, marginMarkPrice(position)), 0);
+   const pnlDisplay = document.getElementById('futuresPnLUSD');
+   pnlDisplay.textContent = `${totalPnl >= 0? '+': ''}${totalPnl.toFixed(2)} USDT`;
+   pnlDisplay.classList.toggle('text-binanceGreen', totalPnl >= 0);
+   pnlDisplay.classList.toggle('text-binanceRed', totalPnl < 0);
+   document.getElementById('futuresPositionsCount').textContent = state.marginPositions.length;
+   if (!state.marginPositions.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-binanceMuted">No open margin positions.</td></tr>';
+    return;
+   }
+   tbody.innerHTML = state.marginPositions.map((position) => {
+    const mark = marginMarkPrice(position);
+    const pnl = futuresPnl(position, mark);
+    const pnlPercent = position.initialMargin > 0? pnl / position.initialMargin * 100: 0;
+    return `<tr class="border-b border-binanceBorder hover:bg-binanceHover/30">
+     <td class="p-2.5"><span>${escapeHTML(position.pair)}</span><span class="ml-1 ${position.side === 'Long'? 'text-binanceGreen': 'text-binanceRed'}">${escapeHTML(position.side)} ${position.leverage.toFixed(1)}x</span><span class="block text-[10px] text-binanceMuted">${escapeHTML(position.marginType)} · simulated</span></td>
+     <td class="p-2.5">${position.size.toFixed(6)} ${escapeHTML(position.asset)}<span class="block text-[10px] text-binanceMuted">Borrowed ${position.borrowedAmount.toFixed(6)} ${escapeHTML(position.borrowedAsset)}</span></td>
+     <td class="p-2.5">${formatMoney(position.entryPrice)}<span class="block text-[10px] text-binanceMuted">${formatMoney(mark)}</span></td>
+     <td class="p-2.5 text-binanceRed">${formatMoney(marginLiquidationPrice(position))}<span class="block text-[10px] text-binanceMuted">${position.marginType === 'Cross'? 'pooled risk estimate': 'isolated'}</span></td>
+     <td class="p-2.5">${position.initialMargin.toFixed(2)} USDT</td>
+     <td class="p-2.5 ${pnl >= 0? 'text-binanceGreen': 'text-binanceRed'}">${pnl >= 0? '+': ''}${pnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)</td>
+     <td class="p-2.5">${position.takeProfit? formatMoney(position.takeProfit): '—'}<span class="block text-[10px] text-binanceMuted">${position.stopLoss? formatMoney(position.stopLoss): '—'}</span></td>
+     <td class="p-2.5 text-right whitespace-nowrap">
+      <button onclick="closeMarginPosition(${position.id}, 0.25)" class="rounded border border-binanceBorder px-1.5 py-1 text-binanceMuted hover:text-white">25%</button>
+      <button onclick="closeMarginPosition(${position.id}, 0.5)" class="rounded border border-binanceBorder px-1.5 py-1 text-binanceMuted hover:text-white">50%</button>
+      <button onclick="closeMarginPosition(${position.id})" class="rounded border border-binanceBorder px-1.5 py-1 text-binanceMuted hover:text-binanceRed">Close / repay</button>
+     </td>
+    </tr>`;
+   }).join('');
   }
 
   function orderHistoryFor(order) {
@@ -12502,7 +13389,7 @@
    const balanceAsset = state.side === 'buy' || state.tradingMode !== 'spot'? 'USDT': state.asset;
    const balance = state.tradingMode === 'futures'? getFuturesBalance(balanceAsset): getBalance(balanceAsset);
    document.getElementById('formAvailBalance').textContent = `${balance.available.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${balanceAsset}`;
-   const maxAmount = state.tradingMode === 'futures'
+   const maxAmount = state.tradingMode === 'futures' || state.tradingMode === 'margin'
     ? (balance.available * state.leverage) / state.currentPrice
     : state.side === 'buy'? balance.available / state.currentPrice: balance.available;
    const percent = maxAmount > 0? Math.min(100, Math.round((amount / maxAmount) * 100)): 0;
@@ -12516,14 +13403,14 @@
     ? state.currentPrice
     : Number(document.getElementById('inputPrice').value) || state.currentPrice;
    const amount = Number(document.getElementById('inputAmount').value) || 0;
-   const futures = state.tradingMode === 'futures';
-   const initialMargin = futures? (entry * amount) / state.leverage: 0;
+   const leveraged = state.tradingMode === 'futures' || state.tradingMode === 'margin';
+   const initialMargin = leveraged? (entry * amount) / state.leverage: 0;
    document.getElementById('estInitialMargin').textContent = `${initialMargin.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
-   const maintenanceRate = 0.005;
+   const maintenanceRate = state.tradingMode === 'margin'? 0.01: 0.005;
    const liquidationPrice = state.side === 'buy'
     ? entry * Math.max(0, 1 - 1 / state.leverage + maintenanceRate)
     : entry * (1 + 1 / state.leverage - maintenanceRate);
-   document.getElementById('estLiqPrice').textContent = futures? formatMoney(liquidationPrice): '—';
+   document.getElementById('estLiqPrice').textContent = leveraged? formatMoney(liquidationPrice): '—';
   }
 
   function setPercentAmount(multiplier) {
@@ -12531,7 +13418,7 @@
    const amountInput = document.getElementById('inputAmount');
    const balanceAsset = state.side === 'buy' || state.tradingMode !== 'spot'? 'USDT': state.asset;
    const balance = state.tradingMode === 'futures'? getFuturesBalance(balanceAsset): getBalance(balanceAsset);
-   const maxAmt = state.tradingMode === 'futures'
+   const maxAmt = state.tradingMode === 'futures' || state.tradingMode === 'margin'
     ? (balance.available * state.leverage) / state.currentPrice
     : state.side === 'buy'? balance.available / state.currentPrice: balance.available;
    amountInput.value = (maxAmt * normalizedMultiplier).toFixed(4);
@@ -13907,7 +14794,7 @@
    }
    tbody.innerHTML = state.assets.filter((asset) => Number(asset.total || 0) > 0).map((asset) => `
     <tr class="border-b border-binanceBorder">
-     <td class="p-2.5">${asset.asset}</td>
+     <td class="p-2.5"><span class="flex items-center gap-2">${assetIconMarkup(asset.asset, 'h-6 w-6')}<span>${escapeHTML(asset.asset)}</span></span></td>
      <td class="p-2.5">${Number(asset.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</td>
      <td class="p-2.5">${Number(asset.available).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</td>
      <td class="p-2.5">${Number(asset.inOrders).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</td>
@@ -13940,13 +14827,14 @@
   }
 
   function resetDemoAccount() {
-   if (!window.confirm('Reset balances, orders, and transaction history? This cannot be undone.')) return;
+   if (!window.confirm('Reset balances, orders, positions, and transaction history? This cannot be undone.')) return;
    state.assets = createDefaultWallet();
    state.fundingAssets = [];
    state.futuresAssets = [];
    state.openOrders = [];
    state.orderHistory = [];
    state.futuresPositions = [];
+   state.marginPositions = [];
    state.transactions = [];
    state.p2pTrades = [];
    state.p2pAds = [];
@@ -14257,7 +15145,7 @@
    }
   }
 
-  let withdrawalProcessingCountdownTimer = null;
+  let withdrawalProcessingRefreshTimer = null;
 
   function renderWithdrawalProcessingPage() {
    const user = state.currentUser;
@@ -14266,20 +15154,17 @@
    const title = document.getElementById('withdrawalProcessingTitle');
    const description = document.getElementById('withdrawalProcessingDescription');
    const status = document.getElementById('withdrawalProcessingStatus');
-   const remaining = document.getElementById('withdrawalProcessingRemaining');
    const icon = document.getElementById('withdrawalProcessingIcon');
    if (!transaction || !job) {
     if (title) title.textContent = 'Withdrawal details unavailable';
     if (description) description.textContent = 'This withdrawal could not be found in the signed-in account. Check your account activity before submitting another request.';
     if (status) status.textContent = 'Check account activity';
-    if (remaining) remaining.textContent = 'Unavailable';
     if (icon) icon.innerHTML = '<i data-lucide="circle-alert" class="h-7 w-7"></i>';
-    if (withdrawalProcessingCountdownTimer) window.clearInterval(withdrawalProcessingCountdownTimer);
-    withdrawalProcessingCountdownTimer = null;
+    if (withdrawalProcessingRefreshTimer) window.clearTimeout(withdrawalProcessingRefreshTimer);
+    withdrawalProcessingRefreshTimer = null;
     return;
    }
    const completed = job.status === 'Completed' || String(transaction.status || '').startsWith('Completed');
-   const secondsLeft = Math.max(0, Math.ceil((Number(job.dueAt) - Date.now()) / 1000));
    const address = document.getElementById('withdrawalProcessingAddress');
    const amount = document.getElementById('withdrawalProcessingAmount');
    const network = document.getElementById('withdrawalProcessingNetwork');
@@ -14291,7 +15176,6 @@
    if (description) description.textContent = completed
     ? 'Your withdrawal record is complete, and the reserved amount has been removed from your Spot balance.'
     : 'Your withdrawal request is being processed. The amount is reserved from your available balance.';
-   if (remaining) remaining.textContent = completed ? 'Completed' : `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, '0')} remaining`;
    if (icon) {
     icon.classList.toggle('bg-binanceGreen/10', completed);
     icon.classList.toggle('text-binanceGreen', completed);
@@ -14301,24 +15185,15 @@
      ? '<i data-lucide="circle-check" class="h-7 w-7"></i>'
      : '<i data-lucide="loader-circle" class="h-7 w-7 animate-spin"></i>';
    }
-   if (withdrawalProcessingCountdownTimer) window.clearInterval(withdrawalProcessingCountdownTimer);
-   withdrawalProcessingCountdownTimer = null;
+   if (withdrawalProcessingRefreshTimer) window.clearTimeout(withdrawalProcessingRefreshTimer);
+   withdrawalProcessingRefreshTimer = null;
    if (!completed) {
-    withdrawalProcessingCountdownTimer = window.setInterval(() => {
-     if (state.activePage !== 'withdrawalProcessing') {
-      window.clearInterval(withdrawalProcessingCountdownTimer);
-      withdrawalProcessingCountdownTimer = null;
-      return;
-     }
-     const seconds = Math.max(0, Math.ceil((Number(job.dueAt) - Date.now()) / 1000));
-     if (remaining) remaining.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} remaining`;
-     if (seconds === 0) {
-      window.clearInterval(withdrawalProcessingCountdownTimer);
-      withdrawalProcessingCountdownTimer = null;
-      if (isLocalPreviewMode()) processDueAdminBalanceJobs();
-      else refreshSignedInAccount();
-     }
-    }, 1000);
+    withdrawalProcessingRefreshTimer = window.setTimeout(() => {
+     withdrawalProcessingRefreshTimer = null;
+     if (state.activePage !== 'withdrawalProcessing') return;
+     if (isLocalPreviewMode()) processDueAdminBalanceJobs();
+     else refreshSignedInAccount();
+    }, Math.max(0, Number(job.dueAt) - Date.now()));
    }
    if (window.lucide) window.lucide.createIcons();
   }
@@ -14356,7 +15231,7 @@
     notify('Callback rate must be between 0.1% and 10%');
     return;
    }
-   if (tradingMode === 'futures' && !reduceOnly) {
+   if ((tradingMode === 'futures' || tradingMode === 'margin') && !reduceOnly) {
     const validTakeProfit = !takeProfit || (state.side === 'buy'? takeProfit > state.currentPrice: takeProfit < state.currentPrice);
     const validStopLoss = !stopLoss || (state.side === 'buy'? stopLoss < state.currentPrice: stopLoss > state.currentPrice);
     if (!validTakeProfit || !validStopLoss) {
@@ -14387,7 +15262,7 @@
     filled: 0,
     triggered: false,
     tradingMode,
-    leverage: tradingMode === 'futures'? state.leverage: 1,
+    leverage: tradingMode === 'futures' || tradingMode === 'margin'? state.leverage: 1,
     marginType: state.marginType,
     reduceOnly,
     postOnly: type === 'limit' && state.advancedOrder.postOnly,
@@ -14416,7 +15291,7 @@
    }
 
    const notional = amount * orderPrice;
-   if (tradingMode === 'futures' || notional > 500) {
+   if (tradingMode === 'futures' || tradingMode === 'margin' || notional > 500) {
     state.pendingOrderConfirmation = { order, history };
     renderOrderConfirmation(order, notional);
     openModal('confirmModal');
@@ -14428,7 +15303,7 @@
   function renderOrderConfirmation(order, notional) {
    const rows = [
     ['Pair', order.pair],
-    ['Side', `${order.side}${order.tradingMode === 'futures'? ` / ${order.side === 'Buy'? 'Long': 'Short'}`: ''}`],
+    ['Side', `${order.side}${order.tradingMode === 'futures' || order.tradingMode === 'margin'? ` / ${order.side === 'Buy'? 'Long': 'Short'}`: ''}`],
     ['Order type', order.type],
     ['Amount', `${order.amount} ${order.asset}`],
     ['Reference price', `${formatMoney(order.price)} USDT`],
@@ -14436,9 +15311,16 @@
    ];
    if (order.type === 'Stop-Limit') rows.push(['Trigger price', `${formatMoney(order.stopPrice)} USDT`]);
    if (order.type === 'Trailing Stop') rows.push(['Callback / trigger', `${order.callbackRate}% / ${formatMoney(order.triggerPrice)} USDT`]);
-   if (order.tradingMode === 'futures') {
+   if (order.tradingMode === 'futures' || order.tradingMode === 'margin') {
     rows.push(['Leverage / margin', `${order.leverage}x · ${order.marginType}`]);
-    if (!order.reduceOnly) rows.push(['Initial margin', `${formatMoney(notional / order.leverage)} USDT`]);
+    if (!order.reduceOnly) rows.push([order.tradingMode === 'margin'? 'Simulated collateral': 'Initial margin', `${formatMoney(notional / order.leverage)} USDT`]);
+    if (order.tradingMode === 'margin') rows.push(['Execution', 'Demo only · loan repaid automatically on close']);
+    if (order.tradingMode === 'margin') {
+     const borrowedAmount = order.side === 'Buy'
+      ? Math.max(0, notional - notional / order.leverage)
+      : order.amount;
+     rows.push(['Borrowed principal', `${formatMoney(borrowedAmount)} ${order.side === 'Buy'? 'USDT': order.asset}`]);
+    }
     if (order.reduceOnly) rows.push(['Risk setting', 'Reduce only']);
    }
    if (order.takeProfit) rows.push(['Take profit', `${formatMoney(order.takeProfit)} USDT`]);
