@@ -1,5 +1,7 @@
 const crypto = require('node:crypto');
 const { getDb } = require('./db');
+const { normalizeUserJsonFields, parseJsonArray } = require('./account-json');
+const { completeDueBalanceJobs } = require('./balance-jobs');
 
 const SESSION_COOKIE = '__Host-exchange_session';
 const SESSION_DURATION_SECONDS = 60 * 60 * 12;
@@ -66,41 +68,6 @@ function hashToken(token) {
     return crypto.createHash('sha256').update(token).digest('hex');
 }
 
-function parseJsonArray(value, field, allowMissing = false) {
-    if (value === null || value === undefined) {
-        if (allowMissing) {
-            console.warn(`Missing stored ${field} data; initializing it as an empty array.`);
-            return [];
-        }
-        throw new Error(`Missing stored ${field} data`);
-    }
-    let parsed = value;
-    while (typeof parsed === 'string') {
-        try {
-            parsed = JSON.parse(parsed);
-        } catch (error) {
-            throw new Error(`Invalid stored ${field} data`, { cause: error });
-        }
-    }
-    if (!Array.isArray(parsed)) throw new Error(`Invalid stored ${field} data`);
-    return parsed;
-}
-
-function normalizeUserJsonFields(user) {
-    return {
-        ...user,
-        wallet: parseJsonArray(user.wallet, 'Spot wallet'),
-        funding_wallet: parseJsonArray(user.funding_wallet, 'Funding wallet', true),
-        futures_wallet: parseJsonArray(user.futures_wallet, 'Futures wallet', true),
-        transactions: parseJsonArray(user.transactions, 'transactions', true),
-        notifications: parseJsonArray(user.notifications, 'notifications', true),
-        balance_jobs: parseJsonArray(user.balance_jobs, 'balance jobs', true),
-        open_orders: parseJsonArray(user.open_orders, 'open orders', true),
-        order_history: parseJsonArray(user.order_history, 'order history', true),
-        futures_positions: parseJsonArray(user.futures_positions, 'futures positions', true)
-    };
-}
-
 async function createSession(userId, res) {
     const token = crypto.randomBytes(32).toString('base64url');
     const expiresAt = new Date(Date.now() + SESSION_DURATION_SECONDS * 1000);
@@ -123,7 +90,16 @@ async function getSessionUser(req) {
         WHERE s.token_hash = ${hashToken(token)} AND s.expires_at > NOW()
         LIMIT 1
     `;
-    return user ? normalizeUserJsonFields(user) : null;
+    if (!user) return null;
+    const normalizedUser = normalizeUserJsonFields(user);
+    const hasDueCredit = normalizedUser.balance_jobs.some((job) =>
+        job.operation === 'credit'
+        && job.status === 'Processing'
+        && Number.isFinite(job.dueAt)
+        && job.dueAt <= Date.now()
+    );
+    if (!hasDueCredit) return normalizedUser;
+    return completeDueBalanceJobs(user.id);
 }
 
 function publicUser(user) {

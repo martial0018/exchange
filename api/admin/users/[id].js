@@ -45,7 +45,7 @@ function createTransaction({ id, action, actor, body, now, beforeWallet, afterWa
     const common = {
         id,
         time: now.toLocaleString('en-GB'),
-        status: 'Completed (practice)',
+        status: action === 'balance_credit' ? 'Processing' : 'Completed (practice)',
         adminUsername: actor.username
     };
     if (action === 'balance_credit') {
@@ -136,28 +136,22 @@ module.exports = async function handler(req, res) {
             if (walletReset) {
                 afterWallet.splice(0, afterWallet.length, ...DEFAULT_WALLET);
                 details = { description: 'Reset to zero-balance practice wallet' };
+            } else if (body.action === 'balance_credit') {
+                details = {
+                    asset: body.asset,
+                    amount: body.amount,
+                    network: body.network.trim(),
+                    fromAddress: body.fromAddress.trim(),
+                    status: 'Processing',
+                    walletChangeRecorded: false
+                };
             } else {
                 let balance = afterWallet.find((entry) => entry.asset === body.asset);
-                if (!balance && body.action === 'balance_credit') {
-                    balance = { asset: body.asset, total: 0, available: 0, inOrders: 0 };
-                    afterWallet.push(balance);
-                }
                 if (!balance) return [];
-                if (body.action === 'balance_credit') {
-                    balance.total += body.amount;
-                    balance.available += body.amount;
-                    details = {
-                        asset: body.asset,
-                        amount: body.amount,
-                        network: body.network.trim(),
-                        fromAddress: body.fromAddress.trim()
-                    };
-                } else {
-                    balance.total = body.total;
-                    balance.available = body.available;
-                    balance.inOrders = body.inOrders;
-                    details = { asset: body.asset, total: body.total, available: body.available, inOrders: body.inOrders };
-                }
+                balance.total = body.total;
+                balance.available = body.available;
+                balance.inOrders = body.inOrders;
+                details = { asset: body.asset, total: body.total, available: body.available, inOrders: body.inOrders };
             }
             if (!validWallet(afterWallet)) throw new Error('Administrator action produced invalid wallet data');
 
@@ -173,13 +167,14 @@ module.exports = async function handler(req, res) {
                 afterWallet
             });
             const transactions = [transaction, ...(Array.isArray(user.transactions) ? user.transactions : [])].slice(0, 1000);
+            const processingCredit = body.action === 'balance_credit';
             const notifications = [{
-                id: `${id}-completed`,
-                title: 'Balance transaction completed',
+                id: processingCredit ? `${id}-processing` : `${id}-completed`,
+                title: processingCredit ? 'Balance transaction processing' : 'Balance transaction completed',
                 message: body.action === 'wallet_reset'
                     ? 'Your practice wallet reset has completed.'
-                    : body.action === 'balance_credit'
-                        ? `${body.amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${body.asset} has been credited to your practice account.`
+                    : processingCredit
+                        ? `${body.amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${body.asset} credit is processing. It will be added to your Spot balance when processing completes.`
                         : `Your ${body.asset} practice balance was updated by an administrator.`,
                 createdAt: now.toLocaleString('en-GB'),
                 read: false
@@ -190,8 +185,13 @@ module.exports = async function handler(req, res) {
                 operation: body.action === 'wallet_reset' ? 'setWallet' : body.action === 'balance_credit' ? 'credit' : 'set',
                 amount: body.action === 'balance_credit' ? body.amount : 0,
                 transactionId: id,
-                status: 'Completed',
-                completedAt: now.getTime()
+                processingNotificationId: processingCredit ? `${id}-processing` : undefined,
+                completionNotificationId: processingCredit ? `${id}-completed` : undefined,
+                auditRequestId: processingCredit ? body.requestId : undefined,
+                createdAt: now.getTime(),
+                dueAt: processingCredit ? now.getTime() + 90_000 : undefined,
+                status: processingCredit ? 'Processing' : 'Completed',
+                completedAt: processingCredit ? undefined : now.getTime()
             }, ...(Array.isArray(user.balance_jobs) ? user.balance_jobs : [])].slice(0, 1000);
 
             const [updatedUser] = await sql`
