@@ -3869,7 +3869,7 @@
    <div class="space-y-3 text-xs">
     <div>
      <label class="text-binanceMuted block mb-1">Select Asset</label>
-     <select id="depositAsset" onchange="updateDepositAddressDisplay()" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono"></select>
+     <select id="depositAsset" onchange="updateDepositNetworkOptions()" class="w-full bg-binanceBg border border-binanceBorder rounded p-2.5 text-white font-mono"></select>
     </div>
     <div>
      <label class="text-binanceMuted block mb-1">Network</label>
@@ -3884,7 +3884,7 @@
      <code id="depositAddressValue" class="block break-all font-mono text-[11px] text-white">Loading address…</code>
      <p id="depositAddressMemo" class="mt-2 hidden break-all text-[10px] text-binanceMuted"></p>
     </div>
-    <p class="rounded border border-binanceRed/40 bg-binanceRedBg p-3 text-[10px] leading-relaxed text-binanceRed">Deposits are not monitored or credited automatically. Verify the asset, network, and address before sending.</p>
+    <p id="depositNetworkWarning" class="rounded border border-binanceRed/40 bg-binanceRedBg p-3 text-[10px] leading-relaxed text-binanceRed" role="alert"></p>
    </div>
   </div>
  </div>
@@ -14887,10 +14887,16 @@
    const networkSelect = document.getElementById('depositNetwork');
    if (!networkSelect) return;
    updateDepositAssetOptions();
+   const asset = document.getElementById('depositAsset')?.value || '';
+   const networks = [...new Set(state.cryptoDepositAddresses
+    .filter((entry) => entry.asset === asset && entry.address)
+    .map((entry) => entry.network))];
    const selectedNetwork = networkSelect.value;
-   networkSelect.innerHTML = DEPOSIT_NETWORK_OPTIONS.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('');
-   if (DEPOSIT_NETWORK_OPTIONS.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
-   networkSelect.disabled = !DEPOSIT_NETWORK_OPTIONS.length;
+   networkSelect.innerHTML = networks.length
+    ? networks.map((network) => `<option value="${escapeHTML(network)}">${escapeHTML(network)}</option>`).join('')
+    : '<option value="">No network configured by admin</option>';
+   if (networks.includes(selectedNetwork)) networkSelect.value = selectedNetwork;
+   networkSelect.disabled = !networks.length;
    updateDepositAddressDisplay();
   }
 
@@ -14910,6 +14916,12 @@
    const addressValue = document.getElementById('depositAddressValue');
    const memo = document.getElementById('depositAddressMemo');
    const copyButton = document.getElementById('copyDepositAddressButton');
+   const warning = document.getElementById('depositNetworkWarning');
+   if (warning) {
+    warning.textContent = asset && network
+     ? `Only deposit ${asset} using the ${network} network. Deposits of other assets or using other networks will be lost.`
+     : 'Select a configured asset and network before depositing. Deposits of other assets or using other networks will be lost.';
+   }
    if (!addressValue || !memo || !copyButton) return;
    addressValue.textContent = address?.address || 'No deposit address is configured for this network.';
    copyButton.classList.toggle('hidden', !address?.address);
@@ -14941,9 +14953,9 @@
 
   async function loadDepositAddresses() {
    try {
-    const { addresses } = await requestAuthApi('/api/market-price-adjustments?resource=deposit-addresses', { method: 'GET', headers: {} });
+    const { addresses } = await requestAuthApi('/api/market-price-adjustments?resource=deposit-addresses', { method: 'GET', headers: {} }, true);
     state.cryptoDepositAddresses = addresses;
-    updateDepositAddressDisplay();
+    updateDepositNetworkOptions();
    } catch (error) {
     console.error('Unable to load crypto deposit addresses', error);
     const addressValue = document.getElementById('depositAddressValue');
