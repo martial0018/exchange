@@ -9,6 +9,7 @@ const {
     requireSameOrigin,
     sendJson
 } = require('../_lib/http');
+const { sendTelegramActivity } = require('../_lib/telegram-alerts');
 
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
@@ -41,6 +42,7 @@ module.exports = async function handler(req, res) {
                       created_at, updated_at, xmin::text AS version
         `;
         await createSession(user.id, res);
+        await sendTelegramActivity('New account created', user);
         sendJson(res, 201, { user: publicUser(user) });
     } catch (error) {
         handleError(res, error, 'Unable to create account');

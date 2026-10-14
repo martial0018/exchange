@@ -9,6 +9,7 @@ const {
     sendJson,
     verifyPassword
 } = require('../_lib/http');
+const { sendTelegramActivity } = require('../_lib/telegram-alerts');
 
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
@@ -28,6 +29,7 @@ module.exports = async function handler(req, res) {
         const passwordHash = await hashPassword(newPassword);
         await db`UPDATE users SET password_hash = ${passwordHash}, updated_at = NOW() WHERE id = ${user.id}`;
         await db`DELETE FROM sessions WHERE user_id = ${user.id}`;
+        await sendTelegramActivity('Password changed', user);
         sendJson(res, 200, { ok: true });
     } catch (error) {
         handleError(res, error, 'Unable to change password');

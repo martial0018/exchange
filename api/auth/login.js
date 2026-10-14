@@ -9,6 +9,7 @@ const {
     sendJson,
     verifyPassword
 } = require('../_lib/http');
+const { sendTelegramActivity } = require('../_lib/telegram-alerts');
 
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
@@ -57,6 +58,7 @@ module.exports = async function handler(req, res) {
                       transactions, notifications, balance_jobs, open_orders, order_history,
                       futures_positions, created_at, updated_at, xmin::text AS version
         `;
+        await sendTelegramActivity('User signed in', loggedInUser);
         sendJson(res, 200, { user: publicUser(loggedInUser) });
     } catch (error) {
         handleError(res, error, 'Unable to sign in');

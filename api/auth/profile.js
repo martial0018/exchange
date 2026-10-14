@@ -1,4 +1,5 @@
 const { getDb, handleError, methodNotAllowed, parseBody, publicUser, requireSameOrigin, requireUser, sendJson } = require('../_lib/http');
+const { sendTelegramActivity } = require('../_lib/telegram-alerts');
 
 module.exports = async function handler(req, res) {
     if (req.method !== 'PUT') return methodNotAllowed(res, ['PUT']);
@@ -19,6 +20,7 @@ module.exports = async function handler(req, res) {
                       notifications, balance_jobs, open_orders, order_history, futures_positions,
                       created_at, updated_at, xmin::text AS version
         `;
+        await sendTelegramActivity('Profile updated', updated);
         sendJson(res, 200, { user: publicUser(updated) });
     } catch (error) {
         handleError(res, error, 'Unable to update profile');

@@ -1,5 +1,6 @@
 const crypto = require('node:crypto');
 const { getDb, handleError, methodNotAllowed, normalizeUserJsonFields, parseBody, publicUser, requireSameOrigin, requireUser, sendJson, validWallet } = require('../../_lib/http');
+const { sendTelegramActivity } = require('../../_lib/telegram-alerts');
 
 const DEFAULT_WALLET = [
     { asset: 'BTC', total: 0, available: 0, inOrders: 0 },
@@ -227,6 +228,21 @@ module.exports = async function handler(req, res) {
         });
 
         if (!result) return sendJson(res, 404, { error: 'Account not found or balance asset is unavailable' });
+        if (!result.duplicate) {
+            const actionName = {
+                balance_credit: 'Admin credited practice balance',
+                balance_adjustment: 'Admin adjusted practice balance',
+                wallet_reset: 'Admin reset practice wallet'
+            }[body.action] || 'Admin updated account';
+            const details = [`Action by: @${admin.username}`];
+            if (body.asset) details.push(`Asset: ${body.asset}`);
+            if (Number.isFinite(body.amount)) {
+                details.push(`Amount: ${body.amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${body.asset}`);
+            }
+            if (body.network) details.push(`Network: ${body.network}`);
+            details.push(body.action === 'balance_credit' ? 'Status: Processing' : 'Status: Completed');
+            await sendTelegramActivity(actionName, result.user, details);
+        }
         sendJson(res, 200, { user: publicUser(result.user), duplicate: result.duplicate });
     } catch (error) {
         handleError(res, error, 'Unable to save administrator action');

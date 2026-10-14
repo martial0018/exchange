@@ -12,6 +12,7 @@ const {
     sendJson,
     validWallet
 } = require('../_lib/http');
+const { sendTelegramActivity } = require('../_lib/telegram-alerts');
 
 function validRequestId(value) {
     return typeof value === 'string'
@@ -49,6 +50,7 @@ module.exports = async function handler(req, res) {
                 return sendJson(res, 400, { error: 'Invalid withdrawal request' });
             }
 
+            let duplicate = false;
             const [updatedUser] = await getDb().begin(async (sql) => {
                 const [userRow] = await sql`
                     SELECT id, username, email, full_name, role, wallet, funding_wallet, futures_wallet, transactions,
@@ -67,7 +69,10 @@ module.exports = async function handler(req, res) {
                         && existingJob.amount === body.amount
                         && existingJob.network === body.network.trim()
                         && existingJob.address === body.address.trim();
-                    if (isSameWithdrawal) return [currentUser];
+                    if (isSameWithdrawal) {
+                        duplicate = true;
+                        return [currentUser];
+                    }
                     const error = new Error('This request ID is already associated with a different account action');
                     error.status = 409;
                     throw error;
@@ -139,6 +144,13 @@ module.exports = async function handler(req, res) {
             });
 
             if (!updatedUser) return sendJson(res, 404, { error: 'Account not found' });
+            if (!duplicate) {
+                await sendTelegramActivity('Withdrawal requested', updatedUser, [
+                    `Amount: ${body.amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${body.asset}`,
+                    `Network: ${body.network.trim()}`,
+                    'Status: Processing (simulated; no blockchain transfer)'
+                ]);
+            }
             return sendJson(res, 200, { user: publicUser(updatedUser) });
         }
         if (req.method === 'GET') {
@@ -147,6 +159,7 @@ module.exports = async function handler(req, res) {
         }
         if (req.method === 'DELETE') {
             if (!requireSameOrigin(req, res)) return;
+            const user = await getSessionUser(req);
             const token = (req.headers.cookie || '').split(';')
                 .map((part) => part.trim())
                 .find((part) => part.startsWith('__Host-exchange_session='))
@@ -157,6 +170,7 @@ module.exports = async function handler(req, res) {
                 await getDb()`DELETE FROM sessions WHERE token_hash = ${tokenHash}`;
             }
             clearSessionCookie(res);
+            if (user) await sendTelegramActivity('User signed out', user);
             return sendJson(res, 200, { ok: true });
         }
         if (req.method === 'PUT') {
@@ -192,6 +206,16 @@ module.exports = async function handler(req, res) {
                     return sendJson(res, 400, { error: `Invalid ${label} data` });
                 }
             }
+            const previousTransactionIds = new Set();
+            const previousAnonymousTransactions = new Map();
+            for (const transaction of user.transactions) {
+                if (transaction?.id !== undefined && transaction.id !== null) {
+                    previousTransactionIds.add(String(transaction.id));
+                } else {
+                    const key = JSON.stringify(transaction);
+                    previousAnonymousTransactions.set(key, (previousAnonymousTransactions.get(key) || 0) + 1);
+                }
+            }
             const [freshUser] = await getDb()`
                 UPDATE users SET
                     wallet = COALESCE(${body.wallet === undefined ? null : JSON.stringify(body.wallet)}::jsonb, wallet),
@@ -220,6 +244,32 @@ module.exports = async function handler(req, res) {
                     error: 'Your account changed elsewhere. The latest balance and account data have been refreshed.',
                     user: publicUser(latestUser)
                 });
+            }
+            const newTransactions = (body.transactions || []).filter((transaction) => {
+                if (!transaction) return false;
+                if (transaction.id !== undefined && transaction.id !== null) {
+                    return !previousTransactionIds.has(String(transaction.id));
+                }
+                const key = JSON.stringify(transaction);
+                const previousCount = previousAnonymousTransactions.get(key) || 0;
+                if (previousCount === 0) return true;
+                previousAnonymousTransactions.set(key, previousCount - 1);
+                return false;
+            });
+            if (newTransactions.length) {
+                const transactionDetails = newTransactions.slice(0, 8).map((transaction) => {
+                    const amount = Number.isFinite(transaction.amount)
+                        ? `${transaction.amount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${transaction.asset || ''}`.trim()
+                        : '';
+                    const quote = Number.isFinite(transaction.quoteAmount)
+                        ? `; quote ${transaction.quoteAmount.toLocaleString('en-US', { maximumFractionDigits: 8 })} ${transaction.quoteAsset || ''}`.trimEnd()
+                        : '';
+                    return `${transaction.type || 'Account transaction'}${amount ? `: ${amount}` : ''}${quote}${transaction.status ? `; status ${transaction.status}` : ''}`;
+                });
+                if (newTransactions.length > transactionDetails.length) {
+                    transactionDetails.push(`${newTransactions.length - transactionDetails.length} more account transaction(s)`);
+                }
+                await sendTelegramActivity('Account transaction recorded', freshUser, transactionDetails);
             }
             return sendJson(res, 200, { user: publicUser(freshUser) });
         }
