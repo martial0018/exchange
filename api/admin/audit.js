@@ -1,4 +1,5 @@
 const { getDb, handleError, methodNotAllowed, parseJsonArray, requireUser, sendJson } = require('../_lib/http');
+const { sendTelegramActivity } = require('../_lib/telegram-alerts');
 
 function balanceFor(wallet, asset) {
     return Array.isArray(wallet) ? wallet.find((balance) => balance && balance.asset === asset) : null;
@@ -37,6 +38,18 @@ module.exports = async function handler(req, res) {
     try {
         const admin = await requireUser(req, res, 'admin');
         if (!admin) return;
+        const requestUrl = new URL(req.url, 'https://exchange.invalid');
+        if (requestUrl.searchParams.get('testTelegram') === '1') {
+            const sent = await sendTelegramActivity('Telegram test notification', admin, [
+                'Test message from the Exchange production alert configuration.'
+            ]);
+            if (!sent) {
+                return sendJson(res, 502, {
+                    error: 'Telegram test alert was not delivered. Check the Production bot token, chat ID, and that the bot has been started in the target chat.'
+                });
+            }
+            return sendJson(res, 200, { ok: true, message: 'Telegram test alert sent.' });
+        }
         const entries = await getDb()`
             SELECT log.id, log.action, log.before_wallet, log.after_wallet, log.details, log.created_at,
                    actor.username AS actor_username, target.username AS target_username
