@@ -4,6 +4,7 @@
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
  <script>
+  document.documentElement.dataset.sessionRestoring = 'true';
   try {
    const savedPage = JSON.parse(sessionStorage.getItem('exchange-page-v1') || 'null')?.activePage;
    const initialPages = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade'];
@@ -2220,9 +2221,42 @@
   #appBody.withdrawal-processing-mode > #mobileBottomNav {
    display: none !important;
   }
+  #sessionRestoreScreen {
+   position: fixed;
+   inset: 0;
+   z-index: 1000;
+   display: none;
+   align-items: center;
+   justify-content: center;
+   gap: 0.75rem;
+   background: #12161a;
+   color: #eaecef;
+   font-size: 0.875rem;
+  }
+  html[data-session-restoring] #appBody > :not(#sessionRestoreScreen) {
+   visibility: hidden !important;
+  }
+  html[data-session-restoring] #sessionRestoreScreen {
+   display: flex;
+  }
+  .session-restore-spinner {
+   width: 1rem;
+   height: 1rem;
+   border: 2px solid #2b3139;
+   border-top-color: #f0b90b;
+   border-radius: 50%;
+   animation: session-restore-spin 0.8s linear infinite;
+  }
+  @keyframes session-restore-spin {
+   to { transform: rotate(360deg); }
+  }
  </style>
 </head>
 <body id="appBody" class="bg-binanceBg text-binanceText font-sans h-screen flex flex-col overflow-hidden select-none">
+<div id="sessionRestoreScreen" role="status" aria-live="polite">
+ <span class="session-restore-spinner" aria-hidden="true"></span>
+ <span>Restoring your account…</span>
+</div>
 <div id="pullToRefreshIndicator" role="status" aria-live="polite">
  <i data-pull-refresh-icon data-lucide="arrow-down" class="h-3.5 w-3.5 text-binanceYellow"></i>
  <span data-pull-refresh-label>Pull to refresh</span>
@@ -8441,11 +8475,14 @@
 
   async function restoreUserSession() {
    try {
-    if (isLocalPreviewMode() && !getLocalPreviewSession()) {
+    const localPreviewSession = isLocalPreviewMode()? getLocalPreviewSession(): null;
+    if (isLocalPreviewMode() && !localPreviewSession) {
      state.restorePage = null;
      return;
     }
-    const { user } = await requestAuthApi('/api/auth/me', { method: 'GET', headers: {} });
+    const isLocalPreviewAccount = localPreviewSession
+     && (String(localPreviewSession.id).startsWith('local-') || localPreviewSession.id === 'admin-local-preview');
+    const { user } = await requestAuthApi('/api/auth/me', { method: 'GET', headers: {} }, isLocalPreviewMode() && !isLocalPreviewAccount);
     if (!user) {
      state.restorePage = null;
      return;
@@ -8464,6 +8501,8 @@
      console.error('Could not restore signed-in account', error);
      notify(message);
     }
+   } finally {
+    delete document.documentElement.dataset.sessionRestoring;
    }
   }
 
