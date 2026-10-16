@@ -14,6 +14,7 @@ const {
 } = require('../_lib/http');
 const { sendTelegramActivity } = require('../_lib/telegram-alerts');
 const handleSupportChat = require('../_lib/support-chat');
+const identityVerification = require('../_lib/identity-verification');
 
 function validRequestId(value) {
     return typeof value === 'string'
@@ -42,6 +43,9 @@ function validWithdrawal(body) {
 module.exports = async function handler(req, res) {
     const requestUrl = new URL(req.url, 'https://exchange.invalid');
     if (requestUrl.searchParams.get('supportChat') === '1') return handleSupportChat(req, res);
+    if (requestUrl.searchParams.get('identityVerification') === '1') return identityVerification.handleUser(req, res);
+    if (requestUrl.searchParams.get('adminIdentityVerifications') === '1') return identityVerification.handleAdminList(req, res);
+    if (requestUrl.searchParams.get('adminIdentityVerificationImage') === '1') return identityVerification.handleAdminImage(req, res);
 
     try {
         if (req.method === 'POST') {

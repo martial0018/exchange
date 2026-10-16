@@ -1,6 +1,18 @@
 {
   "rewrites": [
     {
+      "source": "/api/auth/identity-verification",
+      "destination": "/api/auth/me?identityVerification=1"
+    },
+    {
+      "source": "/api/admin/identity-verifications",
+      "destination": "/api/auth/me?adminIdentityVerifications=1"
+    },
+    {
+      "source": "/api/admin/identity-verifications/:id",
+      "destination": "/api/auth/me?adminIdentityVerificationImage=1&id=:id"
+    },
+    {
       "source": "/api/support/chat",
       "destination": "/api/auth/me?supportChat=1"
     }

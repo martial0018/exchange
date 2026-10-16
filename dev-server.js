@@ -5,7 +5,7 @@ const path = require('node:path');
 const root = __dirname;
 const apiOrigin = new URL('https://exchange-seven-jade.vercel.app');
 const port = Number(process.env.PORT) || 3000;
-const maxRequestSize = 200_000;
+const maxRequestSize = 4_300_000;
 const publicFiles = new Map([
     ['/', 'index.html'],
     ['/index.html', 'index.html'],

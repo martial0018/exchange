@@ -97,3 +97,41 @@ CREATE TABLE IF NOT EXISTS support_messages (
 
 CREATE INDEX IF NOT EXISTS support_messages_thread_created_idx
     ON support_messages (thread_id, created_at, id);
+
+CREATE TABLE IF NOT EXISTS identity_verification_submissions (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    document_type TEXT NOT NULL CHECK (document_type IN ('Identity card', 'Driver''s license', 'Passport')),
+    document_mime_type TEXT NOT NULL CHECK (document_mime_type IN ('image/jpeg', 'image/png', 'image/webp')),
+    document_image BYTEA NOT NULL,
+    document_back_mime_type TEXT CHECK (document_back_mime_type IS NULL OR document_back_mime_type IN ('image/jpeg', 'image/png', 'image/webp')),
+    document_back_image BYTEA,
+    face_mime_type TEXT NOT NULL CHECK (face_mime_type IN ('image/jpeg', 'image/png', 'image/webp')),
+    face_image BYTEA NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    reviewed_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    reviewed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CHECK ((document_back_image IS NULL) = (document_back_mime_type IS NULL))
+);
+
+CREATE INDEX IF NOT EXISTS identity_verification_submissions_created_at_idx
+    ON identity_verification_submissions (created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS identity_verification_submissions_user_created_idx
+    ON identity_verification_submissions (user_id, created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS identity_verification_submissions_status_created_idx
+    ON identity_verification_submissions (status, created_at DESC, id DESC);
+
+CREATE TABLE IF NOT EXISTS identity_verification_upload_chunks (
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    upload_id TEXT NOT NULL CHECK (upload_id ~ '^[0-9a-f-]{36}$'),
+    chunk_index INTEGER NOT NULL CHECK (chunk_index >= 0),
+    chunk_count INTEGER NOT NULL CHECK (chunk_count BETWEEN 1 AND 3),
+    mime_type TEXT NOT NULL CHECK (mime_type IN ('image/jpeg', 'image/png', 'image/webp')),
+    chunk_data BYTEA NOT NULL CHECK (octet_length(chunk_data) BETWEEN 1 AND 2500000),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, upload_id, chunk_index)
+);
+
+CREATE INDEX IF NOT EXISTS identity_verification_upload_chunks_created_at_idx
+    ON identity_verification_upload_chunks (created_at);

@@ -206,6 +206,58 @@
    border-radius: 14px;
    background: linear-gradient(135deg, rgba(240, 185, 11, 0.09), #1e2329 54%);
   }
+  .profile-verification-card {
+   display: flex;
+   margin-bottom: 24px;
+   padding: 16px;
+   align-items: center;
+   justify-content: space-between;
+   gap: 16px;
+   border: 1px solid #2b3139;
+   border-radius: 14px;
+   background: #1e2329;
+  }
+  .profile-verification-copy {
+   display: flex;
+   min-width: 0;
+   align-items: flex-start;
+   gap: 12px;
+  }
+  .profile-verification-icon {
+   display: flex;
+   width: 36px;
+   height: 36px;
+   flex: 0 0 auto;
+   align-items: center;
+   justify-content: center;
+   border-radius: 10px;
+   background: rgba(240, 185, 11, 0.12);
+   color: #f0b90b;
+  }
+  .profile-verification-status {
+   display: inline-flex;
+   margin-top: 7px;
+   padding: 3px 8px;
+   border-radius: 999px;
+   background: rgba(132, 142, 156, 0.15);
+   color: #848e9c;
+   font-size: 10px;
+   font-weight: 600;
+  }
+  .profile-verification-action {
+   flex: 0 0 auto;
+   padding: 8px 12px;
+   border: 1px solid #3a414a;
+   border-radius: 8px;
+   color: #eaecef;
+   font-size: 11px;
+   font-weight: 600;
+  }
+  .profile-verification-action:hover,
+  .profile-verification-action:focus-visible {
+   border-color: #f0b90b;
+   color: #f0b90b;
+  }
   .profile-snapshot-heading {
    display: flex;
    margin-bottom: 14px;
@@ -2383,7 +2435,7 @@
     <span id="headerUSDTBalance" class="font-mono font-semibold">$0.00 USD</span>
    </button>
    
-   <button onclick="openModal('depositModal')" class="hidden md:block bg-binanceYellow hover:bg-binanceYellowHover text-binanceBg font-bold px-3 py-1.5 rounded text-xs transition">
+   <button onclick="openAddFundsPage()" class="hidden md:block bg-binanceYellow hover:bg-binanceYellowHover text-binanceBg font-bold px-3 py-1.5 rounded text-xs transition">
     Deposit
    </button>
    <button onclick="openModal('withdrawModal')" class="hidden lg:block bg-binanceHover hover:bg-opacity-80 text-white font-semibold px-3 py-1.5 rounded text-xs transition border border-binanceBorder">
@@ -2752,7 +2804,7 @@
       <span id="formAvailLabel">Avail Balance:</span>
       <span class="flex items-center gap-1.5">
        <span id="formAvailBalance" class="text-white font-mono">0.00 USDT</span>
-       <button type="button" onclick="openModal('depositModal')" aria-label="Add funds" class="font-bold text-binanceYellow">+</button>
+       <button type="button" onclick="openAddFundsPage()" aria-label="Add funds" class="font-bold text-binanceYellow">+</button>
       </span>
      </div>
 
@@ -2973,7 +3025,7 @@
        <div class="mt-2 flex items-center justify-between gap-2">
         <div id="homePortfolioValue" class="hidden font-mono text-2xl font-bold tracking-tight text-white sm:text-3xl md:block">—</div>
         <div id="homePortfolioBtcValue" class="font-mono text-2xl font-bold tracking-tight text-white sm:text-3xl md:hidden">—</div>
-        <button type="button" onclick="openModal('depositModal')" class="shrink-0 rounded-lg bg-binanceYellow px-3 py-2 text-[10px] font-bold text-binanceBg hover:bg-binanceYellowHover md:hidden">Add funds</button>
+        <button type="button" onclick="openAddFundsPage()" class="shrink-0 rounded-lg bg-binanceYellow px-3 py-2 text-[10px] font-bold text-binanceBg hover:bg-binanceYellowHover md:hidden">Add funds</button>
        </div>
        <div id="homePortfolioFiat" class="mt-1 text-[11px] text-binanceMuted">≈ — USD</div>
        <div class="mt-3 flex flex-wrap items-center gap-2">
@@ -3073,7 +3125,7 @@
    </section>
 
    <div class="hidden grid-cols-2 gap-3 sm:grid sm:grid-cols-4">
-    <button type="button" onclick="openModal('depositModal')" class="group flex items-center gap-3 rounded-xl border border-binanceBorder bg-binanceCard p-4 text-left hover:border-binanceYellow">
+    <button type="button" onclick="openAddFundsPage()" class="group flex items-center gap-3 rounded-xl border border-binanceBorder bg-binanceCard p-4 text-left hover:border-binanceYellow">
      <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-binanceYellow/10 text-binanceYellow"><i data-lucide="arrow-down-to-line" class="h-4 w-4"></i></span>
      <span><span class="block text-xs font-bold text-white">Deposit</span><span class="mt-1 block text-[10px] text-binanceMuted">Add funds</span></span>
     </button>
@@ -3520,7 +3572,7 @@
    </section>
 
    <section id="mobileAssetsActions" class="grid grid-cols-4 gap-2 py-1" aria-label="Wallet actions">
-    <button type="button" onclick="openModal('depositModal')" class="flex min-w-0 flex-col items-center gap-2">
+    <button type="button" onclick="openAddFundsPage()" class="flex min-w-0 flex-col items-center gap-2">
      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-binanceCard text-binanceYellow"><i data-lucide="arrow-down-to-line" class="h-5 w-5"></i></span>
      <span class="text-[10px] font-medium text-binanceText">Add Funds</span>
     </button>
@@ -3622,7 +3674,7 @@
      <p id="assetsPageDescription" class="mt-1 max-w-2xl text-xs leading-relaxed text-binanceMuted">Track your Spot balances, their estimated USDT value, and recent activity.</p>
     </div>
     <div id="assetsPageActions" class="flex flex-wrap gap-2">
-     <button id="assetsPageDepositButton" type="button" onclick="openModal('depositModal')" class="rounded-lg bg-binanceYellow px-4 py-2.5 text-xs font-bold text-binanceBg">Deposit</button>
+     <button id="assetsPageDepositButton" type="button" onclick="openAddFundsPage()" class="rounded-lg bg-binanceYellow px-4 py-2.5 text-xs font-bold text-binanceBg">Deposit</button>
      <button id="assetsPageWithdrawButton" type="button" onclick="openModal('withdrawModal')" class="rounded-lg border border-binanceBorder bg-binanceCard px-4 py-2.5 text-xs font-semibold text-white">Withdraw</button>
      <button type="button" onclick="openWalletTransferModal('spot')" class="rounded-lg border border-binanceBorder bg-binanceCard px-4 py-2.5 text-xs font-semibold text-white">Transfer</button>
      <button id="assetsPageConvertButton" type="button" onclick="openConvertPage()" class="rounded-lg border border-binanceBorder bg-binanceCard px-4 py-2.5 text-xs font-semibold text-white">Convert</button>
@@ -3710,6 +3762,18 @@
       <button type="button" class="profile-share-button" onclick="shareProfile()" aria-label="Share profile"><i data-lucide="share-2" class="h-5 w-5"></i></button>
      </div>
 
+     <section class="profile-verification-card" aria-labelledby="profileVerificationTitle">
+      <div class="profile-verification-copy">
+       <span class="profile-verification-icon" aria-hidden="true"><i data-lucide="shield-check" class="h-5 w-5"></i></span>
+       <div>
+        <h2 id="profileVerificationTitle" class="text-sm font-semibold text-white">Identity verification</h2>
+        <span id="profileVerificationStatus" class="profile-verification-status">Not started</span>
+        <p id="profileVerificationDescription" class="mt-2 text-[11px] leading-relaxed text-binanceMuted">Submit a government-issued ID and face photo for administrator review.</p>
+       </div>
+      </div>
+      <button id="profileVerificationAction" type="button" class="profile-verification-action" onclick="openIdentityVerification()">Start</button>
+     </section>
+
      <section class="profile-snapshot" aria-labelledby="profileSnapshotTitle">
       <div class="profile-snapshot-heading">
        <h2 id="profileSnapshotTitle">Account activity</h2>
@@ -3731,7 +3795,7 @@
        <h2 id="profileToolsTitle">Quick actions</h2>
       </div>
       <div class="profile-tools-grid" aria-label="Account shortcuts">
-       <button type="button" class="profile-tool-node" onclick="openModal('depositModal')"><span class="profile-tool-icon yellow"><i data-lucide="circle-plus"></i></span><span class="profile-tool-label">Deposit</span></button>
+       <button type="button" class="profile-tool-node" onclick="openAddFundsPage()"><span class="profile-tool-icon yellow"><i data-lucide="circle-plus"></i></span><span class="profile-tool-label">Deposit</span></button>
        <button type="button" class="profile-tool-node" onclick="openModal('withdrawModal')"><span class="profile-tool-icon"><i data-lucide="circle-minus"></i></span><span class="profile-tool-label">Withdraw</span></button>
        <button type="button" class="profile-tool-node" onclick="openMobileAssets()"><span class="profile-tool-icon"><i data-lucide="wallet"></i></span><span class="profile-tool-label">Assets</span></button>
        <button type="button" class="profile-tool-node" onclick="openTradePage(); switchBottomTab('open')"><span class="profile-tool-icon"><i data-lucide="chart-candlestick"></i></span><span class="profile-tool-label">Orders</span></button>
@@ -3890,6 +3954,22 @@
    <button type="button" onclick="closeModal('marketQrScannerModal')" class="w-full rounded-lg border border-binanceBorder py-2.5 text-xs font-semibold text-white hover:bg-binanceHover">Cancel</button>
   </div>
  </div>
+
+ <section id="addFundsPage" class="fixed inset-0 z-[90] hidden min-h-0 flex-col bg-binanceBg" role="dialog" aria-modal="true" aria-labelledby="addFundsTitle">
+  <header class="flex shrink-0 items-center gap-3 border-b border-binanceBorder px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+   <button type="button" onclick="closeAddFundsPage()" aria-label="Back" class="flex h-10 w-10 shrink-0 items-center justify-start text-white"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
+   <h1 id="addFundsTitle" class="text-base font-semibold text-white">Select asset to deposit</h1>
+  </header>
+  <div class="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+   <label class="mt-4 flex shrink-0 items-center gap-2 rounded-lg border border-binanceBorder bg-binanceCard px-3 py-3 text-binanceMuted">
+    <i data-lucide="search" class="h-4 w-4 shrink-0"></i>
+    <span class="sr-only">Search assets</span>
+    <input id="addFundsSearch" type="search" oninput="renderAddFundsAssets()" placeholder="Search asset" class="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-binanceMuted">
+   </label>
+   <p class="mt-4 text-[10px] font-medium uppercase tracking-wide text-binanceMuted">Available deposit assets</p>
+   <div id="addFundsAssetList" class="mt-2 min-h-0 flex-1 divide-y divide-binanceBorder overflow-y-auto" aria-live="polite"></div>
+  </div>
+ </section>
 
  <!-- DEPOSIT MODAL -->
  <div id="depositModal" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 p-4">
@@ -4477,6 +4557,7 @@
 
    <nav id="adminMobileNav" class="admin-mobile-nav hidden flex gap-2 overflow-x-auto md:hidden" aria-label="Admin sections">
     <button type="button" onclick="scrollToAdminSection('adminUsersSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Users</button>
+   <button type="button" onclick="scrollToAdminSection('adminIdentityVerificationsSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Identity checks</button>
     <button type="button" onclick="scrollToAdminSection('adminSupportSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Support</button>
     <button type="button" onclick="scrollToAdminSection('adminWalletSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Wallets</button>
     <button type="button" onclick="scrollToAdminSection('adminDepositsSection')" class="shrink-0 rounded-full border border-binanceBorder bg-binanceBg px-3 py-2 text-[10px] font-semibold text-binanceText">Deposit addresses</button>
@@ -4540,6 +4621,14 @@
       </table>
      </div>
     </div>
+
+    <section id="adminIdentityVerificationsSection" data-admin-section="identity-verifications" class="mb-5 rounded-lg border border-binanceBorder bg-binanceBg p-4">
+     <div class="mb-4 flex items-center justify-between gap-3">
+      <div><h4 class="text-sm font-bold text-white">Identity verification submissions</h4><p id="adminIdentityVerificationsStatus" class="mt-1 text-[10px] text-binanceMuted" role="status">Loading submissions…</p></div>
+      <button type="button" onclick="loadAdminIdentityVerifications()" class="rounded border border-binanceBorder px-3 py-2 text-[10px] font-semibold text-binanceText hover:bg-binanceHover">Refresh</button>
+     </div>
+     <div id="adminIdentityVerificationsList" class="space-y-3"></div>
+    </section>
 
     <section id="adminSupportSection" data-admin-section="support" class="mb-5 rounded-lg border border-binanceBorder bg-binanceBg p-4">
      <div class="mb-4 flex items-center justify-between gap-3">
@@ -4734,6 +4823,65 @@
     <textarea id="supportChatInput" rows="2" maxlength="2000" required placeholder="Write a message…" class="min-w-0 flex-1 resize-none rounded-lg border border-binanceBorder bg-binanceBg p-3 text-xs text-white outline-none focus:border-binanceYellow"></textarea>
     <button type="submit" aria-label="Send message to support" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-binanceYellow text-binanceBg hover:bg-binanceYellowHover"><i data-lucide="send" class="h-4 w-4"></i></button>
    </form>
+  </div>
+ </div>
+
+ <div id="identityVerificationModal" class="fixed inset-0 z-[80] hidden flex items-center justify-center overflow-y-auto bg-black/80 p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="identityVerificationTitle" onclick="if (event.target === this) closeIdentityVerification()">
+  <div class="my-auto w-full max-w-md rounded-xl border border-binanceBorder bg-binanceCard p-4 shadow-2xl sm:p-6">
+   <div class="mb-5 flex items-start justify-between gap-4">
+    <div>
+     <p class="text-[9px] font-bold uppercase tracking-[0.16em] text-binanceYellow">Identity check</p>
+     <h2 id="identityVerificationTitle" class="mt-1 text-base font-bold text-white">Verify your identity</h2>
+     <p id="identityVerificationStepLabel" class="mt-1 text-[11px] text-binanceMuted">Step 1 of 2 · Choose a document</p>
+    </div>
+    <button type="button" onclick="closeIdentityVerification()" aria-label="Close identity verification" class="text-xl leading-none text-binanceMuted hover:text-white">&times;</button>
+   </div>
+   <div class="mb-5 h-1 overflow-hidden rounded-full bg-binanceHover" aria-hidden="true">
+    <div id="identityVerificationProgress" class="h-full w-1/2 rounded-full bg-binanceYellow transition-all"></div>
+   </div>
+   <div id="identityDocumentStep">
+    <label for="identityDocumentType" class="mb-2 block text-xs font-semibold text-white">Document type</label>
+    <select id="identityDocumentType" class="mb-4 w-full rounded-lg border border-binanceBorder bg-binanceBg p-3 text-xs text-white outline-none focus:border-binanceYellow" onchange="updateIdentityDocumentButton()">
+     <option value="">Choose an option</option>
+     <option value="Identity card">Identity card</option>
+     <option value="Driver's license">Driver's license</option>
+     <option value="Passport">Passport</option>
+    </select>
+    <label id="identityDocumentFrontLabel" for="identityDocumentFile" class="mb-2 block text-xs font-semibold text-white">Upload the front of your document</label>
+    <input id="identityDocumentFile" type="file" accept="image/jpeg,image/png,image/webp" class="block w-full rounded-lg border border-binanceBorder bg-binanceBg p-3 text-[11px] text-binanceMuted file:mr-3 file:rounded file:border-0 file:bg-binanceHover file:px-3 file:py-2 file:text-[10px] file:font-semibold file:text-white" onchange="handleIdentityDocumentFile(event)">
+    <div id="identityDocumentBackField" class="mt-4 hidden">
+     <label for="identityDocumentBackFile" class="mb-2 block text-xs font-semibold text-white">Upload the back of your document</label>
+     <input id="identityDocumentBackFile" type="file" accept="image/jpeg,image/png,image/webp" class="block w-full rounded-lg border border-binanceBorder bg-binanceBg p-3 text-[11px] text-binanceMuted file:mr-3 file:rounded file:border-0 file:bg-binanceHover file:px-3 file:py-2 file:text-[10px] file:font-semibold file:text-white" onchange="handleIdentityDocumentBackFile(event)">
+     <img id="identityDocumentBackPreview" alt="Selected back of document preview" class="mt-3 hidden max-h-48 w-full rounded-lg border border-binanceBorder object-contain">
+    </div>
+    <p id="identityDocumentUploadHint" class="mt-2 text-[10px] leading-relaxed text-binanceMuted">Use a JPG, PNG, or WebP image up to 5 MB.</p>
+    <img id="identityDocumentPreview" alt="Selected front of document preview" class="mt-4 hidden max-h-48 w-full rounded-lg border border-binanceBorder object-contain">
+    <p id="identityDocumentError" class="mt-2 hidden text-[10px] text-binanceRed" role="alert"></p>
+    <button id="identityDocumentContinue" type="button" disabled onclick="continueIdentityVerification()" class="mt-5 w-full rounded-lg bg-binanceYellow px-4 py-3 text-xs font-bold text-binanceBg disabled:cursor-not-allowed disabled:opacity-40">Continue to face check</button>
+   </div>
+   <div id="identityFaceStep" class="hidden">
+    <p class="mb-4 text-xs leading-relaxed text-binanceMuted">Take a selfie or choose a clear face photo. Your document photos and selfie will be sent to the administrator for review.</p>
+    <div class="overflow-hidden rounded-lg border border-binanceBorder bg-binanceBg">
+     <video id="identityFaceVideo" autoplay playsinline muted class="hidden max-h-64 w-full object-cover"></video>
+     <img id="identityFacePreview" alt="Face-check photo preview" class="hidden max-h-64 w-full object-contain">
+     <div id="identityFacePlaceholder" class="flex min-h-40 flex-col items-center justify-center gap-2 text-binanceMuted">
+      <i data-lucide="scan-face" class="h-8 w-8"></i>
+      <span class="text-[10px]">Camera preview appears here</span>
+     </div>
+    </div>
+    <div class="mt-3 grid grid-cols-2 gap-2">
+     <button id="identityStartCamera" type="button" onclick="startIdentityFaceCamera()" class="rounded-lg border border-binanceBorder px-3 py-2.5 text-[10px] font-semibold text-white hover:border-binanceYellow">Use camera</button>
+     <button id="identityCaptureFace" type="button" disabled onclick="captureIdentityFace()" class="rounded-lg border border-binanceBorder px-3 py-2.5 text-[10px] font-semibold text-white disabled:opacity-40">Capture selfie</button>
+    </div>
+    <label for="identityFaceFile" class="mt-3 block cursor-pointer rounded-lg border border-binanceBorder px-3 py-2.5 text-center text-[10px] font-semibold text-white hover:border-binanceYellow">Or choose a face photo</label>
+    <input id="identityFaceFile" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only" onchange="handleIdentityFaceFile(event)">
+    <p id="identityFaceError" class="mt-3 hidden text-[10px] text-binanceRed" role="alert"></p>
+    <div class="mt-5 grid grid-cols-2 gap-2">
+     <button type="button" onclick="returnToIdentityDocumentStep()" class="rounded-lg border border-binanceBorder px-4 py-3 text-xs font-semibold text-white">Back</button>
+     <button id="identityCompleteButton" type="button" disabled onclick="completeIdentityVerification()" class="rounded-lg bg-binanceYellow px-4 py-3 text-xs font-bold text-binanceBg disabled:cursor-not-allowed disabled:opacity-40">Submit for review</button>
+    </div>
+   </div>
+   <p class="mt-5 rounded-lg border border-binanceBorder bg-binanceBg p-3 text-[10px] leading-relaxed text-binanceMuted">Your photos are sent to the administrator and stored for review. This flow does not automatically verify your identity or match your face to the document.</p>
   </div>
  </div>
 
@@ -5227,7 +5375,7 @@
     if (state.currentUser) openProfilePage();
     else openAuthModal('login');
    } else if (action === 'assets') openMobileAssets();
-   else if (action === 'deposit') openModal('depositModal');
+   else if (action === 'deposit') openAddFundsPage();
    else if (action === 'convert') openConvertPage();
    else if (action === 'trade') openMobileTrade();
    else if (action === 'support') openSupportChat();
@@ -7557,6 +7705,430 @@
    feedback.classList.toggle('text-binanceRed', !success);
   }
 
+  let identityVerificationStatus = 'not_submitted';
+  let identityDocumentPreviewUrl = null;
+  let identityDocumentBackPreviewUrl = null;
+  let identityFacePreviewUrl = null;
+  let identityFaceCameraStream = null;
+  let identityFaceCaptured = false;
+  let identityFaceFile = null;
+  let identityVerificationStatusUserId = null;
+  let identityVerificationStatusRequestActive = false;
+  let adminIdentityVerificationReviewActive = false;
+
+  function updateIdentityVerificationStatus() {
+   const status = document.getElementById('profileVerificationStatus');
+   const description = document.getElementById('profileVerificationDescription');
+   const action = document.getElementById('profileVerificationAction');
+   if (!status || !description || !action) return;
+   const statusCopy = {
+    not_submitted: {
+     label: 'Not submitted',
+     description: 'Submit a government-issued ID and face photo for administrator review.',
+     action: 'Start',
+     disabled: false
+    },
+    pending: {
+     label: 'Under review',
+     description: 'Your documents were submitted and are waiting for administrator approval.',
+     action: 'Under review',
+     disabled: true
+    },
+    approved: {
+     label: 'Verified',
+     description: 'Your identity verification was approved by the administrator.',
+     action: 'Verified',
+     disabled: true
+    },
+    rejected: {
+     label: 'Rejected',
+     description: 'Your submission was rejected. Submit new photos to request another review.',
+     action: 'Resubmit',
+     disabled: false
+    }
+   }[identityVerificationStatus] || {
+    label: 'Not submitted',
+    description: 'Submit a government-issued ID and face photo for administrator review.',
+    action: 'Start',
+    disabled: false
+   };
+   status.textContent = statusCopy.label;
+   description.textContent = statusCopy.description;
+   action.textContent = statusCopy.action;
+   action.disabled = statusCopy.disabled;
+  }
+
+  async function loadIdentityVerificationStatus() {
+   const userId = String(state.currentUser?.id || '');
+   if (!userId || identityVerificationStatusRequestActive) return;
+   if (identityVerificationStatusUserId !== userId) {
+    identityVerificationStatusUserId = userId;
+    identityVerificationStatus = 'not_submitted';
+    updateIdentityVerificationStatus();
+   }
+   identityVerificationStatusRequestActive = true;
+   try {
+    const { submission } = await requestAuthApi('/api/auth/identity-verification', { method: 'GET', headers: {} });
+    if (String(state.currentUser?.id || '') !== userId) return;
+    identityVerificationStatus = submission?.status || 'not_submitted';
+    updateIdentityVerificationStatus();
+   } catch (error) {
+    console.error('Could not load identity verification status.', error);
+   } finally {
+    identityVerificationStatusRequestActive = false;
+   }
+  }
+
+  function openIdentityVerification() {
+   resetIdentityVerification();
+   openModal('identityVerificationModal');
+   if (window.lucide) window.lucide.createIcons();
+  }
+
+  function closeIdentityVerification() {
+   stopIdentityFaceCamera();
+   closeModal('identityVerificationModal');
+  }
+
+  function stopIdentityFaceCamera() {
+   if (identityFaceCameraStream) {
+    identityFaceCameraStream.getTracks().forEach((track) => track.stop());
+    identityFaceCameraStream = null;
+   }
+   const video = document.getElementById('identityFaceVideo');
+   if (video) video.srcObject = null;
+  }
+
+  function clearIdentityFaceSelection() {
+   stopIdentityFaceCamera();
+   if (identityFacePreviewUrl) {
+    URL.revokeObjectURL(identityFacePreviewUrl);
+    identityFacePreviewUrl = null;
+   }
+   identityFaceCaptured = false;
+   identityFaceFile = null;
+   const video = document.getElementById('identityFaceVideo');
+   const preview = document.getElementById('identityFacePreview');
+   const placeholder = document.getElementById('identityFacePlaceholder');
+   const fileInput = document.getElementById('identityFaceFile');
+   if (video) video.classList.add('hidden');
+   if (preview) {
+    preview.removeAttribute('src');
+    preview.classList.add('hidden');
+   }
+   if (placeholder) placeholder.classList.remove('hidden');
+   if (fileInput) fileInput.value = '';
+   document.getElementById('identityCaptureFace').disabled = true;
+   document.getElementById('identityCompleteButton').disabled = true;
+   document.getElementById('identityFaceError').classList.add('hidden');
+  }
+
+  function resetIdentityVerification() {
+   clearIdentityFaceSelection();
+   [identityDocumentPreviewUrl, identityDocumentBackPreviewUrl].forEach((previewUrl) => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+   });
+   identityDocumentPreviewUrl = null;
+   identityDocumentBackPreviewUrl = null;
+   document.getElementById('identityDocumentType').value = '';
+   document.getElementById('identityDocumentFile').value = '';
+   document.getElementById('identityDocumentBackFile').value = '';
+   document.getElementById('identityDocumentBackPreview').removeAttribute('src');
+   document.getElementById('identityDocumentBackPreview').classList.add('hidden');
+   document.getElementById('identityDocumentBackField').classList.add('hidden');
+   document.getElementById('identityDocumentFrontLabel').textContent = 'Upload the front of your document';
+   document.getElementById('identityDocumentUploadHint').textContent = 'Use a JPG, PNG, or WebP image up to 5 MB.';
+   document.getElementById('identityDocumentPreview').removeAttribute('src');
+   document.getElementById('identityDocumentPreview').classList.add('hidden');
+   document.getElementById('identityDocumentError').classList.add('hidden');
+   document.getElementById('identityDocumentContinue').disabled = true;
+   document.getElementById('identityDocumentStep').classList.remove('hidden');
+   document.getElementById('identityFaceStep').classList.add('hidden');
+   document.getElementById('identityStartCamera').classList.remove('hidden');
+   document.getElementById('identityVerificationStepLabel').textContent = 'Step 1 of 2 · Choose a document';
+   document.getElementById('identityVerificationProgress').classList.replace('w-full', 'w-1/2');
+  }
+
+  function updateIdentityDocumentButton() {
+   const documentType = document.getElementById('identityDocumentType').value;
+   const hasFront = !!document.getElementById('identityDocumentFile').files?.[0];
+   const hasBack = !!document.getElementById('identityDocumentBackFile').files?.[0];
+   const needsBack = ['Identity card', "Driver's license"].includes(documentType);
+   document.getElementById('identityDocumentBackField').classList.toggle('hidden', !needsBack);
+   document.getElementById('identityDocumentFrontLabel').textContent = needsBack
+    ? 'Upload the front of your document'
+    : 'Upload a clear photo of your document';
+   document.getElementById('identityDocumentUploadHint').textContent = needsBack
+    ? 'Upload both sides as JPG, PNG, or WebP images up to 5 MB each.'
+    : 'Use a JPG, PNG, or WebP image up to 5 MB.';
+   document.getElementById('identityDocumentContinue').disabled =
+    !documentType || !hasFront || (needsBack && !hasBack);
+  }
+
+  function handleIdentityDocumentFile(event) {
+   handleIdentityDocumentImage(event, 'identityDocumentPreview');
+  }
+
+  function handleIdentityDocumentBackFile(event) {
+   handleIdentityDocumentImage(event, 'identityDocumentBackPreview');
+  }
+
+  function handleIdentityDocumentImage(event, previewId) {
+   const file = event.target.files?.[0];
+   const error = document.getElementById('identityDocumentError');
+   error.classList.add('hidden');
+   const isBack = previewId === 'identityDocumentBackPreview';
+   const currentPreviewUrl = isBack ? identityDocumentBackPreviewUrl : identityDocumentPreviewUrl;
+   if (currentPreviewUrl) {
+    URL.revokeObjectURL(currentPreviewUrl);
+    if (isBack) identityDocumentBackPreviewUrl = null;
+    else identityDocumentPreviewUrl = null;
+   }
+   const preview = document.getElementById(previewId);
+   preview.removeAttribute('src');
+   preview.classList.add('hidden');
+   if (!file) {
+    updateIdentityDocumentButton();
+    return;
+   }
+   if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+    error.textContent = 'Choose a JPG, PNG, or WebP image no larger than 5 MB.';
+    error.classList.remove('hidden');
+    event.target.value = '';
+    updateIdentityDocumentButton();
+    return;
+   }
+   const previewUrl = URL.createObjectURL(file);
+   if (isBack) identityDocumentBackPreviewUrl = previewUrl;
+   else identityDocumentPreviewUrl = previewUrl;
+   preview.src = previewUrl;
+   preview.classList.remove('hidden');
+   updateIdentityDocumentButton();
+  }
+
+  function continueIdentityVerification() {
+   const documentType = document.getElementById('identityDocumentType').value;
+   const hasFront = !!document.getElementById('identityDocumentFile').files?.[0];
+   const hasBack = !!document.getElementById('identityDocumentBackFile').files?.[0];
+   if (!documentType || !hasFront || (['Identity card', "Driver's license"].includes(documentType) && !hasBack)) {
+    notify('Choose the document type and required document photos to continue');
+    return;
+   }
+   document.getElementById('identityDocumentStep').classList.add('hidden');
+   document.getElementById('identityFaceStep').classList.remove('hidden');
+   document.getElementById('identityVerificationStepLabel').textContent = 'Step 2 of 2 · Face check';
+   document.getElementById('identityVerificationProgress').classList.replace('w-1/2', 'w-full');
+  }
+
+  async function startIdentityFaceCamera() {
+   const error = document.getElementById('identityFaceError');
+   error.classList.add('hidden');
+   clearIdentityFaceSelection();
+   if (!navigator.mediaDevices?.getUserMedia) {
+    error.textContent = 'Camera access is unavailable. Choose a face photo instead.';
+    error.classList.remove('hidden');
+    return;
+   }
+   try {
+    identityFaceCameraStream = await navigator.mediaDevices.getUserMedia({
+     audio: false,
+     video: { facingMode: 'user' }
+    });
+    const video = document.getElementById('identityFaceVideo');
+    video.srcObject = identityFaceCameraStream;
+    video.classList.remove('hidden');
+    document.getElementById('identityFacePreview').classList.add('hidden');
+    document.getElementById('identityFacePlaceholder').classList.add('hidden');
+    document.getElementById('identityStartCamera').classList.add('hidden');
+    document.getElementById('identityCaptureFace').disabled = false;
+    await video.play();
+   } catch (cameraError) {
+    stopIdentityFaceCamera();
+    document.getElementById('identityFaceVideo').classList.add('hidden');
+    document.getElementById('identityFacePlaceholder').classList.remove('hidden');
+    document.getElementById('identityStartCamera').classList.remove('hidden');
+    document.getElementById('identityCaptureFace').disabled = true;
+    console.error('Could not start the identity verification camera.', cameraError);
+    error.textContent = cameraError.name === 'NotAllowedError'
+     ? 'Camera permission was denied. Choose a face photo or allow camera access.'
+     : 'Could not open the camera. Choose a face photo instead.';
+    error.classList.remove('hidden');
+   }
+  }
+
+  async function captureIdentityFace() {
+   const video = document.getElementById('identityFaceVideo');
+   if (!video.videoWidth || !video.videoHeight) {
+    document.getElementById('identityFaceError').textContent = 'Wait for the camera preview, then try again.';
+    document.getElementById('identityFaceError').classList.remove('hidden');
+    return;
+   }
+   const canvas = document.createElement('canvas');
+   const scale = Math.min(1, 640 / video.videoWidth);
+   canvas.width = Math.round(video.videoWidth * scale);
+   canvas.height = Math.round(video.videoHeight * scale);
+   const context = canvas.getContext('2d');
+   if (!context) {
+    const error = document.getElementById('identityFaceError');
+    error.textContent = 'Could not capture the selfie. Choose a face photo instead.';
+    error.classList.remove('hidden');
+    return;
+   }
+   context.drawImage(video, 0, 0, canvas.width, canvas.height);
+   let capturedImage;
+   try {
+    capturedImage = await new Promise((resolve, reject) => {
+     canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('The camera did not return an image.')), 'image/jpeg', 0.85);
+    });
+   } catch (captureError) {
+    console.error('Could not encode the identity selfie.', captureError);
+    const error = document.getElementById('identityFaceError');
+    error.textContent = 'Could not capture the selfie. Choose a face photo instead.';
+    error.classList.remove('hidden');
+    return;
+   }
+   if (capturedImage.size > 5 * 1024 * 1024) {
+    const error = document.getElementById('identityFaceError');
+    error.textContent = 'The captured selfie is too large. Choose a smaller face photo instead.';
+    error.classList.remove('hidden');
+    return;
+   }
+   identityFaceFile = new File([capturedImage], 'identity-selfie.jpg', { type: 'image/jpeg' });
+   if (identityFacePreviewUrl) URL.revokeObjectURL(identityFacePreviewUrl);
+   identityFacePreviewUrl = URL.createObjectURL(capturedImage);
+   const preview = document.getElementById('identityFacePreview');
+   preview.src = identityFacePreviewUrl;
+   preview.classList.remove('hidden');
+   video.classList.add('hidden');
+   stopIdentityFaceCamera();
+   document.getElementById('identityFacePlaceholder').classList.add('hidden');
+   document.getElementById('identityStartCamera').classList.remove('hidden');
+   document.getElementById('identityCaptureFace').disabled = true;
+   identityFaceCaptured = true;
+   document.getElementById('identityCompleteButton').disabled = false;
+  }
+
+  function handleIdentityFaceFile(event) {
+   const file = event.target.files?.[0];
+   const error = document.getElementById('identityFaceError');
+   error.classList.add('hidden');
+   if (!file) return;
+   if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+    clearIdentityFaceSelection();
+    error.textContent = 'Choose a JPG, PNG, or WebP image no larger than 5 MB.';
+    error.classList.remove('hidden');
+    event.target.value = '';
+    return;
+   }
+   stopIdentityFaceCamera();
+   if (identityFacePreviewUrl) URL.revokeObjectURL(identityFacePreviewUrl);
+   identityFaceFile = file;
+   identityFacePreviewUrl = URL.createObjectURL(file);
+   const preview = document.getElementById('identityFacePreview');
+   preview.src = identityFacePreviewUrl;
+   preview.classList.remove('hidden');
+   document.getElementById('identityFaceVideo').classList.add('hidden');
+   document.getElementById('identityFacePlaceholder').classList.add('hidden');
+   document.getElementById('identityStartCamera').classList.remove('hidden');
+   document.getElementById('identityCaptureFace').disabled = true;
+   document.getElementById('identityCompleteButton').disabled = false;
+   identityFaceCaptured = true;
+  }
+
+  function returnToIdentityDocumentStep() {
+   clearIdentityFaceSelection();
+   document.getElementById('identityFaceStep').classList.add('hidden');
+   document.getElementById('identityDocumentStep').classList.remove('hidden');
+   document.getElementById('identityVerificationStepLabel').textContent = 'Step 1 of 2 · Choose a document';
+   document.getElementById('identityVerificationProgress').classList.replace('w-full', 'w-1/2');
+   document.getElementById('identityStartCamera').classList.remove('hidden');
+  }
+
+  async function blobToBase64(blob) {
+   return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+     const result = typeof reader.result === 'string' ? reader.result : '';
+     const separator = result.indexOf(',');
+     if (separator < 0) {
+      reject(new Error('Could not read the selected image.'));
+      return;
+     }
+     resolve(result.slice(separator + 1));
+    };
+    reader.onerror = () => reject(reader.error || new Error('Could not read the selected image.'));
+    reader.readAsDataURL(blob);
+   });
+  }
+
+  async function uploadIdentityImage(file) {
+   const uploadId = crypto.randomUUID();
+   const chunkSize = 2_500_000;
+   const chunkCount = Math.ceil(file.size / chunkSize);
+   for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex += 1) {
+    const chunk = file.slice(chunkIndex * chunkSize, Math.min(file.size, (chunkIndex + 1) * chunkSize));
+    const chunkData = await blobToBase64(chunk);
+    await requestAuthApi('/api/auth/identity-verification', {
+     method: 'POST',
+     body: JSON.stringify({
+      action: 'upload_chunk',
+      uploadId,
+      chunkIndex,
+      chunkCount,
+      mimeType: file.type,
+      chunkData
+     })
+    });
+   }
+   return uploadId;
+  }
+
+  async function completeIdentityVerification() {
+   const documentType = document.getElementById('identityDocumentType').value;
+   const documentFile = document.getElementById('identityDocumentFile').files?.[0];
+   const requiresBack = ['Identity card', "Driver's license"].includes(documentType);
+   const documentBackFile = requiresBack
+    ? document.getElementById('identityDocumentBackFile').files?.[0] || null
+    : null;
+   if (!identityFaceCaptured || !documentFile || !identityFaceFile || (requiresBack && !documentBackFile)) {
+    notify('Choose the required document sides and face photo before submitting');
+    return;
+   }
+   const button = document.getElementById('identityCompleteButton');
+   const error = document.getElementById('identityFaceError');
+   button.disabled = true;
+   button.textContent = 'Uploading…';
+   error.classList.add('hidden');
+   try {
+    const documentUploadId = await uploadIdentityImage(documentFile);
+    button.textContent = documentBackFile ? 'Uploading back…' : 'Uploading selfie…';
+    const documentBackUploadId = documentBackFile ? await uploadIdentityImage(documentBackFile) : null;
+    button.textContent = 'Uploading selfie…';
+    const faceUploadId = await uploadIdentityImage(identityFaceFile);
+    button.textContent = 'Submitting…';
+    await requestAuthApi('/api/auth/identity-verification', {
+     method: 'POST',
+     body: JSON.stringify({
+      documentType,
+      documentUploadId,
+      documentBackUploadId,
+      faceUploadId
+     })
+    });
+    identityVerificationStatus = 'pending';
+    updateIdentityVerificationStatus();
+    resetIdentityVerification();
+    closeIdentityVerification();
+    notify('Identity verification documents submitted for administrator review');
+   } catch (submitError) {
+    console.error('Could not submit identity verification documents.', submitError);
+    error.textContent = submitError.message || 'Could not submit your documents. Please try again.';
+    error.classList.remove('hidden');
+    button.disabled = false;
+    button.textContent = 'Submit for review';
+   }
+  }
+
   function renderProfilePage() {
    if (!state.currentUser) return;
    const user = state.users.find((entry) => entry.username === state.currentUser.username);
@@ -7572,6 +8144,8 @@
    document.getElementById('profileUsernameInput').value = user.username;
    document.getElementById('profileFullNameInput').value = user.fullName || '';
    document.getElementById('profileEmailInput').value = user.email || '';
+   updateIdentityVerificationStatus();
+   loadIdentityVerificationStatus();
 
    const createdAt = typeof user.createdAt === 'string'? new Date(user.createdAt): null;
    document.getElementById('profileMemberSince').textContent = createdAt && Number.isFinite(createdAt.getTime())
@@ -8223,7 +8797,13 @@
     state.admin.selectedUser = '';
    }
    renderAdminPanel();
-   await Promise.all([loadAdminAudit(), loadAdminPriceAdjustments(), loadAdminDepositAddresses(), loadAdminSupportThreads()]);
+   await Promise.all([
+    loadAdminAudit(),
+    loadAdminPriceAdjustments(),
+    loadAdminDepositAddresses(),
+    loadAdminSupportThreads(),
+    loadAdminIdentityVerifications()
+   ]);
    schedulePendingAdminCreditRefresh();
   }
 
@@ -11841,6 +12421,72 @@
    `).join('');
   }
 
+  async function loadAdminIdentityVerifications() {
+   if (!state.admin.loggedIn) return;
+   const status = document.getElementById('adminIdentityVerificationsStatus');
+   const list = document.getElementById('adminIdentityVerificationsList');
+   status.textContent = 'Loading submissions…';
+   try {
+    const { submissions } = await requestAuthApi('/api/admin/identity-verifications', { method: 'GET', headers: {} });
+    status.textContent = `${submissions.length} recent submission${submissions.length === 1 ? '' : 's'}`;
+    list.innerHTML = submissions.length ? submissions.map((submission) => {
+     const submittedAt = new Date(submission.submittedAt);
+     const submittedTime = Number.isFinite(submittedAt.getTime()) ? submittedAt.toLocaleString() : '—';
+     const documentUrl = `/api/admin/identity-verifications/${encodeURIComponent(submission.id)}?file=document`;
+     const documentBackUrl = `/api/admin/identity-verifications/${encodeURIComponent(submission.id)}?file=back`;
+     const faceUrl = `/api/admin/identity-verifications/${encodeURIComponent(submission.id)}?file=face`;
+     const statusLabel = {
+      pending: 'Pending review',
+      approved: 'Approved · verified',
+      rejected: 'Rejected'
+     }[submission.status] || 'Pending review';
+     const reviewActions = submission.status === 'pending'
+      ? `<div class="mt-3 flex flex-wrap justify-end gap-2">
+       <button type="button" onclick="reviewIdentityVerification('${escapeHTML(submission.id)}', 'rejected')" ${adminIdentityVerificationReviewActive ? 'disabled' : ''} class="rounded border border-binanceRed/50 px-3 py-2 text-[10px] font-semibold text-binanceRed hover:bg-binanceRedBg disabled:opacity-50">Reject</button>
+       <button type="button" onclick="reviewIdentityVerification('${escapeHTML(submission.id)}', 'approved')" ${adminIdentityVerificationReviewActive ? 'disabled' : ''} class="rounded bg-binanceYellow px-3 py-2 text-[10px] font-bold text-binanceBg hover:bg-binanceYellowHover disabled:opacity-50">Approve · mark verified</button>
+      </div>`
+      : `<p class="mt-3 text-right text-[10px] font-semibold ${submission.status === 'approved' ? 'text-binanceGreen' : 'text-binanceRed'}">${escapeHTML(statusLabel)}${submission.reviewedAt ? ` · ${escapeHTML(new Date(submission.reviewedAt).toLocaleString())}` : ''}</p>`;
+     return `<article class="rounded-lg border border-binanceBorder bg-binanceCard p-3">
+      <div class="mb-3 flex flex-wrap items-start justify-between gap-2">
+       <div><h5 class="text-xs font-semibold text-white">${escapeHTML(submission.fullName || submission.username)} · @${escapeHTML(submission.username)}</h5><p class="mt-1 text-[10px] text-binanceMuted">${escapeHTML(submission.email)} · ${escapeHTML(submission.documentType)}</p><p class="mt-1 text-[10px] font-semibold text-binanceYellow">${escapeHTML(statusLabel)}</p></div>
+       <time class="text-[10px] text-binanceMuted">${escapeHTML(submittedTime)}</time>
+      </div>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+       <a href="${documentUrl}" target="_blank" rel="noopener noreferrer" class="rounded border border-binanceBorder p-2 hover:border-binanceYellow"><span class="mb-2 block text-[10px] font-semibold text-binanceMuted">${submission.documentType === 'Passport' ? 'Passport photo' : 'Front of document'}</span><img src="${documentUrl}" alt="${submission.documentType === 'Passport' ? 'Passport' : 'Front of identity document'} submitted by ${escapeHTML(submission.username)}" loading="lazy" class="max-h-64 w-full rounded object-contain"></a>
+       ${submission.hasDocumentBack ? `<a href="${documentBackUrl}" target="_blank" rel="noopener noreferrer" class="rounded border border-binanceBorder p-2 hover:border-binanceYellow"><span class="mb-2 block text-[10px] font-semibold text-binanceMuted">Back of document</span><img src="${documentBackUrl}" alt="Back of identity document submitted by ${escapeHTML(submission.username)}" loading="lazy" class="max-h-64 w-full rounded object-contain"></a>` : submission.documentType === 'Passport' ? '' : '<p class="rounded border border-binanceBorder p-3 text-[10px] text-binanceMuted">Back side was not included in this submission.</p>'}
+       <a href="${faceUrl}" target="_blank" rel="noopener noreferrer" class="rounded border border-binanceBorder p-2 hover:border-binanceYellow"><span class="mb-2 block text-[10px] font-semibold text-binanceMuted">Face photo</span><img src="${faceUrl}" alt="Face photo submitted by ${escapeHTML(submission.username)}" loading="lazy" class="max-h-64 w-full rounded object-contain"></a>
+      </div>
+      ${reviewActions}
+     </article>`;
+    }).join('') : '<p class="rounded-lg border border-binanceBorder p-5 text-center text-xs text-binanceMuted">No identity verification submissions have been received.</p>';
+   } catch (error) {
+    console.error('Could not load identity verification submissions.', error);
+    status.textContent = 'Could not load submissions';
+    list.innerHTML = `<p class="rounded-lg border border-binanceRed/40 bg-binanceRedBg p-3 text-xs text-binanceRed">${escapeHTML(error.message)}</p>`;
+   }
+  }
+
+  async function reviewIdentityVerification(submissionId, decision) {
+   if (!state.admin.loggedIn || adminIdentityVerificationReviewActive
+    || !/^[1-9]\d{0,18}$/.test(submissionId) || !['approved', 'rejected'].includes(decision)) return;
+   adminIdentityVerificationReviewActive = true;
+   const list = document.getElementById('adminIdentityVerificationsList');
+   list.setAttribute('aria-busy', 'true');
+   try {
+    await requestAuthApi(`/api/admin/identity-verifications/${encodeURIComponent(submissionId)}`, {
+     method: 'POST',
+     body: JSON.stringify({ status: decision })
+    });
+    await loadAdminIdentityVerifications();
+   } catch (error) {
+    console.error('Could not save the identity verification decision.', error);
+    document.getElementById('adminIdentityVerificationsStatus').textContent = error.message;
+   } finally {
+    adminIdentityVerificationReviewActive = false;
+    list.removeAttribute('aria-busy');
+   }
+  }
+
   async function loadAdminSupportThreads() {
    if (!state.admin.loggedIn || adminSupportRequestActive) return;
    adminSupportRequestActive = true;
@@ -12017,6 +12663,7 @@
    const modal = document.getElementById(id);
    if (modal) modal.classList.add('hidden');
    if (id === 'marketQrScannerModal') stopMarketQrScanner();
+   if (id === 'identityVerificationModal') resetIdentityVerification();
    if (id === 'supportModal') {
     if (supportChatPollTimer !== null) {
      window.clearInterval(supportChatPollTimer);
@@ -14897,6 +15544,63 @@
    notify('Account reset');
   }
 
+  async function openAddFundsPage() {
+   const page = document.getElementById('addFundsPage');
+   page.classList.remove('hidden');
+   page.classList.add('flex');
+   document.getElementById('addFundsSearch').value = '';
+   document.getElementById('addFundsAssetList').innerHTML = '<p class="py-8 text-center text-xs text-binanceMuted">Loading available deposit assets…</p>';
+   if (window.lucide) window.lucide.createIcons();
+   const loaded = await loadDepositAddresses();
+   if (loaded) renderAddFundsAssets();
+   else document.getElementById('addFundsAssetList').innerHTML = '<div class="space-y-3 py-8 text-center"><p class="text-xs text-binanceMuted">Could not load available deposit assets.</p><button type="button" onclick="openAddFundsPage()" class="rounded-lg border border-binanceBorder px-4 py-2 text-xs font-semibold text-white hover:bg-binanceHover">Try again</button></div>';
+   document.getElementById('addFundsSearch').focus();
+  }
+
+  function closeAddFundsPage() {
+   const page = document.getElementById('addFundsPage');
+   page.classList.add('hidden');
+   page.classList.remove('flex');
+  }
+
+  function renderAddFundsAssets() {
+   const list = document.getElementById('addFundsAssetList');
+   const query = document.getElementById('addFundsSearch').value.trim().toLowerCase();
+   if (!list) return;
+   const assets = [...new Set(state.cryptoDepositAddresses
+    .filter((entry) => /^[A-Z0-9]{2,20}$/.test(entry.asset) && typeof entry.address === 'string' && entry.address.trim())
+    .map((entry) => entry.asset))]
+    .map((asset) => ({
+     asset,
+     networks: [...new Set(state.cryptoDepositAddresses
+      .filter((entry) => entry.asset === asset && typeof entry.address === 'string' && entry.address.trim())
+      .map((entry) => entry.network))]
+    }))
+    .filter((entry) => `${entry.asset} ${entry.networks.join(' ')}`.toLowerCase().includes(query))
+    .sort((left, right) => left.asset.localeCompare(right.asset));
+   list.innerHTML = assets.length ? assets.map((entry) => `
+    <button type="button" onclick="selectAddFundsAsset('${escapeHTML(entry.asset)}')" class="flex w-full items-center gap-3 py-3 text-left hover:bg-binanceHover/50">
+     ${assetIconMarkup(entry.asset, 'h-9 w-9')}
+     <span class="min-w-0 flex-1"><span class="block text-sm font-semibold text-white">${escapeHTML(entry.asset)}</span><span class="mt-0.5 block truncate text-[10px] text-binanceMuted">${escapeHTML(entry.networks.join(' · '))}</span></span>
+     <i data-lucide="chevron-right" class="h-4 w-4 shrink-0 text-binanceMuted"></i>
+    </button>
+   `).join('') : `<p class="py-8 text-center text-xs text-binanceMuted">${query? 'No deposit assets match your search.': 'No assets have a deposit address configured yet.'}</p>`;
+   if (window.lucide) window.lucide.createIcons();
+  }
+
+  function selectAddFundsAsset(asset) {
+   if (!/^[A-Z0-9]{2,20}$/.test(asset)
+    || !state.cryptoDepositAddresses.some((entry) => entry.asset === asset && typeof entry.address === 'string' && entry.address.trim())) {
+    notify('That asset does not have a deposit address configured');
+    renderAddFundsAssets();
+    return;
+   }
+   updateDepositAssetOptions();
+   document.getElementById('depositAsset').value = asset;
+   closeAddFundsPage();
+   openModal('depositModal');
+  }
+
   function depositAddressForSelection(asset, network) {
    return state.cryptoDepositAddresses.find((entry) => entry.asset === asset && entry.network === network) || null;
   }
@@ -14995,10 +15699,13 @@
     const { addresses } = await requestAuthApi('/api/market-price-adjustments?resource=deposit-addresses', { method: 'GET', headers: {} }, true);
     state.cryptoDepositAddresses = addresses;
     updateDepositNetworkOptions();
+    renderAddFundsAssets();
+    return true;
    } catch (error) {
     console.error('Unable to load crypto deposit addresses', error);
     const addressValue = document.getElementById('depositAddressValue');
     if (addressValue) addressValue.textContent = 'Deposit addresses are temporarily unavailable.';
+    return false;
    }
   }
 
