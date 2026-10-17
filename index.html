@@ -3016,7 +3016,7 @@
         <label class="relative inline-flex items-center">
          <span class="sr-only">Home balance display currency</span>
          <select id="homePortfolioCurrency" aria-label="Home balance display currency" onchange="setAssetsDisplayCurrency(this.value)" class="appearance-none bg-transparent pr-4 text-[10px] font-semibold text-binanceText outline-none" style="color-scheme: dark">
-          <option value="BTC">BTC</option><option value="ETH">ETH</option><option value="BNB">BNB</option><option value="USDT">USDT</option>
+          <option value="BTC">BTC</option><option value="ETH">ETH</option><option value="BNB">BNB</option><option value="USDT">USDT</option><option value="ETB">ETB</option>
          </select>
          <i data-lucide="chevron-down" class="pointer-events-none absolute right-0 h-3 w-3 text-binanceMuted"></i>
         </label>
@@ -3414,7 +3414,7 @@
         <label class="relative inline-flex items-center">
          <span class="sr-only">Overview balance display currency</span>
          <select id="mobileAssetsOverviewCurrency" aria-label="Overview balance display currency" onchange="setAssetsDisplayCurrency(this.value)" class="appearance-none bg-transparent pr-4 text-xs font-semibold text-binanceMuted outline-none" style="color-scheme: dark">
-          <option value="BTC">BTC</option><option value="ETH">ETH</option><option value="BNB">BNB</option><option value="USDT">USDT</option>
+          <option value="BTC">BTC</option><option value="ETH">ETH</option><option value="BNB">BNB</option><option value="USDT">USDT</option><option value="ETB">ETB</option>
          </select>
          <i data-lucide="chevron-down" class="pointer-events-none absolute right-0 h-3 w-3 text-binanceMuted"></i>
         </label>
@@ -3463,6 +3463,7 @@
         <option value="ETH">ETH</option>
         <option value="BNB">BNB</option>
         <option value="USDT">USDT</option>
+        <option value="ETB">ETB</option>
        </select>
        <i data-lucide="chevron-down" class="pointer-events-none absolute right-0 h-3 w-3 text-binanceMuted"></i>
       </label>
@@ -3483,7 +3484,7 @@
       <label class="relative inline-flex items-center">
        <span class="sr-only">Funding balance display currency</span>
        <select id="mobileAssetsFundingCurrency" aria-label="Funding balance display currency" onchange="setAssetsDisplayCurrency(this.value)" class="appearance-none bg-transparent pr-4 text-xs font-semibold text-binanceText outline-none" style="color-scheme: dark">
-        <option value="BTC">BTC</option><option value="ETH">ETH</option><option value="BNB">BNB</option><option value="USDT">USDT</option>
+        <option value="BTC">BTC</option><option value="ETH">ETH</option><option value="BNB">BNB</option><option value="USDT">USDT</option><option value="ETB">ETB</option>
        </select>
        <i data-lucide="chevron-down" class="pointer-events-none absolute right-0 h-3 w-3 text-binanceMuted"></i>
       </label>
@@ -3531,7 +3532,7 @@
        <label class="relative inline-flex items-center">
         <span class="sr-only">Futures balance display currency</span>
         <select id="mobileAssetsFuturesDisplayCurrency" aria-label="Futures balance display currency" onchange="setAssetsDisplayCurrency(this.value)" class="appearance-none bg-transparent pr-4 text-xs font-semibold text-binanceMuted outline-none" style="color-scheme: dark">
-         <option value="BTC">BTC</option><option value="ETH">ETH</option><option value="BNB">BNB</option><option value="USDT">USDT</option>
+         <option value="BTC">BTC</option><option value="ETH">ETH</option><option value="BNB">BNB</option><option value="USDT">USDT</option><option value="ETB">ETB</option>
         </select>
         <i data-lucide="chevron-down" class="pointer-events-none absolute right-0 h-3 w-3 text-binanceMuted"></i>
        </label>
@@ -5060,6 +5061,9 @@
    restoredFormState: {},
    restorePage: null,
    homeBalancesVisible: true,
+   usdEtbRate: 0,
+   usdEtbRateUpdatedAt: 0,
+   usdEtbRateLoading: false,
    homeMarketType: 'spot',
    homeMarketCategory: 'hot',
    marketPageQuery: '',
@@ -6902,15 +6906,63 @@
   }
 
   function setAssetsDisplayCurrency(currency) {
-   const supportedCurrencies = ['BTC', 'ETH', 'BNB', 'USDT'];
+   const supportedCurrencies = ['BTC', 'ETH', 'BNB', 'USDT', 'ETB'];
    if (!supportedCurrencies.includes(currency)) {
-    notify('Choose BTC, ETH, BNB, or USDT');
+    notify('Choose BTC, ETH, BNB, USDT, or ETB');
     renderAssetsPage();
     return;
    }
    state.assetsDisplayCurrency = currency;
    renderAssetsPage();
    renderUserHomeDashboard();
+  }
+
+  function restoreCachedUsdEtbRate() {
+   try {
+    const cached = JSON.parse(localStorage.getItem('exchange-usd-etb-rate-v1') || 'null');
+    if (!cached || !Number.isFinite(cached.rate) || cached.rate <= 0 || !Number.isFinite(cached.updatedAt)) return;
+    state.usdEtbRate = cached.rate;
+    state.usdEtbRateUpdatedAt = cached.updatedAt;
+   } catch (error) {
+    console.error('Could not read the cached USD/ETB rate', error);
+   }
+  }
+
+  async function loadUsdEtbRate() {
+   if (state.usdEtbRateLoading) return;
+   state.usdEtbRateLoading = true;
+   const controller = new AbortController();
+   const timeout = window.setTimeout(() => controller.abort(), 8_000);
+   try {
+    const response = await fetch('https://open.er-api.com/v6/latest/USD', {
+     cache: 'no-store',
+     signal: controller.signal
+    });
+    if (!response.ok) throw new Error(`USD/ETB rate request failed with HTTP ${response.status}`);
+    const result = await response.json();
+    const rate = Number(result?.rates?.ETB);
+    const updatedAt = Number(result?.time_last_update_unix) * 1000;
+    if (result?.result !== 'success' || !Number.isFinite(rate) || rate <= 0) {
+     throw new Error('The USD/ETB rate response was invalid');
+    }
+    state.usdEtbRate = rate;
+    state.usdEtbRateUpdatedAt = Number.isFinite(updatedAt) && updatedAt > 0? updatedAt: Date.now();
+    try {
+     localStorage.setItem('exchange-usd-etb-rate-v1', JSON.stringify({
+      rate: state.usdEtbRate,
+      updatedAt: state.usdEtbRateUpdatedAt
+     }));
+    } catch (error) {
+     console.error('Could not cache the USD/ETB rate', error);
+    }
+    renderAssetsPage();
+    renderUserHomeDashboard();
+   } catch (error) {
+    console.error('Could not refresh the USD/ETB rate', error);
+   } finally {
+    window.clearTimeout(timeout);
+    state.usdEtbRateLoading = false;
+   }
   }
 
   function assetIconMarkup(asset, size = 'h-9 w-9') {
@@ -6964,16 +7016,22 @@
    const pending = user && Array.isArray(user.balanceJobs)? user.balanceJobs.filter((job) => job.status === 'Processing').length: 0;
    const visible = state.homeBalancesVisible;
    const mask = '••••••';
-   const supportedDisplayCurrencies = ['BTC', 'ETH', 'BNB', 'USDT'];
+   const supportedDisplayCurrencies = ['BTC', 'ETH', 'BNB', 'USDT', 'ETB'];
    const displayCurrency = supportedDisplayCurrencies.includes(state.assetsDisplayCurrency)
     ? state.assetsDisplayCurrency: 'BTC';
    state.assetsDisplayCurrency = displayCurrency;
-   const displayDecimals = displayCurrency === 'BTC'? 8: displayCurrency === 'USDT'? 2: 6;
-   const convertFromUsdt = (value) => Number(value || 0) / Math.max(priceFor(displayCurrency), 1);
-   const formatDisplayAmount = (value) => convertFromUsdt(value).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: displayDecimals
-   });
+   const displayDecimals = displayCurrency === 'BTC'? 8: ['USDT', 'ETB'].includes(displayCurrency)? 2: 6;
+   const etbRateAvailable = Number.isFinite(state.usdEtbRate) && state.usdEtbRate > 0;
+   const convertFromUsdt = (value) => displayCurrency === 'ETB'
+    ? etbRateAvailable? Number(value || 0) * state.usdEtbRate: NaN
+    : Number(value || 0) / Math.max(priceFor(displayCurrency), 1);
+   const formatDisplayAmount = (value) => {
+    const converted = convertFromUsdt(value);
+    return Number.isFinite(converted)? converted.toLocaleString('en-US', {
+     minimumFractionDigits: 2,
+     maximumFractionDigits: displayDecimals
+    }): '—';
+   };
    const sectionTitles = {
     overview: ['Assets overview', 'Your combined Spot, Funding, and Futures balances, with values in USDT.', 'All supported assets', 'Supported Spot assets plus Funding and Futures balances · estimated in USDT'],
     spot: ['Spot wallet', 'Browse supported Spot assets and view their balances, estimated in USDT.', 'Supported assets', 'All supported crypto assets · balances and values are estimated in USDT'],
@@ -7014,9 +7072,8 @@
     return sum + value * (Number(state.marketQuoteChanges[balance.asset]) || 0) / 100;
    }, 0);
    const dailyPnlPercent = total > 0? dailyPnl / total * 100: 0;
-   const spotConvertedTotal = convertFromUsdt(spotTotal);
    document.getElementById('mobileAssetsSpotConvertedTotal').textContent = visible
-    ? spotConvertedTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: displayDecimals })
+    ? formatDisplayAmount(spotTotal)
     : mask;
    document.getElementById('mobileAssetsSpotFiatTotal').textContent = visible? `≈ ${formatMoney(spotTotal)}`: `≈ ${mask}`;
    document.getElementById('mobileAssetsSpotPnl').textContent = visible
@@ -7580,19 +7637,28 @@
    const pendingJobs = user.balanceJobs.filter((job) => job.status === 'Processing');
    const visible = state.homeBalancesVisible;
    const mask = '••••••';
-   const displayCurrency = ['BTC', 'ETH', 'BNB', 'USDT'].includes(state.assetsDisplayCurrency)
+   const displayCurrency = ['BTC', 'ETH', 'BNB', 'USDT', 'ETB'].includes(state.assetsDisplayCurrency)
     ? state.assetsDisplayCurrency: 'BTC';
    state.assetsDisplayCurrency = displayCurrency;
-   const displayDecimals = displayCurrency === 'BTC'? 8: displayCurrency === 'USDT'? 2: 6;
-   const portfolioDisplayValue = portfolioValue / Math.max(priceFor(displayCurrency), 1);
-   const formattedPortfolioDisplayValue = portfolioDisplayValue.toLocaleString('en-US', {
+   const displayDecimals = displayCurrency === 'BTC'? 8: ['USDT', 'ETB'].includes(displayCurrency)? 2: 6;
+   const etbRateAvailable = Number.isFinite(state.usdEtbRate) && state.usdEtbRate > 0;
+   const portfolioDisplayValue = displayCurrency === 'ETB'
+    ? etbRateAvailable? portfolioValue * state.usdEtbRate: NaN
+    : portfolioValue / Math.max(priceFor(displayCurrency), 1);
+   const formattedPortfolioDisplayValue = Number.isFinite(portfolioDisplayValue)? portfolioDisplayValue.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: displayDecimals
-   });
+   }): '—';
    document.getElementById('homePortfolioCurrency').value = displayCurrency;
    document.getElementById('homePortfolioValue').textContent = visible? formattedPortfolioDisplayValue: mask;
    document.getElementById('homePortfolioBtcValue').textContent = visible? formattedPortfolioDisplayValue: mask;
-   document.getElementById('homePortfolioFiat').textContent = visible? `≈ ${formatMoney(portfolioValue)}`: `≈ ${mask}`;
+   document.getElementById('homePortfolioFiat').textContent = visible
+    ? displayCurrency === 'ETB'
+     ? etbRateAvailable
+      ? `≈ ${formatMoney(portfolioValue)} · 1 USD ≈ ${state.usdEtbRate.toLocaleString('en-US', { maximumFractionDigits: 2 })} ETB (updated ${new Date(state.usdEtbRateUpdatedAt).toLocaleDateString()})`
+      : `ETB rate unavailable · ≈ ${formatMoney(portfolioValue)}`
+     : `≈ ${formatMoney(portfolioValue)}`
+    : `≈ ${mask}`;
    const changeLabel = document.getElementById('homePortfolioChange');
    const changeColor = portfolioChange >= 0? '#0ecb81': '#f6465d';
    changeLabel.textContent = visible
@@ -16158,6 +16224,7 @@
   function init() {
    setupInstallableApp();
    loadDemoState();
+   restoreCachedUsdEtbRate();
    loadCachedMarketCatalogs();
    loadUsers();
    const preferredPage = ['home', 'markets', 'futures', 'futuresTrade', 'assets', 'convert', 'trade', 'profile'].includes(state.activePage)
@@ -16281,6 +16348,8 @@
    if (isLocalPreviewMode()) window.setInterval(processDueAdminBalanceJobs, 1_000);
    loadTradfiQuotes();
    window.setInterval(loadTradfiQuotes, 15_000);
+   loadUsdEtbRate();
+   window.setInterval(loadUsdEtbRate, 6 * 60 * 60 * 1000);
    loadMarketPriceAdjustments();
    loadLiveMarketCatalogs();
    window.addEventListener('storage', handleUserStorageChange);
