@@ -16,9 +16,12 @@ module.exports = async function handler(req, res) {
     if (!requireSameOrigin(req, res)) return;
     try {
         const { username, email, fullName, password } = parseBody(req);
+        if (typeof fullName !== 'string' || fullName.trim().split(/\s+/).filter(Boolean).length < 2) {
+            return sendJson(res, 400, { error: 'Enter at least two names, such as your first and last name' });
+        }
         if (typeof username !== 'string' || !/^[a-zA-Z0-9_]{3,24}$/.test(username.trim())
             || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
-            || typeof fullName !== 'string' || fullName.trim().length < 2 || fullName.trim().length > 120
+            || fullName.trim().length > 120
             || typeof password !== 'string' || password.length < 12 || password.length > 128) {
             return sendJson(res, 400, { error: 'Enter a valid name, username, email, and password of at least 12 characters' });
         }
