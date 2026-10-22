@@ -14,7 +14,7 @@
    console.error('Could not restore the page before the app starts.', error);
   }
  </script>
- <meta name="theme-color" content="#12161a">
+ <meta name="theme-color" content="#202630">
  <meta name="description" content="A mobile-friendly exchange market dashboard.">
  <meta name="mobile-web-app-capable" content="yes">
  <meta name="apple-mobile-web-app-capable" content="yes">
@@ -37,17 +37,17 @@
    theme: {
     extend: {
      colors: {
-      binanceBg: '#12161a',
-      binanceCard: '#1e2329',
-      binanceHover: '#2b3139',
-      binanceBorder: '#2b3139',
+      binanceBg: '#202630',
+      binanceCard: '#29313d',
+      binanceHover: '#353f4d',
+      binanceBorder: '#343d49',
       binanceYellow: '#F0B90B',
       binanceYellowHover: '#fcd535',
       binanceGreen: '#0ecb81',
       binanceGreenBg: 'rgba(14, 203, 129, 0.12)',
       binanceRed: '#f6465d',
       binanceRedBg: 'rgba(246, 70, 93, 0.12)',
-      binanceMuted: '#848e9c',
+      binanceMuted: '#929baa',
       binanceText: '#eaecef'
      },
      fontFamily: {
@@ -109,9 +109,9 @@
    align-items: center;
    gap: 0.5rem;
    padding: 0.55rem 0.85rem;
-   border: 1px solid #2b3139;
+   border: 1px solid #343d49;
    border-radius: 9999px;
-   background: #1e2329;
+   background: #29313d;
    color: #eaecef;
    font-size: 0.7rem;
    opacity: 0;
@@ -122,12 +122,6 @@
   #pullToRefreshIndicator.visible {
    opacity: 1;
    transform: translate(-50%, var(--pull-refresh-offset, 0.5rem));
-  }
-  #pullToRefreshIndicator.refreshing [data-pull-refresh-icon] {
-   animation: pull-refresh-spin 0.8s linear infinite;
-  }
-  @keyframes pull-refresh-spin {
-   to { transform: rotate(360deg); }
   }
   .header-brand-logo {
    display: block;
@@ -149,7 +143,7 @@
    overflow: hidden;
    border: 1px solid #343b45;
    border-radius: 18px;
-   background: #1e2329;
+   background: #29313d;
    box-shadow: 0 28px 90px rgb(0 0 0 / 55%);
   }
   #authModal .auth-modal-aside {
@@ -159,10 +153,10 @@
    padding: 30px;
    flex-direction: column;
    overflow: hidden;
-   border-right: 1px solid #2b3139;
+   border-right: 1px solid #343d49;
    background:
     radial-gradient(ellipse at 20% 5%, rgb(240 185 11 / 14%), transparent 42%),
-    linear-gradient(160deg, #202630 0%, #181a20 72%);
+    linear-gradient(160deg, #202630 0%, #202630 72%);
   }
   #authModal .auth-modal-aside::after {
    position: absolute;
@@ -251,7 +245,7 @@
   }
   #authModal .auth-modal-header p {
    margin-top: 5px;
-   color: #848e9c;
+   color: #929baa;
    font-size: 11px;
    line-height: 1.5;
   }
@@ -263,14 +257,14 @@
    place-items: center;
    border: 1px solid transparent;
    border-radius: 9px;
-   color: #848e9c;
+   color: #929baa;
    font-size: 22px;
    line-height: 1;
    transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
   }
   #authModal .auth-modal-close:hover {
    border-color: #3a414a;
-   background: #2b3139;
+   background: #343d49;
    color: #eaecef;
   }
   #authModal .auth-modal-tabs {
@@ -279,14 +273,14 @@
    gap: 4px;
    margin-bottom: 18px;
    padding: 4px;
-   border: 1px solid #2b3139;
+   border: 1px solid #343d49;
    border-radius: 10px;
-   background: #181a20;
+   background: #202630;
   }
   #authModal .auth-modal-tabs button {
    min-height: 38px;
    border-radius: 7px;
-   color: #848e9c;
+   color: #929baa;
    font-size: 12px;
    font-weight: 600;
    transition: color 150ms ease, background 150ms ease, box-shadow 150ms ease;
@@ -323,7 +317,7 @@
    padding: 0 12px;
    border: 1px solid #3a414a;
    border-radius: 8px;
-   background: #181a20;
+   background: #202630;
    color: #eaecef;
    font-size: 12px;
    transition: border-color 150ms ease, box-shadow 150ms ease;
@@ -345,7 +339,7 @@
    align-items: center;
    border: 1px solid #3a414a;
    border-radius: 8px;
-   background: #181a20;
+   background: #202630;
    transition: border-color 150ms ease, box-shadow 150ms ease;
   }
   #authModal .auth-password-field:focus-within {
@@ -380,9 +374,9 @@
   }
   #authModal #signupPasswordRules {
    padding: 12px;
-   border: 1px solid #2b3139;
+   border: 1px solid #343d49;
    border-radius: 9px;
-   background: #181a20;
+   background: #202630;
   }
   #authModal #authLoginView > button[type="submit"],
   #authModal #authSignupView > button[type="submit"] {
@@ -427,7 +421,7 @@
   }
   #profilePage.profile-design-page {
    padding: 0;
-   background: #181a20;
+   background: #202630;
    color: #eaecef;
   }
   #profilePage.profile-design-page:not(.hidden) {
@@ -442,7 +436,7 @@
    padding: 16px;
    flex-direction: column;
    overflow-y: visible;
-   background: #181a20;
+   background: #202630;
   }
   .profile-phone-wrapper::-webkit-scrollbar {
    display: none;
@@ -487,9 +481,9 @@
   .profile-snapshot {
    margin-bottom: 24px;
    padding: 16px;
-   border: 1px solid #2b3139;
+   border: 1px solid #343d49;
    border-radius: 14px;
-   background: linear-gradient(135deg, rgba(240, 185, 11, 0.09), #1e2329 54%);
+   background: linear-gradient(135deg, rgba(240, 185, 11, 0.09), #29313d 54%);
   }
   .profile-verification-card {
    display: flex;
@@ -498,9 +492,9 @@
    flex-direction: column;
    align-items: stretch;
    gap: 14px;
-   border: 1px solid #2b3139;
+   border: 1px solid #343d49;
    border-radius: 16px;
-   background: linear-gradient(145deg, #222830 0%, #1e2329 62%);
+   background: linear-gradient(145deg, #222830 0%, #29313d 62%);
    box-shadow: 0 10px 28px rgb(0 0 0 / 12%);
   }
   .profile-verification-heading {
@@ -526,7 +520,7 @@
   }
   .profile-verification-eyebrow {
    margin-bottom: 3px;
-   color: #848e9c;
+   color: #929baa;
    font-size: 9px;
    font-weight: 700;
    letter-spacing: 0.12em;
@@ -546,7 +540,7 @@
    gap: 6px;
    border-radius: 999px;
    background: rgba(132, 142, 156, 0.15);
-   color: #848e9c;
+   color: #929baa;
    font-size: 10px;
    font-weight: 600;
   }
@@ -571,7 +565,7 @@
   }
   .profile-verification-requirements-title {
    margin-bottom: 8px;
-   color: #848e9c;
+   color: #929baa;
    font-size: 9px;
    font-weight: 600;
   }
@@ -619,7 +613,7 @@
   }
   .profile-verification-action:disabled {
    border-color: #3a414a;
-   background: #2b3139;
+   background: #343d49;
    color: #aeb4bc;
    cursor: default;
   }
@@ -657,7 +651,7 @@
    font-weight: 600;
   }
   .profile-snapshot-heading span {
-   color: #848e9c;
+   color: #929baa;
    font-size: 10px;
   }
   .profile-snapshot-grid {
@@ -675,7 +669,7 @@
   .profile-snapshot-label {
    display: block;
    overflow: hidden;
-   color: #848e9c;
+   color: #929baa;
    font-size: 10px;
    text-overflow: ellipsis;
    white-space: nowrap;
@@ -714,9 +708,9 @@
   .profile-tools-panel {
    margin-bottom: 24px;
    padding: 16px;
-   border: 1px solid #2b3139;
+   border: 1px solid #343d49;
    border-radius: 14px;
-   background: #1e2329;
+   background: #29313d;
   }
   .profile-meta {
    display: flex;
@@ -754,7 +748,7 @@
    width: 64%;
    height: 30%;
    border-radius: 20px 20px 0 0;
-   background: #2b3139;
+   background: #343d49;
    content: "";
   }
   .profile-avatar-badge {
@@ -769,7 +763,7 @@
    justify-content: center;
    border: 1px solid #f0b90b;
    border-radius: 3px;
-   background: #1e2329;
+   background: #29313d;
    color: #f0b90b;
   }
   .profile-details {
@@ -789,7 +783,7 @@
    margin-bottom: 8px;
    align-items: center;
    gap: 5px;
-   color: #848e9c;
+   color: #929baa;
    font-size: 12px;
   }
   .profile-badge-row {
@@ -800,7 +794,7 @@
    padding: 3px 8px;
    border-radius: 4px;
    background: rgba(132, 142, 156, 0.15);
-   color: #848e9c;
+   color: #929baa;
    font-size: 11px;
    font-weight: 500;
   }
@@ -811,7 +805,7 @@
    flex: 0 0 auto;
    align-items: center;
    justify-content: center;
-   color: #848e9c;
+   color: #929baa;
   }
   .profile-help-banner {
    display: flex;
@@ -821,7 +815,7 @@
    justify-content: space-between;
    gap: 8px;
    border-radius: 12px;
-   background: #1e2329;
+   background: #29313d;
   }
   .profile-help-left {
    display: flex;
@@ -846,7 +840,7 @@
    flex: 0 0 auto;
    padding: 7px 14px;
    border-radius: 6px;
-   background: #2b3139;
+   background: #343d49;
    color: #eaecef;
    font-size: 12px;
    font-weight: 500;
@@ -865,7 +859,7 @@
    flex-direction: column;
    justify-content: space-between;
    border-radius: 12px;
-   background: #1e2329;
+   background: #29313d;
    text-align: left;
   }
   .profile-campaign-icon {
@@ -878,7 +872,7 @@
   }
   .profile-campaign-label {
    margin-bottom: 4px;
-   color: #848e9c;
+   color: #929baa;
    font-size: 12px;
   }
   .profile-campaign-title {
@@ -948,9 +942,9 @@
   .profile-account-details {
    margin: 8px 0 24px;
    overflow: hidden;
-   border: 1px solid #2b3139;
+   border: 1px solid #343d49;
    border-radius: 12px;
-   background: #181a20;
+   background: #202630;
    color: #eaecef;
   }
   .profile-account-details > summary {
@@ -971,12 +965,12 @@
   }
   .profile-account-details > summary::after {
    content: "+";
-   color: #848e9c;
+   color: #929baa;
    font-size: 18px;
    font-weight: 400;
   }
   .profile-account-details[open] > summary {
-   border-bottom: 1px solid #2b3139;
+   border-bottom: 1px solid #343d49;
   }
   .profile-account-details[open] > summary::after {
    content: "−";
@@ -988,9 +982,9 @@
   }
   .profile-account-card {
    padding: 16px;
-   border: 1px solid #2b3139;
+   border: 1px solid #343d49;
    border-radius: 12px;
-   background: #1e2329;
+   background: #29313d;
   }
   .profile-account-card--overview,
   .profile-account-card--signout,
@@ -1020,16 +1014,16 @@
    gap: 12px;
   }
   .profile-form-grid label {
-   color: #848e9c;
+   color: #929baa;
    font-size: 11px;
   }
   .profile-form-grid input {
    width: 100%;
    margin-top: 4px;
    padding: 9px 10px;
-   border: 1px solid #2b3139;
+   border: 1px solid #343d49;
    border-radius: 6px;
-   background: #181a20;
+   background: #202630;
    color: #eaecef;
   }
   .p2p-mobile-header {
@@ -1052,8 +1046,8 @@
     top: 0;
     z-index: 20;
     padding: 8px 0;
-    border-bottom: 1px solid #2b3139;
-    background-color: #1e2329;
+    border-bottom: 1px solid #343d49;
+    background-color: #29313d;
    }
   }
   .admin-mobile-nav {
@@ -1083,7 +1077,7 @@
     z-index: 10;
     margin: calc(-1 * max(12px, env(safe-area-inset-top))) -12px 12px;
     padding: max(12px, env(safe-area-inset-top)) 12px 10px;
-    border-bottom: 1px solid #2b3139;
+    border-bottom: 1px solid #343d49;
     background: rgba(30, 35, 41, .97);
     backdrop-filter: blur(14px);
    }
@@ -1093,7 +1087,7 @@
     z-index: 9;
     margin: 0 -12px 14px;
     padding: 8px 12px;
-    border-bottom: 1px solid #2b3139;
+    border-bottom: 1px solid #343d49;
     background: rgba(30, 35, 41, .96);
     backdrop-filter: blur(14px);
    }
@@ -1143,9 +1137,9 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 8px 12px;
     padding: 12px;
-    border: 1px solid #2b3139;
+    border: 1px solid #343d49;
     border-radius: 10px;
-    background: #181a20;
+    background: #202630;
    }
    #adminUsersTable tbody td {
     min-width: 0;
@@ -1159,7 +1153,7 @@
    #adminUsersTable tbody td::before {
     display: block;
     margin-bottom: 3px;
-    color: #848e9c;
+    color: #929baa;
     font-size: 9px;
     font-weight: 500;
     text-transform: uppercase;
@@ -1169,7 +1163,7 @@
    #adminUsersTable tbody td[data-label="Action"] {
     display: flex;
     justify-content: flex-end;
-    border-top: 1px solid #2b3139;
+    border-top: 1px solid #343d49;
     padding-top: 8px;
    }
    #adminUsersTable tbody td[data-label="Action"]::before {
@@ -1194,9 +1188,9 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 8px 12px;
     padding: 10px;
-    border: 1px solid #2b3139;
+    border: 1px solid #343d49;
     border-radius: 10px;
-    background: #181a20;
+    background: #202630;
    }
    #adminBalanceTableBody td,
    #adminAuditTableBody td {
@@ -1208,7 +1202,7 @@
    #adminAuditTableBody td::before {
     display: block;
     margin-bottom: 3px;
-    color: #848e9c;
+    color: #929baa;
     font-size: 9px;
     text-transform: uppercase;
     letter-spacing: .05em;
@@ -1218,7 +1212,7 @@
     grid-column: 1 / -1;
     display: flex;
     justify-content: flex-end;
-    border-top: 1px solid #2b3139;
+    border-top: 1px solid #343d49;
     padding-top: 8px;
    }
    #adminBalanceTableBody td[data-label="Action"]::before {
@@ -1739,7 +1733,7 @@
    width: 8px;
    height: 8px;
    border-radius: 50%;
-   background: #181a20;
+   background: #202630;
    content: "";
   }
   #guestHomeContent.gold-ticket::before {
@@ -1757,7 +1751,7 @@
    height: 32px;
    align-items: center;
    justify-content: center;
-   border: 2px solid #181a20;
+   border: 2px solid #202630;
    border-radius: 50%;
    background: #f0b90b;
    color: #181a20;
@@ -1810,14 +1804,14 @@
    height: 4px;
   }
   ::-webkit-scrollbar-track {
-   background: #12161a;
+   background: #202630;
   }
   ::-webkit-scrollbar-thumb {
-   background: #2b3139;
+   background: #343d49;
    border-radius: 2px;
   }
   ::-webkit-scrollbar-thumb:hover {
-   background: #848e9c;
+   background: #929baa;
   }
   
   .flash-green { animation: flashGreen 0.35s ease-out; }
@@ -1825,8 +1819,8 @@
   .history-selector-chevron {
    width: 10px;
    height: 10px;
-   border-right: 2px solid #848e9c;
-   border-bottom: 2px solid #848e9c;
+   border-right: 2px solid #929baa;
+   border-bottom: 2px solid #929baa;
    flex-shrink: 0;
    transform: rotate(-45deg);
   }
@@ -1849,7 +1843,7 @@
   }
   .history-selector-heading p {
    margin-top: 4px;
-   color: #848e9c;
+   color: #929baa;
    font-size: 12px;
    line-height: 18px;
   }
@@ -1861,11 +1855,11 @@
    align-items: center;
    justify-content: center;
    border-radius: 8px;
-   color: #848e9c;
+   color: #929baa;
   }
   .history-selector-close:hover,
   .history-selector-close:focus-visible {
-   background: #2b3139;
+   background: #343d49;
    color: #eaecef;
   }
   .history-selector-option {
@@ -1875,9 +1869,9 @@
    padding: 12px;
    align-items: center;
    gap: 12px;
-   border: 1px solid #2b3139;
+   border: 1px solid #343d49;
    border-radius: 12px;
-   background: #181a20;
+   background: #202630;
    text-align: left;
    transition: border-color 150ms ease, background-color 150ms ease;
   }
@@ -1917,7 +1911,7 @@
   }
   .history-selector-option-description {
    display: block;
-   color: #848e9c;
+   color: #929baa;
    font-size: 11px;
    line-height: 16px;
   }
@@ -2020,7 +2014,7 @@
 
   input[type=range] {
    -webkit-appearance: none;
-   background: #2b3139;
+   background: #343d49;
    height: 4px;
    border-radius: 2px;
   }
@@ -2348,7 +2342,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    background: linear-gradient(to top, #12161a 75%, rgba(18, 22, 26, 0));
+    background: linear-gradient(to top, #202630 75%, rgba(32, 38, 48, 0));
    }
 
    .trade-header-mode.trade-canvas-view #tradeCanvasQuickActions,
@@ -2410,8 +2404,8 @@
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
-    border-bottom: 1px solid #2b3139;
-    background: #1e2329;
+    border-bottom: 1px solid #343d49;
+    background: #29313d;
     padding: 0 0.5rem;
    }
 
@@ -2423,7 +2417,7 @@
     position: relative;
     flex: 1 0 auto;
     padding: 0 0.875rem;
-    color: #848e9c;
+    color: #929baa;
     font-size: 0.75rem;
     font-weight: 600;
     white-space: nowrap;
@@ -2446,7 +2440,7 @@
   @media (max-width: 767px) {
    #userHomePage {
     padding: 12px max(16px, env(safe-area-inset-right)) calc(75px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-    background: #181a20;
+    background: #202630;
     color: #eaecef;
    }
 
@@ -2461,7 +2455,7 @@
    #signedInHomeContent > form {
     border: 0;
     border-radius: 18px;
-    background: #2b3139;
+    background: #343d49;
     padding: 6px 12px;
    }
 
@@ -2474,16 +2468,16 @@
 
    #guestHomeContent > section[aria-labelledby="guestHomePromoTitle"] {
     border-radius: 12px;
-    background: #1e2329;
+    background: #29313d;
     padding: 12px 16px 18px;
    }
 
    #guestHomeContent > section[aria-labelledby="guestMarketsTitle"],
    #homeMarketWatchCard {
     overflow: hidden;
-    border: 1px solid #2b3139;
+    border: 1px solid #343d49;
     border-radius: 12px;
-    background: #1e2329;
+    background: #29313d;
    }
 
    #homeBalanceCard {
@@ -2504,7 +2498,7 @@
 
    #homeBalanceCard >.relative.grid > div:first-child >.flex:first-child {
     margin-bottom: 4px;
-    color: #848e9c;
+    color: #929baa;
     font-size: 12px;
    }
 
@@ -2564,7 +2558,7 @@
     height: 24px;
     margin-bottom: 0;
     background: transparent;
-    color: #848e9c;
+    color: #929baa;
    }
 
    #signedInHomeContent >.home-mobile-actions > button > span:first-child > svg {
@@ -2666,7 +2660,7 @@
 
    #mobileBottomNav {
     min-height: 60px;
-    background: #181a20;
+    background: #202630;
     padding-bottom: max(10px, env(safe-area-inset-bottom));
    }
 
@@ -2674,7 +2668,7 @@
     height: calc(40px + env(safe-area-inset-top));
     min-height: calc(40px + env(safe-area-inset-top));
     border-bottom: 0;
-    background: #181a20;
+    background: #202630;
     padding-top: env(safe-area-inset-top);
     padding-right: max(16px, env(safe-area-inset-right));
     padding-left: max(16px, env(safe-area-inset-left));
@@ -2760,7 +2754,7 @@
     align-content: center;
     gap: 4px;
     border-radius: 10px;
-    background: #1e2329;
+    background: #29313d;
     padding: 10px 6px;
    }
 
@@ -2778,7 +2772,7 @@
     display: grid;
     gap: 2px;
     margin-top: 2px;
-    color: #848e9c;
+    color: #929baa;
     font-size: 10px;
    }
 
@@ -2944,7 +2938,7 @@
 
    #signedHomeBalanceValue {
     color: #f1f3f6;
-    font-size: clamp(24px, 8.5vw, 34px);
+    font-size: clamp(20px, 7vw, 28px);
     font-weight: 700;
     line-height: 1.12;
     letter-spacing: -1.2px;
@@ -3151,14 +3145,14 @@
     color: #929baa;
    }
 
-   @media (max-width: 360px) {
+   @media (max-width: 430px) {
     #signedInMobileBalance > div {
-     align-items: flex-start;
-     flex-direction: column;
+     align-items: center;
+     gap: 8px;
     }
 
     #signedHomeAddFundsButton {
-     width: 100%;
+     min-width: 104px;
     }
    }
   }
@@ -3177,7 +3171,7 @@
    overflow: hidden;
    background:
     radial-gradient(ellipse at 50% 42%, rgb(240 185 11 / 8%), transparent 38%),
-    linear-gradient(155deg, #181a20 0%, #101216 58%, #181a20 100%);
+    linear-gradient(155deg, #202630 0%, #1b222b 58%, #202630 100%);
    color: #eaecef;
    padding: 24px;
    text-align: center;
@@ -3579,7 +3573,7 @@
    </div>
 
    <!-- Leveraged Trading Controls -->
-   <div id="futuresControls" class="p-3 bg-[#1e2329] border-b border-binanceBorder hidden text-xs space-y-3">
+   <div id="futuresControls" class="p-3 bg-[#29313d] border-b border-binanceBorder hidden text-xs space-y-3">
     <div class="flex justify-between items-center">
      <span class="text-binanceMuted">Margin Mode:</span>
      <button id="marginTypeBtn" onclick="toggleMarginType()" class="bg-binanceHover px-2.5 py-1 rounded font-semibold text-white border border-binanceBorder">Cross</button>
@@ -3921,7 +3915,7 @@
     </label>
    </form>
 
-   <section class="hidden rounded-xl bg-[#181a20] px-3 pb-5 md:col-span-4 md:flex md:min-h-[440px] md:flex-col md:items-center md:justify-center md:border md:border-binanceBorder md:px-7 md:py-8" aria-labelledby="guestHomePromoTitle">
+   <section class="hidden rounded-xl bg-[#202630] px-3 pb-5 md:col-span-4 md:flex md:min-h-[440px] md:flex-col md:items-center md:justify-center md:border md:border-binanceBorder md:px-7 md:py-8" aria-labelledby="guestHomePromoTitle">
     <div class="promo-badge-graphic mx-auto mt-1" aria-hidden="true">
      <div class="gold-ticket"><i data-lucide="sparkles" class="h-5 w-5"></i></div>
      <div class="coin-overlay">₿</div>
@@ -4426,7 +4420,6 @@
      <button type="button" aria-pressed="false" onclick="openMarginTrading('Cross')" class="shrink-0 rounded-md px-3 py-2 text-[10px] font-medium text-binanceMuted hover:bg-binanceHover hover:text-white">Cross Margin</button>
      <button type="button" aria-pressed="false" onclick="openMarginTrading('Isolated')" class="shrink-0 rounded-md px-3 py-2 text-[10px] font-medium text-binanceMuted hover:bg-binanceHover hover:text-white">Isolated Margin</button>
     </div>
-    <p class="mt-1 text-[9px] text-binanceMuted">Simulated margin trading · maximum leverage 5x</p>
     <section class="rounded-xl border border-binanceBorder bg-binanceCard px-4 py-3">
      <div class="flex items-center justify-between text-[10px] text-binanceMuted">
       <span>Est. Total Value</span>
@@ -4869,7 +4862,7 @@
  </section>
 
  <div id="mobileHistorySelector" class="fixed inset-0 z-[100] hidden flex items-end justify-center bg-black/70 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="mobileHistorySelectorTitle" onclick="if (event.target === this) closeMobileHistorySelector()" onkeydown="handleMobileHistoryDialogKeydown(event)">
-  <div class="history-selector-sheet w-full max-w-[440px] rounded-t-3xl border border-binanceBorder bg-[#1e2329] px-5 pb-5 pt-3 shadow-2xl sm:rounded-3xl" onclick="event.stopPropagation()">
+  <div class="history-selector-sheet w-full max-w-[440px] rounded-t-3xl border border-binanceBorder bg-[#29313d] px-5 pb-5 pt-3 shadow-2xl sm:rounded-3xl" onclick="event.stopPropagation()">
    <div class="history-selector-handle mb-5 h-1 w-10 rounded-full bg-[#474d57] mx-auto" aria-hidden="true"></div>
    <div class="history-selector-heading">
     <div>
@@ -4898,7 +4891,7 @@
  </div>
 
  <div id="mobileTradesMarketSelector" class="fixed inset-0 z-[100] hidden flex items-end justify-center bg-black/70 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="mobileTradesMarketSelectorTitle" onclick="if (event.target === this) closeMobileTradesMarketSelector()" onkeydown="handleMobileTradesMarketKeydown(event)">
-  <div class="history-selector-sheet w-full max-w-[440px] rounded-t-3xl border border-binanceBorder bg-[#1e2329] px-5 pb-5 pt-3 shadow-2xl sm:rounded-3xl" onclick="event.stopPropagation()">
+  <div class="history-selector-sheet w-full max-w-[440px] rounded-t-3xl border border-binanceBorder bg-[#29313d] px-5 pb-5 pt-3 shadow-2xl sm:rounded-3xl" onclick="event.stopPropagation()">
    <div class="history-selector-handle mb-4 mx-auto h-1 w-10 rounded-full bg-[#474d57]" aria-hidden="true"></div>
    <h2 id="mobileTradesMarketSelectorTitle" class="mb-3 text-lg font-semibold text-binanceText">Select Market</h2>
    <div role="group" aria-label="My Trades market" class="divide-y divide-binanceBorder">
@@ -4913,7 +4906,7 @@
  </div>
 
  <div id="mobileAssetsHistoryCategorySelector" class="fixed inset-0 z-[100] hidden flex items-end justify-center bg-black/70 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="mobileAssetsHistoryCategoryTitle" onclick="if (event.target === this) closeMobileAssetsHistoryCategorySelector()" onkeydown="handleMobileAssetsHistoryCategoryKeydown(event)">
-  <div class="history-selector-sheet w-full max-w-[440px] rounded-t-3xl border border-binanceBorder bg-[#1e2329] px-5 pb-5 pt-3 shadow-2xl sm:rounded-3xl" onclick="event.stopPropagation()">
+  <div class="history-selector-sheet w-full max-w-[440px] rounded-t-3xl border border-binanceBorder bg-[#29313d] px-5 pb-5 pt-3 shadow-2xl sm:rounded-3xl" onclick="event.stopPropagation()">
    <div class="history-selector-handle mb-4 mx-auto h-1 w-10 rounded-full bg-[#474d57]" aria-hidden="true"></div>
    <h2 id="mobileAssetsHistoryCategoryTitle" class="mb-2 text-lg font-semibold text-binanceText">Select history</h2>
    <div role="group" aria-label="Asset history category" class="divide-y divide-binanceBorder">
@@ -14023,27 +14016,7 @@
    }
   }
 
-  async function refreshExchangeApp() {
-   const indicator = document.getElementById('pullToRefreshIndicator');
-   const label = indicator?.querySelector('[data-pull-refresh-label]');
-   const icon = indicator?.querySelector('[data-pull-refresh-icon]');
-   indicator?.classList.add('visible', 'refreshing');
-   if (indicator) indicator.style.setProperty('--pull-refresh-offset', '0.5rem');
-   if (label) label.textContent = 'Refreshing…';
-   if (icon) icon.classList.add('animate-spin');
-   try {
-    if ('serviceWorker' in navigator) {
-     const registration = await navigator.serviceWorker.getRegistration();
-     if (registration) {
-      await Promise.race([
-       registration.update(),
-       new Promise((resolve) => window.setTimeout(resolve, 1500))
-      ]);
-     }
-    }
-   } catch (error) {
-    console.error('Could not check for an Exchange app update before refreshing.', error);
-   }
+  function refreshExchangeApp() {
    window.location.reload();
   }
 
@@ -14057,11 +14030,13 @@
    let pullDistance = 0;
    let tracking = false;
    let readyToRefresh = false;
+   let trackedPage = null;
    const threshold = 74;
 
    const reset = () => {
     tracking = false;
     readyToRefresh = false;
+    trackedPage = null;
     pullDistance = 0;
     indicator.classList.remove('visible', 'refreshing');
     indicator.style.removeProperty('--pull-refresh-offset');
@@ -14071,7 +14046,7 @@
 
    const findPullScrollContainer = (target) => {
     const page = target instanceof Element? target.closest('[data-pull-to-refresh]'): null;
-    if (!page || page.classList.contains('hidden')) return null;
+    if (!page || page.classList.contains('hidden') || page.scrollTop > 0) return null;
     let element = target;
     while (element && element !== page) {
      const overflowY = window.getComputedStyle(element).overflowY;
@@ -14084,9 +14059,10 @@
    };
 
    document.addEventListener('touchstart', (event) => {
-    if (event.touches.length !== 1 || indicator.classList.contains('refreshing')) return;
+    if (event.touches.length !== 1) return;
     if (event.target instanceof Element && event.target.closest('button, a, input, select, textarea, [role="dialog"]')) return;
-    if (!findPullScrollContainer(event.target)) return;
+    trackedPage = findPullScrollContainer(event.target);
+    if (!trackedPage) return;
     startY = event.touches[0].clientY;
     pullDistance = 0;
     tracking = true;
@@ -14094,6 +14070,10 @@
 
    document.addEventListener('touchmove', (event) => {
     if (!tracking || event.touches.length !== 1) return;
+    if (findPullScrollContainer(event.target) !== trackedPage) {
+     reset();
+     return;
+    }
     const distance = event.touches[0].clientY - startY;
     if (distance <= 0) {
      reset();
@@ -16008,7 +15988,7 @@
     ctx.stroke();
    }
    ctx.font = '9px Arial, sans-serif';
-   ctx.fillStyle = '#848e9c';
+   ctx.fillStyle = '#929baa';
    const timeTickCount = Math.min(5, candles.length);
    for (let tick = 0; tick < timeTickCount; tick++) {
     const candleIndex = Math.round(tick * (candles.length - 1) / Math.max(1, timeTickCount - 1));
@@ -16075,7 +16055,7 @@
     candles.forEach((item, index) => {
      const x = padding.left + index * (chartWidth / candles.length);
      const heightVol = (item.volume / maxVolume) * 48;
-     ctx.fillStyle = index % 2 === 0? '#2b3139': '#3b4450';
+     ctx.fillStyle = index % 2 === 0? '#343d49': '#3b4450';
      ctx.fillRect(x + 3, height - 18 - heightVol, barWidth, heightVol);
     });
    }
@@ -16281,7 +16261,7 @@
    const ctx = canvas.getContext('2d');
    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
    ctx.clearRect(0, 0, width, height);
-   ctx.fillStyle = '#1e2329';
+   ctx.fillStyle = '#29313d';
    ctx.fillRect(0, 0, width, height);
 
    const current = Number.isFinite(state.currentPrice) && state.currentPrice > 0
@@ -16341,7 +16321,7 @@
    ctx.lineTo(midX, height - padding.bottom);
    ctx.stroke();
    ctx.restore();
-   ctx.fillStyle = '#848e9c';
+   ctx.fillStyle = '#929baa';
    ctx.font = '9px JetBrains Mono';
    ctx.textAlign = 'left';
    ctx.fillText(formatMoney(minPrice), padding.left, height - 4);
